@@ -59,55 +59,93 @@
   const modules = {
     admin: `
       <div class="cards">
-        <div class="card"><h4>Wanafunzi Wote</h4><div class="val">840 (O & A-Level)</div></div>
-        <div class="card"><h4>Watumishi & Walimu</h4><div class="val">54</div></div>
-        <div class="card"><h4>Akaunti Zinazosubiri Idhini</h4><div class="val" style="color:#d97706;">3 Pending</div></div>
-        <div class="card"><h4>Hali ya Seva & Backup</h4><div class="val" style="color:#16a34a;">100% Salama</div></div>
+        <div class="card"><h4>Database Status</h4><div class="val" style="color:#16a34a;">● Supabase Live</div></div>
+        <div class="card"><h4>Akaunti ya CRDB</h4><div class="val">0150838972100</div></div>
       </div>
       <div class="panel">
-        <h3>Foleni ya Kuidhinisha Akaunti Mpya (User Approval Queue)</h3>
-        <table>
-          <tr><th>Jina Kamili</th><th>Nafasi (Role)</th><th>Namba</th><th>Hatua</th></tr>
-          <tr><td>Mwl. Neema Charles</td><td>Mwalimu (Teacher)</td><td>0754 112 233</td><td><button class="btn btn-green" onclick="alert('Akaunti Imeidhinishwa!')">Approve</button> <button class="btn btn-red">Reject</button></td></tr>
-          <tr><td>Juma Mwita</td><td>Mwanafunzi (Form 3A)</td><td>S.2026/0045</td><td><button class="btn btn-green" onclick="alert('Akaunti Imeidhinishwa!')">Approve</button> <button class="btn btn-red">Reject</button></td></tr>
-        </table>
+        <h3>Watumiaji Waliojisajili (Kutoka Supabase Database)</h3>
+        <button class="btn btn-blue" onclick="loadUsers()">🔄 Pakia Watumiaji Kutoka Database</button>
+        <div id="usersTableArea" style="margin-top:12px;">Bofya kitufe hapo juu kuona waliojisajili...</div>
       </div>`,
     accountant: `
-      <div class="cards">
-        <div class="card" style="border-color:#16a34a;"><h4>CRDB Bank (0150838972100)</h4><div class="val">TZS 380,500,000</div></div>
-        <div class="card"><h4>Pesa Taslimu (Cash Box)</h4><div class="val">TZS 14,200,000</div></div>
-        <div class="card" style="border-color:#dc2626;"><h4>Madeni ya Ada Yaliyobaki</h4><div class="val">TZS 42,800,000</div></div>
-      </div>
       <div class="panel">
-        <h3>Mapokezi ya Fedha: SHULE YA SEKONDARI SANGABUYE E.K (CRDB: 0150838972100) & Cash</h3>
-        <p style="font-size:12px; color:#475569;">Mhasibu (0615 000 305) anaweza kurekodi malipo ya CRDB, Pesa Taslimu (Cash), au Vyakula/Vifaa vya Stoo na kuchapisha risiti ya Thermal Printer (58/80mm).</p>
-        <table>
-          <tr><th>Risiti Na.</th><th>Mwanafunzi</th><th>Njia ya Malipo</th><th>Kiasi (TZS)</th><th>Risiti</th></tr>
-          <tr><td>#SGB-2026-089</td><td>Amina Hassan (Form 4B)</td><td>CRDB Bank (Ref: CRDB9921)</td><td>310,000</td><td><button class="btn btn-blue" onclick="window.print()">🖨️ Print Thermal</button></td></tr>
-          <tr><td>#SGB-2026-090</td><td>Baraka Said (Form 1A)</td><td>Cash (Pesa Taslimu)</td><td>180,000</td><td><button class="btn btn-blue" onclick="window.print()">🖨️ Print Thermal</button></td></tr>
-        </table>
-      </div>`,
-    academic: `
-      <div class="cards">
-        <div class="card"><h4>Mfumo wa Alama</h4><div class="val">CA 30% + Final 70%</div></div>
-        <div class="card"><h4>Vyumba vya Mitihani</h4><div class="val">Viti 40 (Safu 5 x 8)</div></div>
-        <div class="card"><h4>Fomu za NECTA</h4><div class="val">ISAL & CAL Tayari</div></div>
-      </div>
-      <div class="panel">
-        <h3>Uchambuzi wa Matokeo ya NECTA (Division I - IV) & Upangaji wa Vyumba</h3>
-        <button class="btn btn-blue" onclick="alert('Ramani ya Vyumba vya Viti 40, ISAL na CAL imezalishwa kwa PDF!')">📄 Zalisha Viti 40, ISAL & CAL (PDF)</button>
-        <button class="btn btn-green" onclick="window.print()">🖨️ Pakua Master Sheet (A4 PDF)</button>
+        <h3>Rekodi Malipo Mapya: SHULE YA SEKONDARI SANGABUYE E.K (CRDB: 0150838972100) & Cash</h3>
+        <form onsubmit="saveReceipt(event)" style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:12px;">
+          <input type="text" id="stName" required placeholder="Majina Kamili ya Mwanafunzi">
+          <input type="text" id="stReg" required placeholder="Namba ya Usajili (Mfano: S.2026/001)">
+          <select id="payCat" required>
+            <option value="Ada ya Shule">Ada ya Shule (School Fees)</option>
+            <option value="Chakula">Michango ya Chakula</option>
+            <option value="Mitihani">Michango ya Mitihani</option>
+            <option value="Ujenzi">Ujenzi & Maendeleo</option>
+          </select>
+          <select id="payMethod" required>
+            <option value="CRDB_Bank">CRDB Bank (0150838972100)</option>
+            <option value="Cash">Pesa Taslimu (Cash - Ofisi ya Mhasibu)</option>
+            <option value="In_Kind_Store">Vyakula / Vifaa (Stoo)</option>
+          </select>
+          <input type="text" id="bankRef" placeholder="Namba ya Slip ya CRDB (Au andika CASH)">
+          <input type="number" id="payAmount" required placeholder="Kiasi Kilicholipwa (TZS)">
+          <button type="submit" class="btn btn-green" style="grid-column: span 2; padding:12px;">💾 Hifadhi Malipo & Toa Risiti ya Thermal</button>
+        </form>
+        <div id="receiptPreview" style="margin-top:20px;"></div>
       </div>`
   };
+
+  async function loadUsers() {
+    const { data, error } = await db.from('users_profile').select('*').order('created_at', { ascending: false });
+    if (error) { alert(error.message); return; }
+    let html = '<table><tr><th>Jina</th><th>Nafasi</th><th>Namba</th><th>Hali</th><th>Hatua</th></tr>';
+    data.forEach(u => {
+      html += `<tr><td>${u.full_name}</td><td>${u.role}</td><td>${u.reg_or_staff_no || '-'}</td><td><b>${u.status}</b></td>
+      <td><button class="btn btn-green" onclick="approveUser('${u.id}')">Approve</button></td></tr>`;
+    });
+    document.getElementById('usersTableArea').innerHTML = html + '</table>';
+  }
+
+  async function approveUser(id) {
+    await db.from('users_profile').update({ status: 'approved' }).eq('id', id);
+    alert('✅ Akaunti imeidhinishwa!');
+    loadUsers();
+  }
+
+  async function saveReceipt(e) {
+    e.preventDefault();
+    const receipt_number = 'SGB-' + Math.floor(100000 + Math.random() * 900000);
+    const student_name = document.getElementById('stName').value;
+    const student_reg_no = document.getElementById('stReg').value;
+    const payment_category = document.getElementById('payCat').value;
+    const payment_method = document.getElementById('payMethod').value;
+    const bank_ref_no = document.getElementById('bankRef').value || 'CASH';
+    const amount_paid = document.getElementById('payAmount').value;
+    const qr_verification_hash = 'QR-' + Date.now();
+
+    const { error } = await db.from('accounting_receipts').insert([{
+      receipt_number, student_name, student_reg_no, payment_category, payment_method, bank_ref_no, amount_paid, qr_verification_hash
+    }]);
+
+    if (error) { alert('Hitilafu: ' + error.message); return; }
+
+    document.getElementById('receiptPreview').innerHTML = `
+      <div style="border:2px dashed #0f294a; padding:15px; max-width:320px; background:#fff; font-family:monospace;">
+        <center><b>SANGABUYE SECONDARY SCHOOL</b><br>S.L.P 11898, ILEMELA - MWANZA<br>RISITI HALALI YA MALIPO</center><hr>
+        Risiti Na: <b>${receipt_number}</b><br>
+        Mwanafunzi: <b>${student_name}</b> (${student_reg_no})<br>
+        Malipo: ${payment_category}<br>
+        Njia: <b>${payment_method}</b> (Ref: ${bank_ref_no})<br>
+        Akaunti: SHULE YA SEKONDARI SANGABUYE E.K (0150838972100)<br>
+        Kiasi: <b>TZS ${Number(amount_paid).toLocaleString()}/=</b><hr>
+        <center><button class="btn btn-blue" onclick="window.print()">🖨️ Chapisha Risiti (Thermal 58/80mm)</button></center>
+      </div>`;
+  }
+
   function loadModule(key, btn) {
     document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     document.getElementById('pageTitle').innerText = btn.innerText;
-    document.getElementById('mainContent').innerHTML = modules[key] || `<div class="panel"><h3>${btn.innerText}</h3><p>Moduli hii ipo tayari kuunganishwa na majedwali ya Supabase Database (v6.3).</p></div>`;
+    document.getElementById('mainContent').innerHTML = modules[key] || `<div class="panel"><h3>${btn.innerText}</h3><p>Moduli hii imeunganishwa na Supabase Database.</p></div>`;
   }
   function logout() { window.location.href = 'index.html'; }
-  // Auto-Logout baada ya dakika 20 (Usalama wa Data)
-  setTimeout(() => { alert('Muda wa kikao (dakika 20) umeisha. Tafadhali ingia tena.'); logout(); }, 1200000);
   loadModule('admin', document.querySelector('.menu-btn'));
 </script>
 </body>
