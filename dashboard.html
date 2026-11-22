@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashibodi | Sangabuye SIS Portal</title>
+  <script src="https://jsdelivr.net"></script>
+  <script src="supabase-config.js"></script>
   <style>
     * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
     body { margin: 0; background: #f1f5f9; display: flex; min-height: 100vh; color: #1e293b; }
@@ -15,22 +17,20 @@
     .main { flex: 1; display: flex; flex-direction: column; }
     .topbar { background: white; padding: 14px 25px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
     .content { padding: 25px; }
-    .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 15px; margin-bottom: 25px; }
-    .card { background: white; padding: 18px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border-left: 4px solid #1d4ed8; }
-    .card h4 { margin: 0 0 8px; font-size: 12px; color: #64748b; text-transform: uppercase; }
-    .card .val { font-size: 20px; font-weight: bold; color: #0f294a; }
+    .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
+    .card { background: white; padding: 16px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border-left: 4px solid #1d4ed8; }
+    .card h4 { margin: 0 0 6px; font-size: 12px; color: #64748b; }
+    .card .val { font-size: 18px; font-weight: bold; color: #0f294a; }
     .panel { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+    input, select { padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; width: 100%; }
     table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 13px; }
     th, td { padding: 10px; border-bottom: 1px solid #e2e8f0; text-align: left; }
     th { background: #f8fafc; color: #0f294a; }
-    .btn { padding: 7px 12px; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold; }
+    .btn { padding: 8px 14px; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold; }
     .btn-green { background: #16a34a; color: white; }
-    .btn-red { background: #dc2626; color: white; }
     .btn-blue { background: #1d4ed8; color: white; }
-    .logout-btn { background: #dc2626; color: white; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-weight: bold; margin-top: auto; }
+    .logout-btn { background: #dc2626; color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: bold; margin-top: auto; }
   </style>
-  <script src="https://jsdelivr.net"></script>
-<script src="supabase-config.js"></script>
 </head>
 <body>
 <div class="sidebar">
@@ -46,12 +46,11 @@
   <button class="menu-btn" onclick="loadModule('student', this)">🎒 8. Tovuti ya Mwanafunzi</button>
   <button class="logout-btn" onclick="logout()">🚪 Toka Kwenye Mfumo (Logout)</button>
 </div>
+
 <div class="main">
   <div class="topbar">
-    <div><strong id="pageTitle">Dashibodi ya Super Admin & IT</strong> <span style="font-size:12px; color:#16a34a;">● Online (Supabase Ready)</span></div>
-    <div>
-      <button class="btn btn-blue" onclick="location.reload()">🔄 Live Refresh</button>
-    </div>
+    <div><strong id="pageTitle">🛡️ 1. Super Admin & IT</strong> <span style="font-size:12px; color:#16a34a;">● Online</span></div>
+    <button class="btn btn-blue" onclick="location.reload()">🔄 Refresh</button>
   </div>
   <div class="content" id="mainContent"></div>
 </div>
@@ -59,24 +58,33 @@
   const modules = {
     admin: `
       <div class="cards">
-        <div class="card"><h4>Database Status</h4><div class="val" style="color:#16a34a;">● Supabase Live</div></div>
+        <div class="card"><h4>Hali ya Database</h4><div class="val" style="color:#16a34a;">● Supabase Imeunganishwa</div></div>
         <div class="card"><h4>Akaunti ya CRDB</h4><div class="val">0150838972100</div></div>
       </div>
       <div class="panel">
-        <h3>Watumiaji Waliojisajili (Kutoka Supabase Database)</h3>
+        <h3>Watumiaji Waliojisajili (Approval Queue)</h3>
         <button class="btn btn-blue" onclick="loadUsers()">🔄 Pakia Watumiaji Kutoka Database</button>
         <div id="usersTableArea" style="margin-top:12px;">Bofya kitufe hapo juu kuona waliojisajili...</div>
       </div>`,
-       accountant: `
+    director: `
+      <div class="cards">
+        <div class="card" style="border-color:#16a34a;"><h4>CRDB: SHULE YA SEKONDARI SANGABUYE E.K</h4><div class="val">0150838972100</div></div>
+        <div class="card"><h4>Hali ya Uendeshaji</h4><div class="val">O-Level & A-Level</div></div>
+      </div>
+      <div class="panel"><h3>Ripoti Kuu ya Mkurugenzi (Executive Financial & Academic Overview)</h3><p>Muhtasari wa makusanyo ya benki ya CRDB, pesa taslimu (Cash), na maendeleo ya taaluma.</p></div>`,
+    headmaster: `
       <div class="panel">
-        <h3>Rekodi Malipo Mapya: SHULE YA SEKONDARI SANGABUYE E.K (CRDB: 0150838972100) & Cash</h3>
+        <h3>Ofisi ya Mkuu wa Shule (0784 755 173)</h3>
+        <p>Idhini ya Kikao cha Kamati ya Manunuzi, Vocha za Matumizi, Taarifa za Michango ya Wanafunzi, na Gate Pass.</p>
+      </div>`,
+    accountant: `
+      <div class="panel">
+        <h3>Rekodi Malipo: SHULE YA SEKONDARI SANGABUYE E.K (CRDB: 0150838972100) & Cash</h3>
         <form onsubmit="saveReceipt(event)" style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:12px;">
           <input type="text" id="stName" required placeholder="Majina Kamili ya Mwanafunzi">
           <input type="text" id="stReg" required placeholder="Namba ya Usajili (Mfano: S.2026/001)">
-          
-          <!-- SEHEMU YA KUANDIKA AINA YA MCHANGO AU KUCHAGUA -->
           <div style="grid-column: span 2;">
-            <input type="text" id="payCat" list="mchangoList" required placeholder="Andika Aina ya Mchango (Mfano: Ada, Chakula, Mahafali, Sare...)" style="width:100%;">
+            <input type="text" id="payCat" list="mchangoList" required placeholder="Andika Aina ya Mchango (Mfano: Ada, Chakula, Mahafali, Sare...)">
             <datalist id="mchangoList">
               <option value="Ada ya Shule (School Fees)">
               <option value="Mchango wa Chakula">
@@ -86,7 +94,6 @@
               <option value="Tahadhari na Afya">
             </datalist>
           </div>
-
           <select id="payMethod" required>
             <option value="CRDB_Bank">CRDB Bank (0150838972100)</option>
             <option value="Cash">Pesa Taslimu (Cash - Ofisi ya Mhasibu)</option>
@@ -97,24 +104,32 @@
           <button type="submit" class="btn btn-green" style="grid-column: span 2; padding:12px;">💾 Hifadhi Malipo & Tengeneza Risiti</button>
         </form>
         <div id="receiptPreview" style="margin-top:20px;"></div>
-      </div>`
-          </select>
-          <select id="payMethod" required>
-            <option value="CRDB_Bank">CRDB Bank (0150838972100)</option>
-            <option value="Cash">Pesa Taslimu (Cash - Ofisi ya Mhasibu)</option>
-            <option value="In_Kind_Store">Vyakula / Vifaa (Stoo)</option>
-          </select>
-          <input type="text" id="bankRef" placeholder="Namba ya Slip ya CRDB (Au andika CASH)">
-          <input type="number" id="payAmount" required placeholder="Kiasi Kilicholipwa (TZS)">
-          <button type="submit" class="btn btn-green" style="grid-column: span 2; padding:12px;">💾 Hifadhi Malipo & Toa Risiti ya Thermal</button>
-        </form>
-        <div id="receiptPreview" style="margin-top:20px;"></div>
+      </div>`,
+    academic: `
+      <div class="panel">
+        <h3>Ofisi ya Mtaaluma (NECTA Division I–IV, Viti 40, ISAL & CAL)</h3>
+        <p>Mfumo wa alama: CA 30% + Final 70%. Tayari kwa kuchakata matokeo ya O-Level na A-Level.</p>
+      </div>`,
+    teacher: `
+      <div class="panel">
+        <h3>Dashibodi ya Walimu (Uingizaji wa Alama & Kazi za Nyumbani)</h3>
+        <p>Ingiza alama za CA (30%) na Mtihani wa Mwisho (70%) kisha utume kwa Mtaaluma kwa uhakiki.</p>
+      </div>`,
+    parent: `
+      <div class="panel">
+        <h3>Tovuti ya Mzazi (Multi-Child Switcher)</h3>
+        <p>Lipa michango kupitia <b>CRDB Bank: SHULE YA SEKONDARI SANGABUYE E.K (0150838972100)</b> au Cash kwa Mhasibu (0615 000 305).</p>
+      </div>`,
+    student: `
+      <div class="panel">
+        <h3>Tovuti ya Mwanafunzi (Matokeo, Assignments & Online CBT)</h3>
+        <p>Pakua kazi za nyumbani, fanya mitihani ya majaribio (CBT), na angalia ratiba yako.</p>
       </div>`
   };
-
   async function loadUsers() {
+    if (typeof db === 'undefined') { alert('Hakikisha faili la supabase-config.js lipo sahihi.'); return; }
     const { data, error } = await db.from('users_profile').select('*').order('created_at', { ascending: false });
-    if (error) { alert(error.message); return; }
+    if (error) { alert('Hitilafu: ' + error.message); return; }
     let html = '<table><tr><th>Jina</th><th>Nafasi</th><th>Namba</th><th>Hali</th><th>Hatua</th></tr>';
     data.forEach(u => {
       html += `<tr><td>${u.full_name}</td><td>${u.role}</td><td>${u.reg_or_staff_no || '-'}</td><td><b>${u.status}</b></td>
@@ -125,7 +140,7 @@
 
   async function approveUser(id) {
     await db.from('users_profile').update({ status: 'approved' }).eq('id', id);
-    alert('✅ Akaunti imeidhinishwa!');
+    alert('Akaunti imeidhinishwa!');
     loadUsers();
   }
 
@@ -141,20 +156,17 @@
     const qr_verification_hash = 'QR-' + Date.now();
     const tarehe = new Date().toLocaleString('sw-TZ');
 
-    const { error } = await db.from('accounting_receipts').insert([{
-      receipt_number, student_name, student_reg_no, payment_category, payment_method, bank_ref_no, amount_paid, qr_verification_hash
-    }]);
-
-    if (error) { alert('Hitilafu: ' + error.message); return; }
+    if (typeof db !== 'undefined') {
+      const { error } = await db.from('accounting_receipts').insert([{
+        receipt_number, student_name, student_reg_no, payment_category, payment_method, bank_ref_no, amount_paid, qr_verification_hash
+      }]);
+      if (error) { alert('Hitilafu ya Database: ' + error.message); return; }
+    }
 
     document.getElementById('receiptPreview').innerHTML = `
       <div id="printableReceipt" style="border:2px dashed #0f294a; padding:15px; max-width:300px; background:#fff; font-family:monospace; font-size:12px;">
         <div style="text-align:center;">
-          <b>SANGABUYE SECONDARY SCHOOL</b><br>
-          S.L.P 11898, ILEMELA - MWANZA<br>
-          Simu: 0784 755 173 / 0615 000 305<br>
-          --------------------------------<br>
-          <b>RISITI HALALI YA MALIPO</b>
+          <b>SANGABUYE SECONDARY SCHOOL</b><br>S.L.P 11898, ILEMELA - MWANZA<br>Simu: 0784 755 173 / 0615 000 305<br>--------------------------------<br><b>RISITI HALALI YA MALIPO</b>
         </div><br>
         <b>Risiti Na:</b> ${receipt_number}<br>
         <b>Tarehe:</b> ${tarehe}<br>
@@ -167,33 +179,27 @@
         --------------------------------<br>
         <div style="font-size:14px;"><b>KIASI: TZS ${Number(amount_paid).toLocaleString()}/=</b></div>
         --------------------------------<br>
-        <div style="text-align:center; font-size:10px;">
-          Uthibitisho: ${qr_verification_hash}<br>
-          Asante kwa kushirikiana nasi!
-        </div>
-      </div>
-      <br>
+        <div style="text-align:center; font-size:10px;">Uthibitisho: ${qr_verification_hash}<br>Asante kwa kushirikiana nasi!</div>
+      </div><br>
       <button class="btn btn-blue" onclick="printThermalReceipt()">🖨️ Chapisha Risiti Sasa (Print / Save PDF)</button>`;
   }
 
   function printThermalReceipt() {
     const content = document.getElementById('printableReceipt').innerHTML;
     const printWindow = window.open('', '', 'width=350,height=600');
-    printWindow.document.write('<html><head><title>Risiti - Sangabuye SIS</title>');
-    printWindow.document.write('<style>body{font-family:monospace; font-size:12px; width:280px; margin:10px auto;}</style>');
-    printWindow.document.write('</head><body>' + content + '</body></html>');
+    printWindow.document.write('<html><head><title>Risiti - Sangabuye SIS</title><style>body{font-family:monospace; font-size:12px; width:280px; margin:10px auto;}</style></head><body>' + content + '</body></html>');
     printWindow.document.close();
     printWindow.focus();
     setTimeout(() => { printWindow.print(); printWindow.close(); }, 300);
   }
 
-
   function loadModule(key, btn) {
     document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     document.getElementById('pageTitle').innerText = btn.innerText;
-    document.getElementById('mainContent').innerHTML = modules[key] || `<div class="panel"><h3>${btn.innerText}</h3><p>Moduli hii imeunganishwa na Supabase Database.</p></div>`;
+    document.getElementById('mainContent').innerHTML = modules[key];
   }
+
   function logout() { window.location.href = 'index.html'; }
   loadModule('admin', document.querySelector('.menu-btn'));
 </script>
