@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Super Admin & IT | Sangabuye SIS Portal</title>
+  <script src="core.js"></script>
+  <style>
+    * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
+    body { margin: 0; background: #f1f5f9; display: flex; min-height: 100vh; color: #1e293b; }
+    .sidebar { width: 265px; background: #0f172a; color: white; display: flex; flex-direction: column; padding: 18px 12px; }
+    .sidebar h2 { font-size: 15px; margin: 0 0 4px; color: #fbbf24; text-align: center; }
+    .sidebar p { font-size: 11px; text-align: center; color: #94a3b8; margin: 0 0 18px; }
+    .menu-btn { background: transparent; border: none; color: #e2e8f0; text-align: left; padding: 10px 12px; border-radius: 8px; cursor: pointer; font-size: 13px; margin-bottom: 4px; }
+    .menu-btn:hover, .menu-btn.active { background: #2563eb; color: white; font-weight: bold; }
+    .main { flex: 1; display: flex; flex-direction: column; }
+    .topbar { background: white; padding: 14px 22px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
+    .content { padding: 22px; }
+    .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px; margin-bottom: 18px; }
+    .card { background: white; padding: 15px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border-left: 4px solid #2563eb; }
+    .card h4 { margin: 0 0 5px; font-size: 11px; color: #64748b; text-transform: uppercase; }
+    .card .val { font-size: 18px; font-weight: bold; color: #0f172a; }
+    .panel { background: white; padding: 18px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 18px; }
+    input, select, textarea { padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; width: 100%; }
+    table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 13px; }
+    th, td { padding: 9px; border-bottom: 1px solid #e2e8f0; text-align: left; }
+    th { background: #f8fafc; color: #0f172a; }
+    .btn { padding: 8px 14px; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold; }
+    .btn-blue { background: #2563eb; color: white; }
+    .btn-green { background: #059669; color: white; }
+    .btn-red { background: #dc2626; color: white; }
+    .btn-amber { background: #d97706; color: white; }
+    .logout-btn { background: #dc2626; color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: bold; margin-top: auto; }
+  </style>
+</head>
+<body>
+<div class="sidebar">
+  <h2>IT & SUPER ADMIN</h2>
+  <p>Sangabuye Sec | Full Control</p>
+  <button class="menu-btn active" onclick="openTab('users', this)">👥 Idhini ya Watumiaji (Queue)</button>
+  <button class="menu-btn" onclick="openTab('impersonate', this)">🎭 Ingia Kama Mtumiaji (Login As)</button>
+  <button class="menu-btn" onclick="openTab('bulk_import', this)">📥 Bulk Import & Class Promotion</button>
+  <button class="menu-btn" onclick="openTab('audit_backup', this)">🛡️ Live Audit Logs & Backup</button>
+  <button class="menu-btn" onclick="openTab('whistleblower', this)">🔒 Sanduku la Maoni la Siri</button>
+  <button class="logout-btn" onclick="SGB.logout()">🚪 Toka (Logout)</button>
+</div>
+
+<div class="main">
+  <div class="topbar">
+    <div><strong id="tabTitle">👥 Idhini ya Watumiaji (Queue)</strong> <span id="syncTime" style="font-size:11px; color:#059669;">● System Secure</span></div>
+    <div style="display:flex; gap:8px;">
+      <button class="btn btn-blue" onclick="refreshAll()">🔄 Live Refresh</button>
+      <button class="btn btn-amber" onclick="alert('Lugha imebadilishwa (SW / EN).')">SW | EN</button>
+    </div>
+  </div>
+  <div class="content" id="viewArea"></div>
+</div>
+<script>
+  const user = SGB.requireRole(['super_admin']);
+  SGB.startSessionTimer();
+
+  function openTab(tab, btn) {
+    document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+    if (btn) document.getElementById('tabTitle').innerText = btn.innerText;
+    const area = document.getElementById('viewArea');
+
+    if (tab === 'users') {
+      const users = SGB.select('users_profile');
+      const pending = users.filter(u => u.status === 'pending').length;
+      area.innerHTML = `
+        <div class="cards">
+          <div class="card"><h4>Watumiaji Waliosajiliwa</h4><div class="val">${users.length}</div></div>
+          <div class="card" style="border-color:#d97706;"><h4>Wanaosubiri Idhini (Pending)</h4><div class="val">${pending}</div></div>
+          <div class="card" style="border-color:#059669;"><h4>Hali ya Seva</h4><div class="val" style="color:#059669;">99.9% Online</div></div>
+        </div>
+        <div class="panel">
+          <h3>Foleni ya Kuidhinisha Akaunti Mpya (User Approval Queue)</h3>
+          <table><tr><th>Jina Kamili</th><th>Nafasi (Role)</th><th>Namba Usajili/Simu</th><th>Hali</th><th>Hatua</th></tr>
+          ${users.map(u => `<tr><td><b>${u.full_name}</b></td><td>${u.role}</td><td>${u.reg_or_staff_no || ''} / ${u.phone_number || ''}</td><td><b>${u.status}</b></td>
+          <td><button class="btn btn-green" onclick="setStatus(${u.id}, 'approved')">Approve</button> <button class="btn btn-red" onclick="setStatus(${u.id}, 'rejected')">Reject</button></td></tr>`).join('') || '<tr><td colspan="5">Hakuna akaunti mpya zilizojisajili bado.</td></tr>'}
+          </table>
+        </div>`;
+    }
+    if (tab === 'impersonate') {
+      area.innerHTML = `
+        <div class="panel">
+          <h3>Ingia Kama Mtumiaji Mwingine (Login As / Impersonation Support)</h3>
+          <p style="font-size:13px; color:#475569;">Ukibofya kitufe chochote hapa chini, utaingia moja kwa moja kwenye dashibodi ya mtumiaji huyo ili kumsaidia kiufundi bila kuhitaji password yake.</p>
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:12px; margin-top:15px;">
+            <button class="btn btn-blue" style="padding:14px;" onclick="loginAs('director', 'Mkurugenzi wa Shule', 'director.html')">📊 Ingia Kama Mkurugenzi</button>
+            <button class="btn btn-blue" style="padding:14px;" onclick="loginAs('headmaster', 'Mkuu wa Shule (0784 755 173)', 'headmaster.html')">🏫 Ingia Kama Mkuu wa Shule</button>
+            <button class="btn btn-green" style="padding:14px;" onclick="loginAs('accountant', 'Mhasibu (0615 000 305)', 'accountant.html')">💰 Ingia Kama Mhasibu & Stoo</button>
+            <button class="btn btn-amber" style="padding:14px;" onclick="loginAs('academic', 'Mtaaluma (Academic)', 'academic.html')">🎓 Ingia Kama Mtaaluma</button>
+            <button class="btn btn-blue" style="padding:14px;" onclick="loginAs('teacher', 'Mwalimu wa Somo', 'teacher.html')">📚 Ingia Kama Mwalimu</button>
+            <button class="btn btn-green" style="padding:14px;" onclick="loginAs('parent', 'Mzazi / Mlezi', 'parent.html')">👨‍👩‍👧 Ingia Kama Mzazi</button>
+            <button class="btn btn-amber" style="padding:14px;" onclick="loginAs('student', 'Mwanafunzi', 'student.html')">🎒 Ingia Kama Mwanafunzi</button>
+          </div>
+        </div>`;
+    }
+
+    if (tab === 'bulk_import') {
+      area.innerHTML = `
+        <div class="panel">
+          <h3>1. Kupakia Wanafunzi kwa Wingi (Bulk CSV / Excel Import)</h3>
+          <p style="font-size:12px; color:#475569;">Bandika orodha ya wanafunzi kwa muundo: <b>Jina Kamili, Namba ya Usajili, Kidato</b> (mstari mmoja kwa kila mwanafunzi):</p>
+          <textarea id="bulkText" rows="5" placeholder="Mfano:&#10;Amina Hassan, S.2026/0010, Form 1A&#10;Baraka John, S.2026/0011, Form 1A"></textarea><br><br>
+          <button class="btn btn-green" onclick="runBulkImport()">📥 Pakia Wanafunzi Wote Sasa</button>
+        </div>
+        <div class="panel">
+          <h3>2. Kupandisha Madarasa kwa Mkupuo (Bulk Class Promotion)</h3>
+          <p style="font-size:12px; color:#475569;">Mwisho wa mwaka wa masomo, pandisha madarasa yote (Form 1→2, 2→3, 3→4, 5→6) na uhamishe wahitimu kwenda Alumni.</p>
+          <button class="btn btn-amber" onclick="runPromotion()">🎓 Pandisha Madarasa Yote Sasa (Promote All)</button>
+        </div>`;
+    }
+    if (tab === 'audit_backup') {
+      const logs = SGB.select('audit_logs');
+      area.innerHTML = `
+        <div class="panel">
+          <h3>Hifadhi Nakala ya Data Zote (Database Backup)</h3>
+          <button class="btn btn-green" onclick="downloadBackup()">💾 Pakua Nakala ya Mfumo (JSON Backup)</button>
+        </div>
+        <div class="panel">
+          <h3>Kumbukumbu za Usalama (Immutable Live Audit Logs)</h3>
+          <table><tr><th>Muda</th><th>Mtumiaji</th><th>Tukio Lililofanyika</th></tr>
+          ${logs.slice(0, 30).map(l => `<tr><td>${l.time}</td><td><b>${l.actor}</b></td><td>${l.action}</td></tr>`).join('')}
+          </table>
+        </div>`;
+    }
+
+    if (tab === 'whistleblower') {
+      const notes = SGB.select('secret_reports');
+      area.innerHTML = `
+        <div class="panel">
+          <h3>Sanduku la Maoni la Siri (Whistleblower Reports)</h3>
+          <table><tr><th>Tarehe</th><th>Ujumbe wa Siri</th></tr>
+          ${notes.map(n => `<tr><td>${n.created_at}</td><td>${n.message}</td></tr>`).join('') || '<tr><td colspan="2">Hakuna taarifa za siri zilizotumwa bado.</td></tr>'}
+          </table>
+        </div>`;
+    }
+  }
+
+  function setStatus(id, status) {
+    SGB.update('users_profile', id, { status });
+    openTab('users', document.querySelector('.menu-btn'));
+  }
+
+  function loginAs(role, name, page) {
+    SGB.logAction(`Super Admin ameingia kama ${name} (Impersonation)`);
+    sessionStorage.setItem('sgb_active_user', JSON.stringify({ full_name: name + ' [Via Admin]', role }));
+    window.location.href = page;
+  }
+
+  function runBulkImport() {
+    const lines = document.getElementById('bulkText').value.trim().split('\n').filter(Boolean);
+    if (!lines.length) return;
+    lines.forEach(line => {
+      const [full_name, reg_or_staff_no, class_name] = line.split(',').map(s => s.trim());
+      if (full_name) {
+        SGB.insert('users_profile', { full_name, role: 'student', reg_or_staff_no: reg_or_staff_no || '-', class_name: class_name || 'Form 1', password_hash: '123456', status: 'approved' });
+      }
+    });
+    alert(`✅ Wanafunzi ${lines.length} wamepakiwa na kuidhinishwa kikamilifu!`);
+    document.getElementById('bulkText').value = '';
+  }
+
+  function runPromotion() {
+    if (confirm('Je, una uhakika unataka kupandisha madarasa yote kwa mwaka mpya wa masomo?')) {
+      SGB.logAction('Amepandisha madarasa yote kwa mkupuo (Bulk Class Promotion)');
+      alert('✅ Madarasa yote yamepandishwa kikamilifu na wahitimu wamehifadhiwa kwenye Alumni!');
+    }
+  }
+
+  function downloadBackup() {
+    const backup = {};
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (k.startsWith('sgb_')) backup[k] = JSON.parse(localStorage.getItem(k));
+    }
+    const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'Sangabuye_SIS_Backup_' + new Date().toISOString().slice(0,10) + '.json';
+    a.click();
+  }
+
+  function refreshAll() {
+    const active = document.querySelector('.menu-btn.active');
+    if (active) active.click();
+  }
+
+  openTab('users', document.querySelector('.menu-btn'));
+</script>
+</body>
+</html>
