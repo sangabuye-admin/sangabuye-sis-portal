@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashibodi ya Mtaaluma | Sangabuye SIS Portal</title>
+  <title>Ofisi ya Taaluma (NECTA Standard) | Sangabuye SIS Portal</title>
   <script src="core.js"></script>
   <style>
     * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
     body { margin: 0; background: #f1f5f9; display: flex; min-height: 100vh; color: #1e293b; }
-    .sidebar { width: 265px; background: #1e1b4b; color: white; display: flex; flex-direction: column; padding: 18px 12px; }
+    .sidebar { width: 270px; background: #1e1b4b; color: white; display: flex; flex-direction: column; padding: 18px 12px; }
     .sidebar h2 { font-size: 15px; margin: 0 0 4px; color: #fde68a; text-align: center; }
     .sidebar p { font-size: 11px; text-align: center; color: #c7d2fe; margin: 0 0 18px; }
     .menu-btn { background: transparent; border: none; color: #e0e7ff; text-align: left; padding: 10px 12px; border-radius: 8px; cursor: pointer; font-size: 13px; margin-bottom: 4px; }
@@ -16,40 +16,42 @@
     .main { flex: 1; display: flex; flex-direction: column; }
     .topbar { background: white; padding: 14px 22px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
     .content { padding: 22px; }
-    .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px; margin-bottom: 18px; }
+    .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-bottom: 18px; }
     .card { background: white; padding: 15px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border-left: 4px solid #4338ca; }
     .card h4 { margin: 0 0 5px; font-size: 11px; color: #64748b; text-transform: uppercase; }
     .card .val { font-size: 18px; font-weight: bold; color: #1e1b4b; }
     .panel { background: white; padding: 18px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 18px; }
-    input, select { padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; width: 100%; }
-    table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 13px; }
-    th, td { padding: 9px; border-bottom: 1px solid #e2e8f0; text-align: left; }
+    input, select, textarea { padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; width: 100%; }
+    table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 12.5px; }
+    th, td { padding: 8px; border: 1px solid #e2e8f0; text-align: left; }
     th { background: #f8fafc; color: #1e1b4b; }
     .btn { padding: 8px 14px; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold; }
     .btn-indigo { background: #4338ca; color: white; }
     .btn-green { background: #059669; color: white; }
     .btn-amber { background: #d97706; color: white; }
+    .btn-red { background: #dc2626; color: white; }
     .logout-btn { background: #dc2626; color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: bold; margin-top: auto; }
   </style>
 </head>
 <body>
 <div class="sidebar">
   <h2>OFISI YA MTAALUMA</h2>
-  <p>Sangabuye Sec | O & A-Level</p>
-  <button class="menu-btn active" onclick="openTab('necta_results', this)">📊 Matokeo & NECTA Division</button>
-  <button class="menu-btn" onclick="openTab('seating_isal', this)">🪑 Viti 40, ISAL & CAL (PDF)</button>
-  <button class="menu-btn" onclick="openTab('report_card', this)">📄 Ripoti ya Mwanafunzi (A4)</button>
-  <button class="menu-btn" onclick="openTab('analytics', this)">📈 Uchambuzi & Remedial List</button>
-  <button class="menu-btn" onclick="openTab('timetable', this)">🗓️ Smart Timetable (Clash-Free)</button>
-  <button class="menu-btn" onclick="openTab('subjects_map', this)">📚 Tahasusi & Masomo (Mapping)</button>
+  <p>Sangabuye Sec | NECTA Standard</p>
+  <button class="menu-btn active" onclick="openTab('exams_ctrl', this)">📝 1. Usimamizi wa Mitihani & Publish</button>
+  <button class="menu-btn" onclick="openTab('necta_master', this)">📊 2. Master Sheet (O & A-Level NECTA)</button>
+  <button class="menu-btn" onclick="openTab('seating_isal', this)">🪑 3. Viti 40 (Real Mix), ISAL & CAL</button>
+  <button class="menu-btn" onclick="openTab('analytics_gpa', this)">📈 4. Kijinsia (M/F), GPA & Term Trend</button>
+  <button class="menu-btn" onclick="openTab('report_card', this)">📄 5. Ripoti Binafsi (A4 PDF)</button>
+  <button class="menu-btn" onclick="openTab('subjects_map', this)">📚 6. Tahasusi & Masomo ya Hiari</button>
+  <button class="menu-btn" onclick="openTab('timetable', this)">🗓️ 7. Smart Timetable (Clash-Free)</button>
   <button class="logout-btn" onclick="SGB.logout()">🚪 Toka (Logout)</button>
 </div>
 
 <div class="main">
   <div class="topbar">
-    <div><strong id="tabTitle">📊 Matokeo & NECTA Division</strong> <span id="syncTime" style="font-size:11px; color:#4338ca;"></span></div>
+    <div><strong id="tabTitle">📝 1. Usimamizi wa Mitihani & Publish</strong> <span id="syncTime" style="font-size:11px; color:#4338ca;"></span></div>
     <div style="display:flex; gap:8px;">
-      <button class="btn btn-indigo" onclick="refreshAll()">🔄 Live Refresh</button>
+      <button class="btn btn-indigo" onclick="document.querySelector('.menu-btn.active').click()">🔄 Live Refresh</button>
       <button class="btn btn-amber" onclick="alert('Lugha imebadilishwa (SW / EN).')">SW | EN</button>
     </div>
   </div>
@@ -67,11 +69,21 @@
     document.getElementById('stList').innerHTML = Array.from(names).map(n => `<option value="${n}">`).join('');
   }
 
-  function calcDiv(pts) {
+  // Kanuni ya NECTA O-Level (Masomo 7 Bora: 7-35)
+  function calcOLevelDiv(pts) {
     if (pts >= 7 && pts <= 17) return 'Division I';
     if (pts >= 18 && pts <= 21) return 'Division II';
     if (pts >= 22 && pts <= 25) return 'Division III';
     if (pts >= 26 && pts <= 33) return 'Division IV';
+    return 'Division 0';
+  }
+
+  // Kanuni ya NECTA A-Level (Masomo 3 ya Tahasusi: 3-21)
+  function calcALevelDiv(pts) {
+    if (pts >= 3 && pts <= 9) return 'Division I';
+    if (pts >= 10 && pts <= 12) return 'Division II';
+    if (pts >= 13 && pts <= 17) return 'Division III';
+    if (pts >= 18 && pts <= 19) return 'Division IV';
     return 'Division 0';
   }
 
@@ -83,58 +95,87 @@
     updateNames();
     const area = document.getElementById('viewArea');
 
-    if (tab === 'necta_results') {
-      const marks = SGB.select('exam_results');
-      const bySt = {};
-      marks.forEach(m => {
-        const k = m.student_name.toLowerCase();
-        if (!bySt[k]) bySt[k] = { name: m.student_name, pts: [], scores: [] };
-        if (m.points > 0) bySt[k].pts.push(Number(m.points));
-        if (m.grade !== 'X') bySt[k].scores.push(Number(m.total_score));
-      });
-
-      const ranked = Object.values(bySt).map(s => {
-        const best7 = s.pts.sort((a,b) => a - b).slice(0, 7);
-        const sumPts = best7.reduce((a,b) => a + b, 0);
-        const totalM = s.scores.reduce((a,b) => a + b, 0);
-        const avg = s.scores.length ? (totalM / s.scores.length).toFixed(1) : 0;
-        const div = best7.length >= 7 ? calcDiv(sumPts) : `Masomo (${best7.length}/7)`;
-        return { ...s, sumPts, totalM, avg, div };
-      }).sort((a,b) => b.avg - a.avg);
-
+    if (tab === 'exams_ctrl') {
+      const exams = SGB.select('exams_list');
       area.innerHTML = `
-        <div class="cards">
-          <div class="card"><h4>Mfumo wa Alama</h4><div class="val">CA 30% + Final 70%</div></div>
-          <div class="card"><h4>Wanafunzi Waliofanya</h4><div class="val">${ranked.length}</div></div>
-          <div class="card"><h4>Alama ya Mgonjwa</h4><div class="val">'X' (Haiharibu Wastani)</div></div>
-        </div>
         <div class="panel">
-          <h3>Master Result Sheet (Standard & NECTA Format)</h3>
-          <div style="display:flex; gap:10px; margin-bottom:12px;">
-            <button class="btn btn-indigo" onclick="printSection('masterPrint')">🖨️ Pakua Master Sheet (A4 Landscape PDF)</button>
-            <button class="btn btn-green" onclick="exportCSV()">📊 Pakua Excel (.csv)</button>
-          </div>
-          <div id="masterPrint">
-            <h4>SANGABUYE SECONDARY SCHOOL — MATOKEO YA JUMLA & NAFASI (POSITION)</h4>
-            <table><tr><th>Nafasi (Pos)</th><th>Jina la Mwanafunzi</th><th>Jumla (Total)</th><th>Wastani (Avg)</th><th>Pointi (7 Bora)</th><th>NECTA Division</th></tr>
-            ${ranked.map((r, idx) => `<tr><td><b>#${idx + 1}</b></td><td><b>${r.name}</b></td><td>${r.totalM}</td><td>${r.avg}%</td><td>${r.sumPts}</td><td><b style="color:#4338ca;">${r.div}</b></td></tr>`).join('') || '<tr><td colspan="6">Hakuna alama zilizotumwa na walimu bado.</td></tr>'}
-            </table>
-          </div>
+          <h3>Unda Mtihani Mpya (Exam Creation & Lock/Publish Control)</h3>
+          <form onsubmit="createExam(event)" style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:15px;">
+            <input type="text" id="exTitle" required placeholder="Jina la Mtihani (Mfano: Terminal Exam 2026)">
+            <select id="exLevel"><option value="O-Level">O-Level (Form 1 - 4)</option><option value="A-Level">A-Level (Form 5 - 6)</option></select>
+            <select id="exTerm"><option value="Term I">Muhula wa I (Term I)</option><option value="Term II">Muhula wa II (Term II)</option></select>
+            <button type="submit" class="btn btn-indigo" style="grid-column: span 3;">➕ Fungua Mtihani Mpya</button>
+          </form>
+          <table><tr><th>Jina la Mtihani</th><th>Ngazi</th><th>Muhula</th><th>Hali (Status)</th><th>Udhibiti (Lock / Publish)</th></tr>
+          ${exams.map(e => `<tr><td><b>${e.title}</b></td><td>${e.level}</td><td>${e.term}</td><td><b>${e.status}</b></td>
+          <td>
+            <button class="btn btn-amber" onclick="SGB.update('exams_list', ${e.id}, {status:'Locked (Alama Zimefungwa)'}); openTab('exams_ctrl')">🔒 Lock Marks</button>
+            <button class="btn btn-green" onclick="SGB.update('exams_list', ${e.id}, {status:'Published (Yamechapishwa Kwa Wazazi)'}); openTab('exams_ctrl')">📢 Publish Results</button>
+          </td></tr>`).join('') || '<tr><td colspan="5">Hakuna mtihani ulioundwa bado.</td></tr>'}
+          </table>
         </div>`;
     }
+    if (tab === 'necta_master') {
+      area.innerHTML = `
+        <div class="panel">
+          <h3>Master Result Sheet (Chagua Ngazi & Muundo wa Ripoti)</h3>
+          <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:15px;">
+            <select id="msLevel" onchange="renderMasterSheet()">
+              <option value="O-Level">O-Level (Form 1–4 | Masomo 7 Bora)</option>
+              <option value="A-Level">A-Level (Form 5–6 | Principal 3)</option>
+            </select>
+            <select id="msFormat" onchange="renderMasterSheet()">
+              <option value="NECTA">Muundo wa NECTA (Cand No, Sex, Agg, Div, Subjects)</option>
+              <option value="STANDARD">Muundo wa Kawaida (Pos, Name, Total, Avg, Grade)</option>
+            </select>
+            <button class="btn btn-indigo" onclick="printSection('masterPrintArea')">🖨️ Pakua A4 Landscape PDF</button>
+          </div>
+          <div id="masterPrintArea"></div>
+        </div>`;
+      renderMasterSheet();
+    }
+
     if (tab === 'seating_isal') {
       area.innerHTML = `
         <div class="panel">
-          <h3>Upangaji wa Vyumba vya Mitihani (Viti 40 — Safu 5 x 8), ISAL & CAL</h3>
+          <h3>Upangaji wa Viti 40 (Real Student Anti-Cheating Mix), ISAL & CAL</h3>
+          <p style="font-size:12px; color:#475569;">Mfumo unavuta majina halisi ya wanafunzi waliosajiliwa na kuwachanganya kwenye vyumba vya viti 40 (Safu 5 x 8).</p>
           <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:15px;">
-            <input type="text" id="exRoom" placeholder="Jina la Chumba (Mfano: Form 4 Room 01)">
-            <input type="text" id="exSubj" placeholder="Somo (Mfano: 012 History)">
+            <input type="text" id="exRoom" value="Chumba 01 (Hall A)" placeholder="Jina la Chumba">
+            <input type="text" id="exSubj" value="012 History" placeholder="Somo & Msimbo">
             <input type="date" id="exDate">
-            <button class="btn btn-indigo" onclick="genSeating()">🪑 1. Ramani ya Viti 40</button>
-            <button class="btn btn-green" onclick="genISAL()">📋 2. Zalisha Fomu ya ISAL</button>
-            <button class="btn btn-amber" onclick="genCAL()">📑 3. Zalisha Fomu ya CAL</button>
+            <button class="btn btn-indigo" onclick="genRealSeating()">🪑 1. Panga Viti 40 (Majina Halisi)</button>
+            <button class="btn btn-green" onclick="genRealISAL()">📋 2. Zalisha Fomu ya ISAL</button>
+            <button class="btn btn-amber" onclick="genRealCAL()">📑 3. Zalisha Fomu ya CAL</button>
           </div>
           <div id="examFormsOutput"></div>
+        </div>`;
+    }
+    if (tab === 'analytics_gpa') {
+      const marks = SGB.select('exam_results');
+      const bySubj = {};
+      marks.forEach(m => {
+        if (m.grade === 'X') return;
+        if (!bySubj[m.subject_name]) bySubj[m.subject_name] = { count: 0, pts: 0, pass: 0 };
+        bySubj[m.subject_name].count++;
+        bySubj[m.subject_name].pts += Number(m.points);
+        if (Number(m.points) <= 4) bySubj[m.subject_name].pass++;
+      });
+
+      const remedial = marks.filter(m => Number(m.total_score) < 35 && m.grade !== 'X');
+
+      area.innerHTML = `
+        <div class="panel">
+          <h3>1. Uchambuzi wa Ufaulu Kila Somo (Subject GPA & Pass Rate)</h3>
+          <table><tr><th>Somo</th><th>Watahiniwa</th><th>Waliofaulu (A–D)</th><th>Wastani wa GPA</th></tr>
+          ${Object.entries(bySubj).map(([sub, d]) => `<tr><td><b>${sub}</b></td><td>${d.count}</td><td>${d.pass} (${Math.round((d.pass/d.count)*100)}%)</td><td><b>${(d.pts/d.count).toFixed(2)}</b></td></tr>`).join('') || '<tr><td colspan="4">Hakuna alama bado.</td></tr>'}
+          </table>
+        </div>
+        <div class="panel">
+          <h3>2. Mlinganisho wa Mwenendo wa Wanafunzi (Term-to-Term Trend & Remedial List &lt; 35%)</h3>
+          <table><tr><th>Mwanafunzi</th><th>Somo</th><th>Alama</th><th>Daraja</th><th>Hali ya Mwenendo</th></tr>
+          ${remedial.map(r => `<tr><td><b>${r.student_name}</b></td><td>${r.subject_name}</td><td style="color:#dc2626;"><b>${r.total_score}%</b></td><td>${r.grade}</td><td>⚠️ Inahitaji Remedial</td></tr>`).join('') || '<tr><td colspan="5">Hakuna mwanafunzi wa Remedial kwa sasa.</td></tr>'}
+          </table>
         </div>`;
     }
 
@@ -145,22 +186,27 @@
           <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:15px;">
             <input type="text" id="rcName" list="stList" placeholder="Andika herufi chache za jina la mwanafunzi...">
             <input type="text" id="rcClass" placeholder="Kidato/Mkondo (Mfano: Form 4A)">
-            <input type="text" id="rcTeacherComment" placeholder="Maoni ya Mwalimu wa Darasa">
-            <input type="text" id="rcHMComment" value="Juhudi zaidi zinahitajika. Hongera." placeholder="Maoni ya Mkuu wa Shule">
+            <input type="text" id="rcTeacherComment" value="Ameonesha bidii nzuri darasani." placeholder="Maoni ya Mwalimu wa Darasa">
+            <input type="text" id="rcHMComment" value="Hongera, ongeza juhudi zaidi." placeholder="Maoni ya Mkuu wa Shule">
             <button class="btn btn-indigo" style="grid-column: span 2;" onclick="buildReportCard()">📄 Tengeneza Ripoti ya A4 PDF</button>
           </div>
           <div id="rcOutput"></div>
         </div>`;
     }
-    if (tab === 'analytics') {
-      const marks = SGB.select('exam_results');
-      const remedial = marks.filter(m => Number(m.total_score) < 35 && m.grade !== 'X');
+
+    if (tab === 'subjects_map') {
+      const maps = SGB.select('student_subjects');
       area.innerHTML = `
         <div class="panel">
-          <h3>Uchambuzi Yakinifu & Orodha ya Wanafunzi wa Msaada Maalum (Remedial List &lt; 35%)</h3>
-          <p style="font-size:12px; color:#475569;">Wanafunzi waliopata chini ya alama 35% wanapendekezwa kuingia kwenye programu ya masomo ya ziada (Remedial).</p>
-          <table><tr><th>Mwanafunzi</th><th>Somo</th><th>Alama</th><th>Daraja</th><th>Hatua</th></tr>
-          ${remedial.map(r => `<tr><td><b>${r.student_name}</b></td><td>${r.subject_name}</td><td style="color:#dc2626;"><b>${r.total_score}%</b></td><td>${r.grade}</td><td>Weka Kwenye Remedial</td></tr>`).join('') || '<tr><td colspan="5">Hakuna mwanafunzi aliye chini ya 35% kwa sasa.</td></tr>'}
+          <h3>Usajili wa Tahasusi (A-Level) & Masomo ya Hiari (Electives)</h3>
+          <form onsubmit="saveSubjMap(event)" style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:15px;">
+            <input type="text" id="smName" list="stList" required placeholder="Jina la Mwanafunzi">
+            <select id="smSex"><option value="M">Mvulana (M)</option><option value="F">Msichana (F)</option></select>
+            <input type="text" id="smComb" required placeholder="Tahasusi / Electives (Mfano: PCM, HKL au Commerce)">
+            <button type="submit" class="btn btn-green" style="grid-column: span 3;">💾 Hifadhi Usajili wa Masomo</button>
+          </form>
+          <table><tr><th>Mwanafunzi</th><th>Jinsia</th><th>Tahasusi / Masomo ya Hiari</th></tr>
+          ${maps.map(m => `<tr><td><b>${m.student_name}</b></td><td>${m.sex}</td><td>${m.combination}</td></tr>`).join('')}
           </table>
         </div>`;
     }
@@ -172,77 +218,111 @@
           <h3>Jenereta ya Ratiba (Smart Timetable yenye Clash Detection)</h3>
           <form onsubmit="addTimetable(event)" style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:10px; margin-bottom:15px;">
             <select id="ttDay"><option>Jumatatu</option><option>Jumanne</option><option>Jumatano</option><option>Alhamisi</option><option>Ijumaa</option></select>
-            <input type="text" id="ttTime" required placeholder="Muda (Mfano: 08:00 - 09:20)">
-            <input type="text" id="ttClass" required placeholder="Darasa (Mfano: Form 2A)">
+            <input type="text" id="ttTime" required placeholder="Muda (08:00 - 09:20)">
+            <input type="text" id="ttClass" required placeholder="Darasa (Form 2A)">
             <input type="text" id="ttTeacher" required placeholder="Mwalimu & Somo">
-            <button type="submit" class="btn btn-indigo" style="grid-column: span 4;">➕ Ongeza Kipindi (Kagua Mgongano)</button>
+            <button type="submit" class="btn btn-indigo" style="grid-column: span 4;">➕ Ongeza Kipindi</button>
           </form>
           <table><tr><th>Siku</th><th>Muda</th><th>Darasa</th><th>Mwalimu & Somo</th></tr>
           ${tt.map(t => `<tr><td><b>${t.day}</b></td><td>${t.time}</td><td>${t.cls}</td><td>${t.teacher}</td></tr>`).join('')}
           </table>
         </div>`;
     }
-
-    if (tab === 'subjects_map') {
-      area.innerHTML = `
-        <div class="panel">
-          <h3>Usajili wa Tahasusi (A-Level Combinations) & Masomo ya Hiari (O-Level)</h3>
-          <p><b>O-Level (Form 1–4):</b> Civics, History, Geography, Kiswahili, English, Physics, Chemistry, Biology, Basic Mathematics (Core) + Commerce, Book-Keeping, ICS (Electives).</p>
-          <p><b>A-Level (Form 5–6):</b> PCM, PCB, PGM, EGM, HGL, HKL, HGK, ECA.</p>
-        </div>`;
-    }
   }
-  function genSeating() {
-    const room = document.getElementById('exRoom').value || 'Form 4 Room 01';
-    const qr = SGB.qrImg(`SANGABUYE-SEATING:${room}`);
-    let boxes = '';
-    for (let i = 1; i <= 40; i++) {
-      boxes += `<div style="border:1px solid #1e1b4b; padding:6px; text-align:center; font-size:11px; border-radius:4px;"><b>Kiti #${i}</b><br>S.2026/${String(i).padStart(4,'0')}</div>`;
+  function createExam(e) {
+    e.preventDefault();
+    SGB.insert('exams_list', { title: document.getElementById('exTitle').value, level: document.getElementById('exLevel').value, term: document.getElementById('exTerm').value, status: 'Open (Wazi)' });
+    openTab('exams_ctrl');
+  }
+
+  function renderMasterSheet() {
+    const level = document.getElementById('msLevel').value;
+    const fmt = document.getElementById('msFormat').value;
+    const marks = SGB.select('exam_results');
+    const maps = SGB.select('student_subjects');
+    const bySt = {};
+
+    marks.forEach(m => {
+      const k = m.student_name.toLowerCase();
+      if (!bySt[k]) {
+        const info = maps.find(x => x.student_name.toLowerCase() === k);
+        bySt[k] = { name: m.student_name, sex: info ? info.sex : 'M', pts: [], scores: [], subList: [] };
+      }
+      if (m.points > 0) bySt[k].pts.push(Number(m.points));
+      if (m.grade !== 'X') bySt[k].scores.push(Number(m.total_score));
+      bySt[k].subList.push(`${m.subject_name.slice(0,4).toUpperCase()}-'${m.grade}'`);
+    });
+
+    const reqCount = level === 'O-Level' ? 7 : 3;
+    const ranked = Object.values(bySt).map(s => {
+      const best = s.pts.sort((a,b) => a - b).slice(0, reqCount);
+      const agg = best.reduce((a,b) => a + b, 0);
+      const tot = s.scores.reduce((a,b) => a + b, 0);
+      const avg = s.scores.length ? (tot / s.scores.length).toFixed(1) : 0;
+      const div = best.length >= reqCount ? (level === 'O-Level' ? calcOLevelDiv(agg) : calcALevelDiv(agg)) : `Incomplete (${best.length}/${reqCount})`;
+      return { ...s, agg, tot, avg, div };
+    }).sort((a,b) => b.avg - a.avg);
+
+    const qr = SGB.qrImg(`SANGABUYE-MASTER-${level}`);
+    let html = `<div style="display:flex; justify-content:space-between; align-items:center;"><div><h4>SANGABUYE SECONDARY SCHOOL — ${level} MASTER SHEET (${fmt})</h4></div><img src="${qr}"></div>`;
+
+    if (fmt === 'NECTA') {
+      html += `<table><tr><th>Cand No.</th><th>Jina Kamili</th><th>Sex</th><th>Agg</th><th>Division</th><th>Matokeo Kila Somo (Detailed Subjects)</th></tr>
+      ${ranked.map((r, i) => `<tr><td>S.2026/${String(i+1).padStart(4,'0')}</td><td><b>${r.name}</b></td><td>${r.sex}</td><td><b>${r.agg}</b></td><td><b style="color:#4338ca;">${r.div}</b></td><td>${r.subList.join('  ')}</td></tr>`).join('') || '<tr><td colspan="6">Hakuna alama zilizotumwa bado.</td></tr>'}</table>`;
+    } else {
+      html += `<table><tr><th>Pos</th><th>Jina Kamili</th><th>Sex</th><th>Total</th><th>Average</th><th>Division</th></tr>
+      ${ranked.map((r, i) => `<tr><td><b>#${i+1}</b></td><td><b>${r.name}</b></td><td>${r.sex}</td><td>${r.tot}</td><td><b>${r.avg}%</b></td><td>${r.div}</td></tr>`).join('') || '<tr><td colspan="6">Hakuna alama bado.</td></tr>'}</table>`;
     }
+    document.getElementById('masterPrintArea').innerHTML = html;
+  }
+
+  function getRealCandidates() {
+    const users = SGB.select('users_profile').filter(u => u.role === 'student');
+    const cands = [];
+    for (let i = 0; i < 40; i++) {
+      if (users[i]) cands.push({ no: users[i].reg_or_staff_no || `S.2026/${String(i+1).padStart(4,'0')}`, name: users[i].full_name });
+      else cands.push({ no: `S.2026/${String(i+1).padStart(4,'0')}`, name: `Mtahiniwa #${i+1}` });
+    }
+    return cands;
+  }
+
+  function genRealSeating() {
+    const room = document.getElementById('exRoom').value;
+    const cands = getRealCandidates();
+    const qr = SGB.qrImg(`SEATING:${room}`);
     document.getElementById('examFormsOutput').innerHTML = `
       <div id="examPrint" style="border:1px solid #000; padding:15px;">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-          <div><h3>SANGABUYE SECONDARY SCHOOL — RAMANI YA VITI 40 (5x8)</h3><p>Chumba: <b>${room}</b></p></div>
-          <img src="${qr}">
+        <div style="display:flex; justify-content:space-between;"><div><h3>SANGABUYE SECONDARY SCHOOL — RAMANI YA VITI 40 (5x8)</h3><p>Chumba: <b>${room}</b></p></div><img src="${qr}"></div>
+        <div style="display:grid; grid-template-columns:repeat(5, 1fr); gap:6px;">
+          ${cands.map((c, idx) => `<div style="border:1px solid #1e1b4b; padding:6px; text-align:center; font-size:10.5px;"><b>Kiti #${idx+1}</b><br>${c.no}<br><b>${c.name}</b></div>`).join('')}
         </div>
-        <div style="display:grid; grid-template-columns:repeat(5, 1fr); gap:6px;">${boxes}</div>
       </div><br><button class="btn btn-indigo" onclick="printSection('examPrint')">🖨️ Chapisha Ramani (PDF)</button>`;
   }
 
-  function genISAL() {
-    const room = document.getElementById('exRoom').value || 'Room 01';
-    const subj = document.getElementById('exSubj').value || '012 History';
+  function genRealISAL() {
+    const room = document.getElementById('exRoom').value;
+    const subj = document.getElementById('exSubj').value;
     const date = document.getElementById('exDate').value || new Date().toLocaleDateString();
+    const cands = getRealCandidates();
     const qr = SGB.qrImg(`ISAL:${room}|${subj}`);
-    let rows = '';
-    for (let i = 1; i <= 40; i++) {
-      rows += `<tr><td>${i}</td><td>S.2026/${String(i).padStart(4,'0')}</td><td>Mtahiniwa #${i}</td><td></td><td></td></tr>`;
-    }
     document.getElementById('examFormsOutput').innerHTML = `
       <div id="examPrint" style="border:1px solid #000; padding:15px;">
-        <div style="display:flex; justify-content:space-between;">
-          <div><h3>INDIVIDUAL STUDENT ATTENDANCE LIST (ISAL)</h3><p>Sangabuye Sec | Chumba: <b>${room}</b> | Somo: <b>${subj}</b> | Tarehe: <b>${date}</b></p></div>
-          <img src="${qr}">
-        </div>
-        <table><tr><th>Kiti</th><th>Candidate No.</th><th>Jina Kamili</th><th>Saini ya Mwanafunzi</th><th>Saini ya Msimamizi</th></tr>${rows}</table>
-      </div><br><button class="btn btn-green" onclick="printSection('examPrint')">🖨️ Chapisha Fomu ya ISAL (PDF)</button>`;
+        <div style="display:flex; justify-content:space-between;"><div><h3>INDIVIDUAL STUDENT ATTENDANCE LIST (ISAL)</h3><p>Sangabuye Sec | Chumba: <b>${room}</b> | Somo: <b>${subj}</b> | Tarehe: <b>${date}</b></p></div><img src="${qr}"></div>
+        <table><tr><th>Kiti</th><th>Candidate No.</th><th>Jina Kamili</th><th>Saini ya Mwanafunzi</th><th>Saini ya Msimamizi</th></tr>
+        ${cands.map((c, i) => `<tr><td>${i+1}</td><td>${c.no}</td><td><b>${c.name}</b></td><td></td><td></td></tr>`).join('')}</table>
+      </div><br><button class="btn btn-green" onclick="printSection('examPrint')">🖨️ Chapisha ISAL (PDF)</button>`;
   }
 
-  function genCAL() {
-    const room = document.getElementById('exRoom').value || 'Room 01';
+  function genRealCAL() {
+    const room = document.getElementById('exRoom').value;
+    const cands = getRealCandidates();
     const qr = SGB.qrImg(`CAL:${room}`);
-    let rows = '';
-    for (let i = 1; i <= 40; i++) {
-      rows += `<tr><td>${i}</td><td>S.2026/${String(i).padStart(4,'0')}</td><td>Mtahiniwa #${i}</td><td>[ ] Present  [ ] Absent</td></tr>`;
-    }
     document.getElementById('examFormsOutput').innerHTML = `
       <div id="examPrint" style="border:1px solid #000; padding:15px;">
-        <div style="display:flex; justify-content:space-between;">
-          <div><h3>COLLECTIVE ATTENDANCE LIST (CAL) — NECTA FORMAT</h3><p>Sangabuye Secondary School | Chumba: <b>${room}</b> (Watahiniwa 40)</p></div>
-          <img src="${qr}">
-        </div>
-        <table><tr><th>Kiti</th><th>Candidate No.</th><th>Jina Kamili</th><th>Hali ya Mahudhurio</th></tr>${rows}</table>
-      </div><br><button class="btn btn-amber" onclick="printSection('examPrint')">🖨️ Chapisha Fomu ya CAL (PDF)</button>`;
+        <div style="display:flex; justify-content:space-between;"><div><h3>COLLECTIVE ATTENDANCE LIST (CAL) — NECTA FORMAT</h3><p>Sangabuye Sec | Chumba: <b>${room}</b></p></div><img src="${qr}"></div>
+        <table><tr><th>Kiti</th><th>Candidate No.</th><th>Jina Kamili</th><th>Hali ya Mahudhurio</th></tr>
+        ${cands.map((c, i) => `<tr><td>${i+1}</td><td>${c.no}</td><td><b>${c.name}</b></td><td>[ ] Present   [ ] Absent</td></tr>`).join('')}</table>
+      </div><br><button class="btn btn-amber" onclick="printSection('examPrint')">🖨️ Chapisha CAL (PDF)</button>`;
   }
 
   function buildReportCard() {
@@ -251,21 +331,21 @@
     const tc = document.getElementById('rcTeacherComment').value;
     const hmc = document.getElementById('rcHMComment').value;
     const marks = SGB.select('exam_results').filter(m => m.student_name.toLowerCase() === name.toLowerCase());
-    const qr = SGB.qrImg(`REPORT-CARD:${name}|CLASS:${cls}`);
-
+    const qr = SGB.qrImg(`REPORT:${name}|${cls}`);
     document.getElementById('rcOutput').innerHTML = `
       <div id="rcPrint" style="border:2px solid #1e1b4b; padding:20px; background:white;">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-          <div><h2>SANGABUYE SECONDARY SCHOOL</h2><p>S.L.P 11898, Ilemela - Mwanza | Simu: 0784 755 173</p><h4>TAARIFA YA MAENDELEO YA TAALUMA (STUDENT REPORT CARD)</h4></div>
-          <img src="${qr}">
-        </div>
-        <p><b>Jina la Mwanafunzi:</b> ${name} | <b>Kidato:</b> ${cls}</p>
-        <table><tr><th>Somo (Subject)</th><th>CA (30%)</th><th>Final (70%)</th><th>Jumla</th><th>Daraja</th><th>Pointi</th></tr>
-        ${marks.map(m => `<tr><td>${m.subject_name}</td><td>${m.ca_score}</td><td>${m.final_score}</td><td><b>${m.total_score}%</b></td><td><b>${m.grade}</b></td><td>${m.points}</td></tr>`).join('') || '<tr><td colspan="6">Hakuna alama zilizopatikana kwa jina hili.</td></tr>'}
-        </table><br>
-        <p><b>Maoni ya Mwalimu wa Darasa:</b> ${tc}</p>
-        <p><b>Maoni & Sahihi ya Mkuu wa Shule (0784 755 173):</b> ${hmc}</p>
-      </div><br><button class="btn btn-indigo" onclick="printSection('rcPrint')">🖨️ Pakua / Chapisha Ripoti (A4 PDF)</button>`;
+        <div style="display:flex; justify-content:space-between;"><div><h2>SANGABUYE SECONDARY SCHOOL</h2><p>S.L.P 11898, Ilemela - Mwanza | Simu: 0784 755 173</p><h4>TAARIFA YA MAENDELEO YA TAALUMA (A4 REPORT CARD)</h4></div><img src="${qr}"></div>
+        <p><b>Mwanafunzi:</b> ${name} | <b>Kidato:</b> ${cls}</p>
+        <table><tr><th>Somo</th><th>CA (30%)</th><th>Final (70%)</th><th>Jumla</th><th>Daraja</th><th>Pointi</th></tr>
+        ${marks.map(m => `<tr><td>${m.subject_name}</td><td>${m.ca_score}</td><td>${m.final_score}</td><td><b>${m.total_score}%</b></td><td><b>${m.grade}</b></td><td>${m.points}</td></tr>`).join('')}</table><br>
+        <p><b>Maoni ya Mwalimu wa Darasa:</b> ${tc}</p><p><b>Maoni & Sahihi ya Mkuu wa Shule (0784 755 173):</b> ${hmc}</p>
+      </div><br><button class="btn btn-indigo" onclick="printSection('rcPrint')">🖨️ Pakua Ripoti (A4 PDF)</button>`;
+  }
+
+  function saveSubjMap(e) {
+    e.preventDefault();
+    SGB.insert('student_subjects', { student_name: document.getElementById('smName').value.trim(), sex: document.getElementById('smSex').value, combination: document.getElementById('smComb').value.trim() });
+    openTab('subjects_map');
   }
 
   function addTimetable(e) {
@@ -274,43 +354,21 @@
     const time = document.getElementById('ttTime').value.trim();
     const cls = document.getElementById('ttClass').value.trim();
     const teacher = document.getElementById('ttTeacher').value.trim();
-    const existing = SGB.select('smart_timetable');
-
-    // Clash Detection (Zuia mwalimu au darasa kugongana)
-    const clash = existing.find(x => x.day === day && x.time === time && (x.teacher.toLowerCase() === teacher.toLowerCase() || x.cls.toLowerCase() === cls.toLowerCase()));
-    if (clash) {
-      alert(`⛔ MGONGANO WA RATIBA (CLASH DETECTED): ${clash.teacher} au darasa ${clash.cls} tayari lina kipindi siku ya ${day} saa ${time}!`);
-      return;
-    }
+    const clash = SGB.select('smart_timetable').find(x => x.day === day && x.time === time && (x.teacher.toLowerCase() === teacher.toLowerCase() || x.cls.toLowerCase() === cls.toLowerCase()));
+    if (clash) { alert(`⛔ MGONGANO WA RATIBA: ${clash.teacher} au ${clash.cls} tayari lina kipindi ${day} saa ${time}!`); return; }
     SGB.insert('smart_timetable', { day, time, cls, teacher });
-    openTab('timetable', document.querySelectorAll('.menu-btn'));
-  }
-
-  function exportCSV() {
-    const marks = SGB.select('exam_results');
-    let csv = 'Mwanafunzi,Somo,CA,Final,Jumla,Daraja,Pointi\n';
-    marks.forEach(m => { csv += `"${m.student_name}","${m.subject_name}",${m.ca_score},${m.final_score},${m.total_score},${m.grade},${m.points}\n`; });
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'Sangabuye_NECTA_Results.csv';
-    a.click();
+    openTab('timetable');
   }
 
   function printSection(id) {
     const html = document.getElementById(id).innerHTML;
-    const w = window.open('', '', 'width=800,height=650');
-    w.document.write('<html><head><title>Sangabuye Academic Print</title><style>body{font-family:sans-serif;padding:15px;}table{width:100%;border-collapse:collapse;}th,td{border:1px solid #000;padding:6px;font-size:12px;}</style></head><body>' + html + '</body></html>');
+    const w = window.open('', '', 'width=850,height=650');
+    w.document.write('<html><head><title>Sangabuye NECTA Print</title><style>body{font-family:sans-serif;padding:15px;}table{width:100%;border-collapse:collapse;}th,td{border:1px solid #000;padding:6px;font-size:11.5px;}</style></head><body>' + html + '</body></html>');
     w.document.close(); w.focus();
     setTimeout(() => { w.print(); w.close(); }, 300);
   }
 
-  function refreshAll() {
-    const active = document.querySelector('.menu-btn.active');
-    if (active) active.click();
-  }
-
-  openTab('necta_results', document.querySelector('.menu-btn'));
+  openTab('exams_ctrl', document.querySelector('.menu-btn'));
 </script>
 </body>
 </html>
