@@ -133,7 +133,6 @@
   </div>
 </div>
 <script>
-  const DB_URL = 'https://firebaseio.com';
   let attempts = 0;
 
   function togglePass(id) {
@@ -157,7 +156,7 @@
     box.style.display = 'block';
   }
 
-  async function handleLogin(e) {
+  function handleLogin(e) {
     e.preventDefault();
     if (attempts >= 5) {
       showAlert('⛔ Akaunti imefungwa kwa dakika 15 (Brute-Force Lock) baada ya kukosea mara 5.', 'error');
@@ -172,30 +171,25 @@
       return;
     }
 
-    try {
-      const res = await fetch(`'/api/firebase?path=users_profile'
-`);
-      const data = await res.json();
-      const users = data ? Object.values(data) : [];
-      const found = users.find(u => (u.phone_number === user || u.reg_or_staff_no === user) && u.password_hash === pass);
+    const users = JSON.parse(localStorage.getItem('sgb_users_profile') || '[]');
+    const found = users.find(u => (u.phone_number === user || u.reg_or_staff_no === user) && u.password_hash === pass);
 
-      if (!found) {
-        attempts++;
-        showAlert(`❌ Taarifa si sahihi (Jaribio ${attempts}/5).`, 'error');
-      } else if (found.status !== 'approved') {
-        showAlert('⏳ Akaunti yako bado inasubiri idhini (Approval) ya Super Admin / IT.', 'error');
-      } else {
-        showAlert(`✅ Karibu <b>${found.full_name}</b>! Tunafungua mfumo...`, 'success');
-        setTimeout(() => { window.location.href = 'dashboard.html'; }, 800);
-      }
-    } catch (err) {
-      showAlert('❌ Hitilafu ya mtandao: ' + err.message, 'error');
+    if (!found) {
+      attempts++;
+      showAlert(`❌ Taarifa si sahihi (Jaribio ${attempts}/5).`, 'error');
+    } else if (found.status !== 'approved') {
+      showAlert('⏳ Akaunti yako bado inasubiri idhini (Approval) ya Super Admin / IT.', 'error');
+    } else {
+      showAlert(`✅ Karibu <b>${found.full_name}</b>! Tunafungua mfumo...`, 'success');
+      setTimeout(() => { window.location.href = 'dashboard.html'; }, 800);
     }
   }
 
-  async function handleRegister(e) {
+  function handleRegister(e) {
     e.preventDefault();
     const payload = {
+      id: Date.now(),
+      _key: String(Date.now()),
       full_name: document.getElementById('regName').value.trim(),
       role: document.getElementById('regRole').value,
       reg_or_staff_no: document.getElementById('regNo').value.trim(),
@@ -205,14 +199,12 @@
       created_at: new Date().toISOString()
     };
 
-    try {
-      const res = await fetch(`${DB_URL}/users_profile.json`, { method: 'POST', body: JSON.stringify(payload) });
-      if (!res.ok) throw new Error('Imeshindwa kuhifadhi');
-      showAlert(`✅ Asante <b>${payload.full_name}</b>! Maombi yako yamehifadhiwa na yanasubiri idhini ya Admin.`, 'success');
-      document.getElementById('registerForm').reset();
-    } catch (err) {
-      showAlert('❌ Hitilafu: ' + err.message, 'error');
-    }
+    let users = JSON.parse(localStorage.getItem('sgb_users_profile') || '[]');
+    users.unshift(payload);
+    localStorage.setItem('sgb_users_profile', JSON.stringify(users));
+
+    showAlert(`✅ Asante <b>${payload.full_name}</b>! Maombi yako yamehifadhiwa na yanasubiri idhini ya Admin.`, 'success');
+    document.getElementById('registerForm').reset();
   }
 
   function handleOtp(e) {
