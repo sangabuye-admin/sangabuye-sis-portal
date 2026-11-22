@@ -67,17 +67,37 @@
         <button class="btn btn-blue" onclick="loadUsers()">🔄 Pakia Watumiaji Kutoka Database</button>
         <div id="usersTableArea" style="margin-top:12px;">Bofya kitufe hapo juu kuona waliojisajili...</div>
       </div>`,
-    accountant: `
+       accountant: `
       <div class="panel">
         <h3>Rekodi Malipo Mapya: SHULE YA SEKONDARI SANGABUYE E.K (CRDB: 0150838972100) & Cash</h3>
         <form onsubmit="saveReceipt(event)" style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:12px;">
           <input type="text" id="stName" required placeholder="Majina Kamili ya Mwanafunzi">
           <input type="text" id="stReg" required placeholder="Namba ya Usajili (Mfano: S.2026/001)">
-          <select id="payCat" required>
-            <option value="Ada ya Shule">Ada ya Shule (School Fees)</option>
-            <option value="Chakula">Michango ya Chakula</option>
-            <option value="Mitihani">Michango ya Mitihani</option>
-            <option value="Ujenzi">Ujenzi & Maendeleo</option>
+          
+          <!-- SEHEMU YA KUANDIKA AINA YA MCHANGO AU KUCHAGUA -->
+          <div style="grid-column: span 2;">
+            <input type="text" id="payCat" list="mchangoList" required placeholder="Andika Aina ya Mchango (Mfano: Ada, Chakula, Mahafali, Sare...)" style="width:100%;">
+            <datalist id="mchangoList">
+              <option value="Ada ya Shule (School Fees)">
+              <option value="Mchango wa Chakula">
+              <option value="Mchango wa Mitihani">
+              <option value="Ujenzi na Maendeleo">
+              <option value="Sare za Shule">
+              <option value="Tahadhari na Afya">
+            </datalist>
+          </div>
+
+          <select id="payMethod" required>
+            <option value="CRDB_Bank">CRDB Bank (0150838972100)</option>
+            <option value="Cash">Pesa Taslimu (Cash - Ofisi ya Mhasibu)</option>
+            <option value="In_Kind_Store">Vyakula / Vifaa (Stoo)</option>
+          </select>
+          <input type="text" id="bankRef" placeholder="Namba ya Slip ya CRDB (Au andika CASH)">
+          <input type="number" id="payAmount" required placeholder="Kiasi Kilicholipwa (TZS)" style="grid-column: span 2;">
+          <button type="submit" class="btn btn-green" style="grid-column: span 2; padding:12px;">💾 Hifadhi Malipo & Tengeneza Risiti</button>
+        </form>
+        <div id="receiptPreview" style="margin-top:20px;"></div>
+      </div>`
           </select>
           <select id="payMethod" required>
             <option value="CRDB_Bank">CRDB Bank (0150838972100)</option>
