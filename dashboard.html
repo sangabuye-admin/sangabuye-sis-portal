@@ -33,7 +33,6 @@
   </style>
 </head>
 <body>
-
 <div class="sidebar">
   <h2>SANGABUYE SIS PORTAL</h2>
   <p>S.L.P 11898, Ilemela - Mwanza</p>
@@ -50,49 +49,37 @@
 
 <div class="main">
   <div class="topbar">
-    <div><strong id="pageTitle">🛡️ 1. Super Admin & IT</strong> <span style="font-size:12px; color:#16a34a;">● Direct Cloud API</span></div>
+    <div><strong id="pageTitle">🛡️ 1. Super Admin & IT</strong> <span style="font-size:12px; color:#16a34a;">● Google Cloud Live</span></div>
     <button class="btn btn-blue" onclick="location.reload()">🔄 Refresh</button>
   </div>
   <div class="content" id="mainContent"></div>
 </div>
 <script>
-  const SB_KEY = 'sb_publishable_I5QzeQGfG15VGaYBr7Nj7A_3MDlh7U5';
-  const HEADERS = { 'Content-Type': 'application/json' };
+  const DB_URL = 'https://firebaseio.com';
 
   async function sbInsert(table, payload) {
-    const res = await fetch(`/api/db?table=${table}`, { method: 'POST', headers: HEADERS, body: JSON.stringify(payload) });
-    const text = await res.text();
-    if (!res.ok) throw new Error(text);
-    return JSON.parse(text);
-  }
-
-  async function sbSelect(table, query = 'select=*&order=id.desc') {
-    const res = await fetch(`/api/db?table=${table}&query=${encodeURIComponent(query)}`);
-    const text = await res.text();
-    if (!res.ok) throw new Error(text);
-    return JSON.parse(text);
-  }
-
-  async function sbUpdate(table, id, payload) {
-    const res = await fetch(`/api/db?table=${table}&query=${encodeURIComponent('id=eq.' + id)}`, { method: 'PATCH', headers: HEADERS, body: JSON.stringify(payload) });
-    const text = await res.text();
-    if (!res.ok) throw new Error(text);
-  }
-  async function sbSelect(table, query = 'select=*&order=id.desc') {
-    const res = await fetch(`${SB_URL}/${table}?${query}`, { headers: HEADERS });
-    if (!res.ok) { const err = await res.json(); throw new Error(err.message || res.statusText); }
+    payload.id = Date.now();
+    payload.created_at = new Date().toISOString();
+    const res = await fetch(`${DB_URL}/${table}.json`, { method: 'POST', body: JSON.stringify(payload) });
+    if (!res.ok) throw new Error('Imeshindwa kuhifadhi');
     return await res.json();
   }
 
-  async function sbUpdate(table, id, payload) {
-    const res = await fetch(`${SB_URL}/${table}?id=eq.${id}`, { method: 'PATCH', headers: HEADERS, body: JSON.stringify(payload) });
-    if (!res.ok) { const err = await res.json(); throw new Error(err.message || res.statusText); }
+  async function sbSelect(table) {
+    const res = await fetch(`${DB_URL}/${table}.json`);
+    const data = await res.json();
+    if (!data) return [];
+    return Object.keys(data).map(key => ({ _key: key, ...data[key] })).reverse();
+  }
+
+  async function sbUpdate(table, key, payload) {
+    await fetch(`${DB_URL}/${table}/${key}.json`, { method: 'PATCH', body: JSON.stringify(payload) });
   }
 
   const modules = {
     admin: `
       <div class="cards">
-        <div class="card"><h4>Database</h4><div class="val" style="color:#16a34a;">● Direct Cloud Live</div></div>
+        <div class="card"><h4>Database</h4><div class="val" style="color:#16a34a;">● Google Cloud Live</div></div>
         <div class="card"><h4>CRDB Bank</h4><div class="val">0150838972100</div></div>
       </div>
       <div class="panel">
@@ -190,7 +177,7 @@
   async function saveMarks(e) {
     e.preventDefault();
     const msgBox = document.getElementById('marksMsg');
-    msgBox.innerHTML = '⏳ Inahifadhi kwenye Supabase Cloud...';
+    msgBox.innerHTML = '⏳ Inahifadhi...';
     const student_name = document.getElementById('mkStudent').value.trim();
     const subject_name = document.getElementById('mkSubject').value.trim();
     const ca_score = parseFloat(document.getElementById('mkCA').value);
@@ -202,7 +189,7 @@
 
     try {
       await sbInsert('exam_results', { student_name, subject_name, ca_score, final_score, total_score, grade, points });
-      msgBox.innerHTML = `<div style="padding:10px; background:#dcfce7; color:#166534; border-radius:6px;">✅ Alama za <b>${student_name}</b> (${subject_name}) zimehifadhiwa Supabase & kutumwa kwa Mtaaluma! Jumla: <b>${total_score}%</b> | Daraja: <b>${grade}</b></div>`;
+      msgBox.innerHTML = `<div style="padding:10px; background:#dcfce7; color:#166534; border-radius:6px;">✅ Alama za <b>${student_name}</b> (${subject_name}) zimehifadhiwa na kutumwa kwa Mtaaluma! Jumla: <b>${total_score}%</b> | Daraja: <b>${grade}</b></div>`;
       e.target.reset();
     } catch (err) {
       msgBox.innerHTML = `<div style="padding:10px; background:#fee2e2; color:#991b1b; border-radius:6px;">❌ Kosa: ${err.message}</div>`;
@@ -220,9 +207,7 @@
         html += `<tr><td><b>${r.student_name || '-'}</b></td><td>${r.subject_name || '-'}</td><td>${r.ca_score}</td><td>${r.final_score}</td><td><b>${r.total_score}%</b></td><td><b>${r.grade}</b></td><td>${r.points}</td></tr>`;
       });
       area.innerHTML = html + '</table>';
-    } catch (err) {
-      area.innerHTML = '❌ Kosa: ' + err.message;
-    }
+    } catch (err) { area.innerHTML = '❌ Kosa: ' + err.message; }
   }
 
   function generateSeating() {
@@ -254,25 +239,27 @@
       let html = '<table><tr><th>Kikao</th><th>Bajeti (TZS)</th><th>Hali</th><th>Maamuzi</th></tr>';
       data.forEach(p => {
         html += `<tr><td><b>${p.meeting_title}</b><br><small>${p.minutes_summary}</small></td><td>${Number(p.estimated_budget).toLocaleString()}</td><td><b>${p.status}</b></td>
-        <td><button class="btn btn-green" onclick="decideProc(${p.id}, 'accepted')">Accept</button> <button class="btn btn-red" onclick="decideProc(${p.id}, 'rejected')">Reject</button></td></tr>`;
+        <td><button class="btn btn-green" onclick="decideProc('${p._key}', 'accepted')">Accept</button> <button class="btn btn-red" onclick="decideProc('${p._key}', 'rejected')">Reject</button></td></tr>`;
       });
       document.getElementById('procListArea').innerHTML = html + '</table>';
     } catch (err) { alert(err.message); }
   }
 
-  async function decideProc(id, status) {
-    await sbUpdate('procurement_committee', id, { status });
+  async function decideProc(key, status) {
+    await sbUpdate('procurement_committee', key, { status });
     loadProcurements();
   }
 
   async function searchChildData() {
-    const name = document.getElementById('searchChildName').value.trim();
+    const name = document.getElementById('searchChildName').value.trim().toLowerCase();
     const area = document.getElementById('parentDataArea');
     if (!name) return;
     area.innerHTML = '⏳ Inatafuta...';
     try {
-      const receipts = await sbSelect('accounting_receipts', `select=*&student_name=ilike.*${encodeURIComponent(name)}*`);
-      const marks = await sbSelect('exam_results', `select=*&student_name=ilike.*${encodeURIComponent(name)}*`);
+      const allReceipts = await sbSelect('accounting_receipts');
+      const allMarks = await sbSelect('exam_results');
+      const receipts = allReceipts.filter(r => (r.student_name || '').toLowerCase().includes(name));
+      const marks = allMarks.filter(m => (m.student_name || '').toLowerCase().includes(name));
       let html = '<h4>Risiti za Malipo (CRDB 0150838972100 & Cash)</h4>';
       if (receipts.length) {
         html += '<table><tr><th>Risiti Na.</th><th>Mchango</th><th>Njia</th><th>Kiasi (TZS)</th></tr>';
@@ -291,18 +278,18 @@
 
   async function loadUsers() {
     try {
-      const data = await sbSelect('users_profile', 'select=*&order=created_at.desc');
+      const data = await sbSelect('users_profile');
       let html = '<table><tr><th>Jina</th><th>Nafasi</th><th>Namba</th><th>Hali</th><th>Hatua</th></tr>';
       data.forEach(u => {
         html += `<tr><td>${u.full_name}</td><td>${u.role}</td><td>${u.reg_or_staff_no || '-'}</td><td><b>${u.status}</b></td>
-        <td><button class="btn btn-green" onclick="approveUser('${u.id}')">Approve</button></td></tr>`;
+        <td><button class="btn btn-green" onclick="approveUser('${u._key}')">Approve</button></td></tr>`;
       });
       document.getElementById('usersTableArea').innerHTML = html + '</table>';
     } catch (err) { alert(err.message); }
   }
 
-  async function approveUser(id) {
-    await sbUpdate('users_profile', id, { status: 'approved' });
+  async function approveUser(key) {
+    await sbUpdate('users_profile', key, { status: 'approved' });
     alert('✅ Akaunti imeidhinishwa!'); loadUsers();
   }
 
