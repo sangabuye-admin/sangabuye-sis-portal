@@ -67,7 +67,17 @@
 
     <div id="alertBox" class="alert"></div>
 
-    <form id="loginForm" onsubmit="handleLogin(event)">
+      const ROLE_PAGES = {
+    super_admin: 'admin.html',
+    director: 'director.html',
+    headmaster: 'headmaster.html',
+    accountant: 'accountant.html',
+    academic: 'academic.html',
+    teacher: 'teacher.html',
+    parent: 'parent.html',
+    student: 'student.html'
+  };
+
       <div class="form-group">
         <label id="lblUser">Namba ya Simu / Namba ya Usajili / Username</label>
         <input type="text" id="loginUser" required placeholder="Mfano: 0784755173 au S.2026/0045">
