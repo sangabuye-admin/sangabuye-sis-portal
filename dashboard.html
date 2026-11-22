@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashibodi | Sangabuye SIS Portal</title>
+  <title>Dashibodi Kamili | Sangabuye SIS Portal</title>
   <style>
     * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
     body { margin: 0; background: #f1f5f9; display: flex; min-height: 100vh; color: #1e293b; }
-    .sidebar { width: 255px; background: #0f294a; color: white; display: flex; flex-direction: column; padding: 18px 12px; }
+    .sidebar { width: 260px; background: #0f294a; color: white; display: flex; flex-direction: column; padding: 18px 12px; }
     .sidebar h2 { font-size: 15px; margin: 0 0 4px; color: #fbbf24; text-align: center; }
     .sidebar p { font-size: 11px; text-align: center; color: #cbd5e1; margin: 0 0 18px; }
     .menu-btn { background: transparent; border: none; color: #e2e8f0; text-align: left; padding: 10px 12px; border-radius: 8px; cursor: pointer; font-size: 13px; margin-bottom: 4px; }
@@ -39,8 +39,8 @@
   <button class="menu-btn active" onclick="loadModule('admin', this)">🛡️ 1. Super Admin & IT</button>
   <button class="menu-btn" onclick="loadModule('director', this)">📊 2. Mkurugenzi (Director)</button>
   <button class="menu-btn" onclick="loadModule('headmaster', this)">🏫 3. Mkuu wa Shule (0784 755 173)</button>
-  <button class="menu-btn" onclick="loadModule('accountant', this)">💰 4. Mhasibu & CRDB (0615 000 305)</button>
-  <button class="menu-btn" onclick="loadModule('academic', this)">🎓 5. Mtaaluma & NECTA (ISAL/CAL)</button>
+  <button class="menu-btn" onclick="loadModule('accountant', this)">💰 4. Mhasibu, CRDB & Stoo</button>
+  <button class="menu-btn" onclick="loadModule('academic', this)">🎓 5. Mtaaluma, NECTA & Clearance</button>
   <button class="menu-btn" onclick="loadModule('teacher', this)">📚 6. Walimu (Alama & Kazi)</button>
   <button class="menu-btn" onclick="loadModule('parent', this)">👨‍👩‍👧 7. Tovuti ya Mzazi</button>
   <button class="menu-btn" onclick="loadModule('student', this)">🎒 8. Tovuti ya Mwanafunzi</button>
@@ -49,7 +49,7 @@
 
 <div class="main">
   <div class="topbar">
-    <div><strong id="pageTitle">🛡️ 1. Super Admin & IT</strong> <span style="font-size:12px; color:#16a34a;">● Mfumo Uko Hewani</span></div>
+    <div><strong id="pageTitle">🛡️ 1. Super Admin & IT</strong> <span style="font-size:12px; color:#16a34a;">● Toleo Kamili (v6.4)</span></div>
     <button class="btn btn-blue" onclick="location.reload()">🔄 Refresh</button>
   </div>
   <div class="content" id="mainContent"></div>
@@ -78,7 +78,7 @@
   const modules = {
     admin: `
       <div class="cards">
-        <div class="card"><h4>Hali ya Hifadhi</h4><div class="val" style="color:#16a34a;">● Inafanya Kazi 100%</div></div>
+        <div class="card"><h4>Hali ya Mfumo</h4><div class="val" style="color:#16a34a;">● Kamili 100%</div></div>
         <div class="card"><h4>CRDB Bank</h4><div class="val">0150838972100</div></div>
       </div>
       <div class="panel">
@@ -91,10 +91,10 @@
         <div class="card" style="border-color:#16a34a;"><h4>CRDB: SHULE YA SEKONDARI SANGABUYE E.K</h4><div class="val">0150838972100</div></div>
         <div class="card"><h4>Ngazi za Elimu</h4><div class="val">O-Level & A-Level</div></div>
       </div>
-      <div class="panel"><h3>Muhtasari wa Mkurugenzi</h3><p>Ufuatiliaji wa mapato ya benki ya CRDB, pesa taslimu (Cash), na matokeo ya mitihani.</p></div>`,
+      <div class="panel"><h3>Muhtasari wa Mkurugenzi</h3><p>Ufuatiliaji wa mapato ya benki ya CRDB, pesa taslimu (Cash), stoo ya vyakula, na matokeo ya mitihani.</p></div>`,
     headmaster: `
       <div class="panel">
-        <h3>Ofisi ya Mkuu wa Shule (0784 755 173) — Kamati ya Manunuzi</h3>
+        <h3>1. Ofisi ya Mkuu wa Shule (0784 755 173) — Kamati ya Manunuzi</h3>
         <form onsubmit="saveProcurement(event)" style="display:grid; gap:10px; margin-bottom:15px;">
           <input type="text" id="procTitle" required placeholder="Kichwa cha Kikao / Manunuzi">
           <input type="number" id="procBudget" required placeholder="Makadirio ya Bajeti (TZS)">
@@ -103,10 +103,21 @@
         </form>
         <button class="btn btn-green" onclick="loadProcurements()">🔄 Pakia Maombi ya Manunuzi</button>
         <div id="procListArea" style="margin-top:12px;"></div>
+      </div>
+      <div class="panel">
+        <h3>2. Ruhusa za Wanafunzi Nje ya Shule (Gate Pass & Zahanati)</h3>
+        <form onsubmit="saveGatePass(event)" style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px;">
+          <input type="text" id="gpStudent" required placeholder="Majina Kamili ya Mwanafunzi">
+          <input type="text" id="gpReason" required placeholder="Sababu (Mfano: Rufaa Hospitali / Ruhusa ya Mzazi)">
+          <input type="date" id="gpReturn" required style="grid-column: span 2;">
+          <button type="submit" class="btn btn-amber" style="grid-column: span 2;">🎫 Toa Gate Pass Rasmi</button>
+        </form>
+        <button class="btn btn-blue" onclick="loadGatePasses()">🔄 Onyesha Gate Pass Zilizotolewa</button>
+        <div id="gpTableArea" style="margin-top:12px;"></div>
       </div>`,
     accountant: `
       <div class="panel">
-        <h3>Rekodi Malipo: SHULE YA SEKONDARI SANGABUYE E.K (CRDB: 0150838972100) & Cash</h3>
+        <h3>1. Mapokezi ya Fedha: SHULE YA SEKONDARI SANGABUYE E.K (CRDB: 0150838972100) & Cash</h3>
         <form onsubmit="saveReceipt(event)" style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:12px;">
           <input type="text" id="stName" required placeholder="Majina Kamili ya Mwanafunzi">
           <input type="text" id="stReg" required placeholder="Namba ya Usajili (Mfano: S.2026/001)">
@@ -124,12 +135,24 @@
           <button type="submit" class="btn btn-green" style="grid-column: span 2; padding:12px;">💾 Hifadhi Malipo & Tengeneza Risiti</button>
         </form>
         <div id="receiptPreview" style="margin-top:20px;"></div>
+      </div>
+      <div class="panel">
+        <h3>2. Stoo ya Vyakula & Mali za Shule (Store Inventory)</h3>
+        <form onsubmit="saveStoreItem(event)" style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:12px;">
+          <input type="text" id="stItem" required placeholder="Bidhaa (Mfano: Mahindi, Maharage, Chaki)">
+          <input type="number" step="0.1" id="stQty" required placeholder="Kiasi (Mfano: 50)">
+          <input type="text" id="stUnit" required placeholder="Kipimo (Mfano: Magunia / Kg / Boksi)">
+          <button type="submit" class="btn btn-blue" style="grid-column: span 3;">📦 Hifadhi Kwenye Stoo</button>
+        </form>
+        <button class="btn btn-green" onclick="loadStoreItems()">🔄 Angalia Salio la Stoo</button>
+        <div id="storeTableArea" style="margin-top:12px;"></div>
       </div>`,
     academic: `
       <div class="panel">
-        <h3>1. Matokeo Yaliyotumwa na Walimu (NECTA Grading)</h3>
-        <button class="btn btn-blue" onclick="loadResults()">🔄 Pakia Alama Zote za Wanafunzi</button>
+        <h3>1. Matokeo & Ukokotoaji wa NECTA Division (Division I - IV / 0)</h3>
+        <button class="btn btn-blue" onclick="loadResults()">🔄 Pakia Alama & Kokotoa Division</button>
         <button class="btn btn-green" onclick="window.print()">🖨️ Chapisha Master Sheet (PDF)</button>
+        <div id="divisionSummary" style="margin-top:12px;"></div>
         <div id="resultsTableArea" style="margin-top:12px;">Bofya kitufe kupakia matokeo...</div>
       </div>
       <div class="panel">
@@ -139,6 +162,17 @@
           <button class="btn btn-amber" onclick="generateSeating()">🪑 Zalisha Viti 40 (ISAL/CAL)</button>
         </div>
         <div id="seatingArea"></div>
+      </div>
+      <div class="panel">
+        <h3>3. Fomu ya Kuhama / Kuhitimu (Student Clearance Checklist)</h3>
+        <form onsubmit="saveClearance(event)" style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px;">
+          <input type="text" id="clStudent" required placeholder="Majina Kamili ya Mwanafunzi">
+          <select id="clReason"><option value="Kuhitimu Kidato cha 4 / 6">Kuhitimu Kidato cha 4 / 6</option><option value="Uhamisho wa Shule">Uhamisho wa Shule</option></select>
+          <label><input type="checkbox" id="clFin" style="width:auto;"> Uhasibu (CRDB/Cash) Amemaliza</label>
+          <label><input type="checkbox" id="clLib" style="width:auto;"> Maktaba & Maabara Amerudisha Vifaa</label>
+          <button type="submit" class="btn btn-green" style="grid-column: span 2;">✅ Thibitisha Clearance ya Mwanafunzi</button>
+        </form>
+        <div id="clearanceArea"></div>
       </div>`,
     teacher: `
       <div class="panel">
@@ -162,7 +196,7 @@
         </div>
         <div id="parentDataArea"></div>
       </div>`,
-    student: `<div class="panel"><h3>Tovuti ya Mwanafunzi</h3><p>Karibu Sangabuye SIS Portal! Wasiliana na mwalimu wa somo kupata kazi za nyumbani na mitihani ya majaribio (CBT).</p></div>`
+    student: `<div class="panel"><h3>Tovuti ya Mwanafunzi</h3><p>Karibu Sangabuye SIS Portal! Wasiliana na mwalimu wa somo kupata kazi za nyumbani, mitihani ya majaribio (CBT), na fomu yako ya Clearance.</p></div>`
   };
   function calcGrade(total, isAbsent) {
     if (isAbsent) return { grade: 'X', points: 0 };
@@ -171,6 +205,14 @@
     if (total >= 45) return { grade: 'C', points: 3 };
     if (total >= 30) return { grade: 'D', points: 4 };
     return { grade: 'F', points: 5 };
+  }
+
+  function calcDivision(pts) {
+    if (pts >= 7 && pts <= 17) return 'Division I';
+    if (pts >= 18 && pts <= 21) return 'Division II';
+    if (pts >= 22 && pts <= 25) return 'Division III';
+    if (pts >= 26 && pts <= 33) return 'Division IV';
+    return 'Division 0';
   }
 
   async function saveMarks(e) {
@@ -186,21 +228,38 @@
     const { grade, points } = calcGrade(total_score, isAbsent);
 
     await sbInsert('exam_results', { student_name, subject_name, ca_score, final_score, total_score, grade, points });
-    msgBox.innerHTML = `<div style="padding:10px; background:#dcfce7; color:#166534; border-radius:6px;">✅ Alama za <b>${student_name}</b> (${subject_name}) zimehifadhiwa na kutumwa kwa Mtaaluma! Jumla: <b>${total_score}%</b> | Daraja: <b>${grade}</b></div>`;
+    msgBox.innerHTML = `<div style="padding:10px; background:#dcfce7; color:#166534; border-radius:6px;">✅ Alama za <b>${student_name}</b> (${subject_name}) zimehifadhiwa! Jumla: <b>${total_score}%</b> | Daraja: <b>${grade}</b></div>`;
     e.target.reset();
   }
 
   async function loadResults() {
     const area = document.getElementById('resultsTableArea');
+    const divArea = document.getElementById('divisionSummary');
     const data = await sbSelect('exam_results');
     if (!data.length) { area.innerHTML = 'Hakuna alama zilizoingizwa bado.'; return; }
-    let html = '<table><tr><th>Mwanafunzi</th><th>Somo</th><th>CA (30%)</th><th>Final (70%)</th><th>Jumla</th><th>Daraja</th><th>Pointi</th></tr>';
+
+    const byStudent = {};
     data.forEach(r => {
-      html += `<tr><td><b>${r.student_name || '-'}</b></td><td>${r.subject_name || '-'}</td><td>${r.ca_score}</td><td>${r.final_score}</td><td><b>${r.total_score}%</b></td><td><b>${r.grade}</b></td><td>${r.points}</td></tr>`;
+      const k = r.student_name.toLowerCase();
+      if (!byStudent[k]) byStudent[k] = { name: r.student_name, pts: [] };
+      if (r.points > 0) byStudent[k].pts.push(r.points);
+    });
+
+    let divHtml = '<h4>Muhtasari wa NECTA Division (Masomo 7 Bora):</h4><table><tr><th>Mwanafunzi</th><th>Idadi ya Masomo</th><th>Jumla ya Pointi</th><th>Division</th></tr>';
+    Object.values(byStudent).forEach(st => {
+      const best7 = st.pts.sort((a,b) => a - b).slice(0, 7);
+      const sumPts = best7.reduce((a,b) => a + b, 0);
+      const div = best7.length >= 7 ? calcDivision(sumPts) : 'Masomo Hayajatimia 7 (' + best7.length + '/7)';
+      divHtml += `<tr><td><b>${st.name}</b></td><td>${best7.length}</td><td><b>${sumPts}</b></td><td><b style="color:#1d4ed8;">${div}</b></td></tr>`;
+    });
+    divArea.innerHTML = divHtml + '</table>';
+
+    let html = '<h4>Orodha ya Alama Kila Somo:</h4><table><tr><th>Mwanafunzi</th><th>Somo</th><th>CA (30%)</th><th>Final (70%)</th><th>Jumla</th><th>Daraja</th><th>Pointi</th></tr>';
+    data.forEach(r => {
+      html += `<tr><td><b>${r.student_name}</b></td><td>${r.subject_name}</td><td>${r.ca_score}</td><td>${r.final_score}</td><td><b>${r.total_score}%</b></td><td><b>${r.grade}</b></td><td>${r.points}</td></tr>`;
     });
     area.innerHTML = html + '</table>';
   }
-
   function generateSeating() {
     const room = document.getElementById('roomName').value || 'Chumba 01';
     let grid = `<h4>Ramani ya Viti 40 (Safu 5 x 8) & ISAL/CAL — ${room}</h4><div style="display:grid; grid-template-columns:repeat(5, 1fr); gap:6px;">`;
@@ -210,6 +269,56 @@
     document.getElementById('seatingArea').innerHTML = grid + '</div>';
   }
 
+  async function saveClearance(e) {
+    e.preventDefault();
+    const st = document.getElementById('clStudent').value;
+    const rsn = document.getElementById('clReason').value;
+    const fin = document.getElementById('clFin').checked ? '✅ Amelipa' : '❌ Anadaiwa';
+    const lib = document.getElementById('clLib').checked ? '✅ Amerudisha' : '❌ Bado';
+    document.getElementById('clearanceArea').innerHTML = `<div style="padding:12px; border:1px solid #16a34a; background:#f0fdf4; border-radius:8px;"><b>FOMU YA CLEARANCE — ${st}</b><br>Sababu: ${rsn}<br>Uhasibu (CRDB/Cash): ${fin} | Maktaba & Maabara: ${lib}<br><button class="btn btn-blue" style="margin-top:8px;" onclick="window.print()">🖨️ Chapisha Fomu ya Clearance (PDF)</button></div>`;
+  }
+
+  async function saveStoreItem(e) {
+    e.preventDefault();
+    await sbInsert('store_inventory', {
+      item_name: document.getElementById('stItem').value,
+      quantity: parseFloat(document.getElementById('stQty').value),
+      unit: document.getElementById('stUnit').value
+    });
+    alert('✅ Bidhaa imehifadhiwa kwenye Stoo!');
+    e.target.reset(); loadStoreItems();
+  }
+
+  async function loadStoreItems() {
+    const data = await sbSelect('store_inventory');
+    let html = '<table><tr><th>Bidhaa</th><th>Kiasi</th><th>Hali</th></tr>';
+    data.forEach(s => {
+      const alertTxt = s.quantity <= 10 ? '<span style="color:#dc2626; font-weight:bold;">⚠️ Kinakaribia Kuisha</span>' : '<span style="color:#16a34a;">● Inatosha</span>';
+      html += `<tr><td><b>${s.item_name}</b></td><td>${s.quantity} ${s.unit}</td><td>${alertTxt}</td></tr>`;
+    });
+    document.getElementById('storeTableArea').innerHTML = html + '</table>';
+  }
+
+  async function saveGatePass(e) {
+    e.preventDefault();
+    await sbInsert('gate_passes', {
+      student_name: document.getElementById('gpStudent').value,
+      reason: document.getElementById('gpReason').value,
+      return_date: document.getElementById('gpReturn').value,
+      status: 'Imetolewa (Active)'
+    });
+    alert('✅ Gate Pass imetolewa rasmi!');
+    e.target.reset(); loadGatePasses();
+  }
+
+  async function loadGatePasses() {
+    const data = await sbSelect('gate_passes');
+    let html = '<table><tr><th>Mwanafunzi</th><th>Sababu</th><th>Tarehe ya Kurudi</th><th>Hali</th></tr>';
+    data.forEach(g => {
+      html += `<tr><td><b>${g.student_name}</b></td><td>${g.reason}</td><td>${g.return_date}</td><td><b>${g.status}</b></td></tr>`;
+    });
+    document.getElementById('gpTableArea').innerHTML = html + '</table>';
+  }
   async function saveProcurement(e) {
     e.preventDefault();
     await sbInsert('procurement_committee', {
@@ -307,51 +416,6 @@
     w.document.write('<html><head><title>Risiti - Sangabuye SIS</title><style>body{font-family:monospace; font-size:12px; width:280px; margin:10px auto;}</style></head><body>' + content + '</body></html>');
     w.document.close(); w.focus();
     setTimeout(() => { w.print(); w.close(); }, 300);
-  }
-  // 1. STOO YA VYAKULA NA MALI ZA SHULE
-  async function saveStoreItem(e) {
-    e.preventDefault();
-    await sbInsert('store_inventory', {
-      item_name: document.getElementById('stItem').value,
-      quantity: parseFloat(document.getElementById('stQty').value),
-      unit: document.getElementById('stUnit').value
-    });
-    alert('✅ Bidhaa imehifadhiwa kwenye Stoo ya Shule!');
-    e.target.reset();
-    loadStoreItems();
-  }
-
-  async function loadStoreItems() {
-    const data = await sbSelect('store_inventory');
-    let html = '<table><tr><th>Bidhaa (Chakula/Vifaa)</th><th>Kiasi Kilichopo</th><th>Hali</th></tr>';
-    data.forEach(s => {
-      const alertTxt = s.quantity <= 10 ? '<span style="color:#dc2626; font-weight:bold;">⚠️ Kinakaribia Kuisha</span>' : '<span style="color:#16a34a;">● Inatosha</span>';
-      html += `<tr><td><b>${s.item_name}</b></td><td>${s.quantity} ${s.unit}</td><td>${alertTxt}</td></tr>`;
-    });
-    document.getElementById('storeTableArea').innerHTML = html + '</table>';
-  }
-
-  // 2. GATE PASS & RUHUSA ZA WANAFUNZI (MKUU WA SHULE)
-  async function saveGatePass(e) {
-    e.preventDefault();
-    await sbInsert('gate_passes', {
-      student_name: document.getElementById('gpStudent').value,
-      reason: document.getElementById('gpReason').value,
-      return_date: document.getElementById('gpReturn').value,
-      status: 'Imetolewa (Active)'
-    });
-    alert('✅ Gate Pass imetolewa rasmi!');
-    e.target.reset();
-    loadGatePasses();
-  }
-
-  async function loadGatePasses() {
-    const data = await sbSelect('gate_passes');
-    let html = '<table><tr><th>Mwanafunzi</th><th>Sababu ya Ruhusa</th><th>Tarehe ya Kurudi</th><th>Hali</th></tr>';
-    data.forEach(g => {
-      html += `<tr><td><b>${g.student_name}</b></td><td>${g.reason}</td><td>${g.return_date}</td><td><b>${g.status}</b></td></tr>`;
-    });
-    document.getElementById('gpTableArea').innerHTML = html + '</table>';
   }
 
   function loadModule(key, btn) {
