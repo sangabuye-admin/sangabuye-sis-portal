@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashibodi ya Mtaaluma | Sangabuye SIS Portal</title>
+  <script src="core.js"></script>
+  <style>
+    * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
+    body { margin: 0; background: #f1f5f9; display: flex; min-height: 100vh; color: #1e293b; }
+    .sidebar { width: 265px; background: #1e1b4b; color: white; display: flex; flex-direction: column; padding: 18px 12px; }
+    .sidebar h2 { font-size: 15px; margin: 0 0 4px; color: #fde68a; text-align: center; }
+    .sidebar p { font-size: 11px; text-align: center; color: #c7d2fe; margin: 0 0 18px; }
+    .menu-btn { background: transparent; border: none; color: #e0e7ff; text-align: left; padding: 10px 12px; border-radius: 8px; cursor: pointer; font-size: 13px; margin-bottom: 4px; }
+    .menu-btn:hover, .menu-btn.active { background: #4338ca; color: white; font-weight: bold; }
+    .main { flex: 1; display: flex; flex-direction: column; }
+    .topbar { background: white; padding: 14px 22px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
+    .content { padding: 22px; }
+    .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px; margin-bottom: 18px; }
+    .card { background: white; padding: 15px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border-left: 4px solid #4338ca; }
+    .card h4 { margin: 0 0 5px; font-size: 11px; color: #64748b; text-transform: uppercase; }
+    .card .val { font-size: 18px; font-weight: bold; color: #1e1b4b; }
+    .panel { background: white; padding: 18px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 18px; }
+    input, select { padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; width: 100%; }
+    table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 13px; }
+    th, td { padding: 9px; border-bottom: 1px solid #e2e8f0; text-align: left; }
+    th { background: #f8fafc; color: #1e1b4b; }
+    .btn { padding: 8px 14px; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold; }
+    .btn-indigo { background: #4338ca; color: white; }
+    .btn-green { background: #059669; color: white; }
+    .btn-amber { background: #d97706; color: white; }
+    .logout-btn { background: #dc2626; color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: bold; margin-top: auto; }
+  </style>
+</head>
+<body>
+<div class="sidebar">
+  <h2>OFISI YA MTAALUMA</h2>
+  <p>Sangabuye Sec | O & A-Level</p>
+  <button class="menu-btn active" onclick="openTab('necta_results', this)">📊 Matokeo & NECTA Division</button>
+  <button class="menu-btn" onclick="openTab('seating_isal', this)">🪑 Viti 40, ISAL & CAL (PDF)</button>
+  <button class="menu-btn" onclick="openTab('report_card', this)">📄 Ripoti ya Mwanafunzi (A4)</button>
+  <button class="menu-btn" onclick="openTab('analytics', this)">📈 Uchambuzi & Remedial List</button>
+  <button class="menu-btn" onclick="openTab('timetable', this)">🗓️ Smart Timetable (Clash-Free)</button>
+  <button class="menu-btn" onclick="openTab('subjects_map', this)">📚 Tahasusi & Masomo (Mapping)</button>
+  <button class="logout-btn" onclick="SGB.logout()">🚪 Toka (Logout)</button>
+</div>
+
+<div class="main">
+  <div class="topbar">
+    <div><strong id="tabTitle">📊 Matokeo & NECTA Division</strong> <span id="syncTime" style="font-size:11px; color:#4338ca;"></span></div>
+    <div style="display:flex; gap:8px;">
+      <button class="btn btn-indigo" onclick="refreshAll()">🔄 Live Refresh</button>
+      <button class="btn btn-amber" onclick="alert('Lugha imebadilishwa (SW / EN).')">SW | EN</button>
+    </div>
+  </div>
+  <div class="content" id="viewArea"></div>
+  <datalist id="stList"></datalist>
+</div>
+<script>
+  const user = SGB.requireRole(['academic', 'super_admin']);
+  SGB.startSessionTimer();
+
+  function updateNames() {
+    const names = new Set();
+    SGB.select('users_profile').filter(u => u.role === 'student').forEach(u => names.add(u.full_name));
+    SGB.select('exam_results').forEach(r => names.add(r.student_name));
+    document.getElementById('stList').innerHTML = Array.from(names).map(n => `<option value="${n}">`).join('');
+  }
+
+  function calcDiv(pts) {
+    if (pts >= 7 && pts <= 17) return 'Division I';
+    if (pts >= 18 && pts <= 21) return 'Division II';
+    if (pts >= 22 && pts <= 25) return 'Division III';
+    if (pts >= 26 && pts <= 33) return 'Division IV';
+    return 'Division 0';
+  }
+
+  function openTab(tab, btn) {
+    document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+    if (btn) document.getElementById('tabTitle').innerText = btn.innerText;
+    document.getElementById('syncTime').innerText = ' • Last synced: ' + new Date().toLocaleTimeString();
+    updateNames();
+    const area = document.getElementById('viewArea');
+
+    if (tab === 'necta_results') {
+      const marks = SGB.select('exam_results');
+      const bySt = {};
+      marks.forEach(m => {
+        const k = m.student_name.toLowerCase();
+        if (!bySt[k]) bySt[k] = { name: m.student_name, pts: [], scores: [] };
+        if (m.points > 0) bySt[k].pts.push(Number(m.points));
+        if (m.grade !== 'X') bySt[k].scores.push(Number(m.total_score));
+      });
+
+      const ranked = Object.values(bySt).map(s => {
+        const best7 = s.pts.sort((a,b) => a - b).slice(0, 7);
+        const sumPts = best7.reduce((a,b) => a + b, 0);
+        const totalM = s.scores.reduce((a,b) => a + b, 0);
+        const avg = s.scores.length ? (totalM / s.scores.length).toFixed(1) : 0;
+        const div = best7.length >= 7 ? calcDiv(sumPts) : `Masomo (${best7.length}/7)`;
+        return { ...s, sumPts, totalM, avg, div };
+      }).sort((a,b) => b.avg - a.avg);
+
+      area.innerHTML = `
+        <div class="cards">
+          <div class="card"><h4>Mfumo wa Alama</h4><div class="val">CA 30% + Final 70%</div></div>
+          <div class="card"><h4>Wanafunzi Waliofanya</h4><div class="val">${ranked.length}</div></div>
+          <div class="card"><h4>Alama ya Mgonjwa</h4><div class="val">'X' (Haiharibu Wastani)</div></div>
+        </div>
+        <div class="panel">
+          <h3>Master Result Sheet (Standard & NECTA Format)</h3>
+          <div style="display:flex; gap:10px; margin-bottom:12px;">
+            <button class="btn btn-indigo" onclick="printSection('masterPrint')">🖨️ Pakua Master Sheet (A4 Landscape PDF)</button>
+            <button class="btn btn-green" onclick="exportCSV()">📊 Pakua Excel (.csv)</button>
+          </div>
+          <div id="masterPrint">
+            <h4>SANGABUYE SECONDARY SCHOOL — MATOKEO YA JUMLA & NAFASI (POSITION)</h4>
+            <table><tr><th>Nafasi (Pos)</th><th>Jina la Mwanafunzi</th><th>Jumla (Total)</th><th>Wastani (Avg)</th><th>Pointi (7 Bora)</th><th>NECTA Division</th></tr>
+            ${ranked.map((r, idx) => `<tr><td><b>#${idx + 1}</b></td><td><b>${r.name}</b></td><td>${r.totalM}</td><td>${r.avg}%</td><td>${r.sumPts}</td><td><b style="color:#4338ca;">${r.div}</b></td></tr>`).join('') || '<tr><td colspan="6">Hakuna alama zilizotumwa na walimu bado.</td></tr>'}
+            </table>
+          </div>
+        </div>`;
+    }
+    if (tab === 'seating_isal') {
+      area.innerHTML = `
+        <div class="panel">
+          <h3>Upangaji wa Vyumba vya Mitihani (Viti 40 — Safu 5 x 8), ISAL & CAL</h3>
+          <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:15px;">
+            <input type="text" id="exRoom" placeholder="Jina la Chumba (Mfano: Form 4 Room 01)">
+            <input type="text" id="exSubj" placeholder="Somo (Mfano: 012 History)">
+            <input type="date" id="exDate">
+            <button class="btn btn-indigo" onclick="genSeating()">🪑 1. Ramani ya Viti 40</button>
+            <button class="btn btn-green" onclick="genISAL()">📋 2. Zalisha Fomu ya ISAL</button>
+            <button class="btn btn-amber" onclick="genCAL()">📑 3. Zalisha Fomu ya CAL</button>
+          </div>
+          <div id="examFormsOutput"></div>
+        </div>`;
+    }
+
+    if (tab === 'report_card') {
+      area.innerHTML = `
+        <div class="panel">
+          <h3>Ripoti Binafsi ya Maendeleo ya Mwanafunzi (A4 Portrait PDF)</h3>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:15px;">
+            <input type="text" id="rcName" list="stList" placeholder="Andika herufi chache za jina la mwanafunzi...">
+            <input type="text" id="rcClass" placeholder="Kidato/Mkondo (Mfano: Form 4A)">
+            <input type="text" id="rcTeacherComment" placeholder="Maoni ya Mwalimu wa Darasa">
+            <input type="text" id="rcHMComment" value="Juhudi zaidi zinahitajika. Hongera." placeholder="Maoni ya Mkuu wa Shule">
+            <button class="btn btn-indigo" style="grid-column: span 2;" onclick="buildReportCard()">📄 Tengeneza Ripoti ya A4 PDF</button>
+          </div>
+          <div id="rcOutput"></div>
+        </div>`;
+    }
+    if (tab === 'analytics') {
+      const marks = SGB.select('exam_results');
+      const remedial = marks.filter(m => Number(m.total_score) < 35 && m.grade !== 'X');
+      area.innerHTML = `
+        <div class="panel">
+          <h3>Uchambuzi Yakinifu & Orodha ya Wanafunzi wa Msaada Maalum (Remedial List &lt; 35%)</h3>
+          <p style="font-size:12px; color:#475569;">Wanafunzi waliopata chini ya alama 35% wanapendekezwa kuingia kwenye programu ya masomo ya ziada (Remedial).</p>
+          <table><tr><th>Mwanafunzi</th><th>Somo</th><th>Alama</th><th>Daraja</th><th>Hatua</th></tr>
+          ${remedial.map(r => `<tr><td><b>${r.student_name}</b></td><td>${r.subject_name}</td><td style="color:#dc2626;"><b>${r.total_score}%</b></td><td>${r.grade}</td><td>Weka Kwenye Remedial</td></tr>`).join('') || '<tr><td colspan="5">Hakuna mwanafunzi aliye chini ya 35% kwa sasa.</td></tr>'}
+          </table>
+        </div>`;
+    }
+
+    if (tab === 'timetable') {
+      const tt = SGB.select('smart_timetable');
+      area.innerHTML = `
+        <div class="panel">
+          <h3>Jenereta ya Ratiba (Smart Timetable yenye Clash Detection)</h3>
+          <form onsubmit="addTimetable(event)" style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:10px; margin-bottom:15px;">
+            <select id="ttDay"><option>Jumatatu</option><option>Jumanne</option><option>Jumatano</option><option>Alhamisi</option><option>Ijumaa</option></select>
+            <input type="text" id="ttTime" required placeholder="Muda (Mfano: 08:00 - 09:20)">
+            <input type="text" id="ttClass" required placeholder="Darasa (Mfano: Form 2A)">
+            <input type="text" id="ttTeacher" required placeholder="Mwalimu & Somo">
+            <button type="submit" class="btn btn-indigo" style="grid-column: span 4;">➕ Ongeza Kipindi (Kagua Mgongano)</button>
+          </form>
+          <table><tr><th>Siku</th><th>Muda</th><th>Darasa</th><th>Mwalimu & Somo</th></tr>
+          ${tt.map(t => `<tr><td><b>${t.day}</b></td><td>${t.time}</td><td>${t.cls}</td><td>${t.teacher}</td></tr>`).join('')}
+          </table>
+        </div>`;
+    }
+
+    if (tab === 'subjects_map') {
+      area.innerHTML = `
+        <div class="panel">
+          <h3>Usajili wa Tahasusi (A-Level Combinations) & Masomo ya Hiari (O-Level)</h3>
+          <p><b>O-Level (Form 1–4):</b> Civics, History, Geography, Kiswahili, English, Physics, Chemistry, Biology, Basic Mathematics (Core) + Commerce, Book-Keeping, ICS (Electives).</p>
+          <p><b>A-Level (Form 5–6):</b> PCM, PCB, PGM, EGM, HGL, HKL, HGK, ECA.</p>
+        </div>`;
+    }
+  }
+  function genSeating() {
+    const room = document.getElementById('exRoom').value || 'Form 4 Room 01';
+    const qr = SGB.qrImg(`SANGABUYE-SEATING:${room}`);
+    let boxes = '';
+    for (let i = 1; i <= 40; i++) {
+      boxes += `<div style="border:1px solid #1e1b4b; padding:6px; text-align:center; font-size:11px; border-radius:4px;"><b>Kiti #${i}</b><br>S.2026/${String(i).padStart(4,'0')}</div>`;
+    }
+    document.getElementById('examFormsOutput').innerHTML = `
+      <div id="examPrint" style="border:1px solid #000; padding:15px;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <div><h3>SANGABUYE SECONDARY SCHOOL — RAMANI YA VITI 40 (5x8)</h3><p>Chumba: <b>${room}</b></p></div>
+          <img src="${qr}">
+        </div>
+        <div style="display:grid; grid-template-columns:repeat(5, 1fr); gap:6px;">${boxes}</div>
+      </div><br><button class="btn btn-indigo" onclick="printSection('examPrint')">🖨️ Chapisha Ramani (PDF)</button>`;
+  }
+
+  function genISAL() {
+    const room = document.getElementById('exRoom').value || 'Room 01';
+    const subj = document.getElementById('exSubj').value || '012 History';
+    const date = document.getElementById('exDate').value || new Date().toLocaleDateString();
+    const qr = SGB.qrImg(`ISAL:${room}|${subj}`);
+    let rows = '';
+    for (let i = 1; i <= 40; i++) {
+      rows += `<tr><td>${i}</td><td>S.2026/${String(i).padStart(4,'0')}</td><td>Mtahiniwa #${i}</td><td></td><td></td></tr>`;
+    }
+    document.getElementById('examFormsOutput').innerHTML = `
+      <div id="examPrint" style="border:1px solid #000; padding:15px;">
+        <div style="display:flex; justify-content:space-between;">
+          <div><h3>INDIVIDUAL STUDENT ATTENDANCE LIST (ISAL)</h3><p>Sangabuye Sec | Chumba: <b>${room}</b> | Somo: <b>${subj}</b> | Tarehe: <b>${date}</b></p></div>
+          <img src="${qr}">
+        </div>
+        <table><tr><th>Kiti</th><th>Candidate No.</th><th>Jina Kamili</th><th>Saini ya Mwanafunzi</th><th>Saini ya Msimamizi</th></tr>${rows}</table>
+      </div><br><button class="btn btn-green" onclick="printSection('examPrint')">🖨️ Chapisha Fomu ya ISAL (PDF)</button>`;
+  }
+
+  function genCAL() {
+    const room = document.getElementById('exRoom').value || 'Room 01';
+    const qr = SGB.qrImg(`CAL:${room}`);
+    let rows = '';
+    for (let i = 1; i <= 40; i++) {
+      rows += `<tr><td>${i}</td><td>S.2026/${String(i).padStart(4,'0')}</td><td>Mtahiniwa #${i}</td><td>[ ] Present  [ ] Absent</td></tr>`;
+    }
+    document.getElementById('examFormsOutput').innerHTML = `
+      <div id="examPrint" style="border:1px solid #000; padding:15px;">
+        <div style="display:flex; justify-content:space-between;">
+          <div><h3>COLLECTIVE ATTENDANCE LIST (CAL) — NECTA FORMAT</h3><p>Sangabuye Secondary School | Chumba: <b>${room}</b> (Watahiniwa 40)</p></div>
+          <img src="${qr}">
+        </div>
+        <table><tr><th>Kiti</th><th>Candidate No.</th><th>Jina Kamili</th><th>Hali ya Mahudhurio</th></tr>${rows}</table>
+      </div><br><button class="btn btn-amber" onclick="printSection('examPrint')">🖨️ Chapisha Fomu ya CAL (PDF)</button>`;
+  }
+
+  function buildReportCard() {
+    const name = document.getElementById('rcName').value.trim();
+    const cls = document.getElementById('rcClass').value.trim() || 'Form 4';
+    const tc = document.getElementById('rcTeacherComment').value;
+    const hmc = document.getElementById('rcHMComment').value;
+    const marks = SGB.select('exam_results').filter(m => m.student_name.toLowerCase() === name.toLowerCase());
+    const qr = SGB.qrImg(`REPORT-CARD:${name}|CLASS:${cls}`);
+
+    document.getElementById('rcOutput').innerHTML = `
+      <div id="rcPrint" style="border:2px solid #1e1b4b; padding:20px; background:white;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <div><h2>SANGABUYE SECONDARY SCHOOL</h2><p>S.L.P 11898, Ilemela - Mwanza | Simu: 0784 755 173</p><h4>TAARIFA YA MAENDELEO YA TAALUMA (STUDENT REPORT CARD)</h4></div>
+          <img src="${qr}">
+        </div>
+        <p><b>Jina la Mwanafunzi:</b> ${name} | <b>Kidato:</b> ${cls}</p>
+        <table><tr><th>Somo (Subject)</th><th>CA (30%)</th><th>Final (70%)</th><th>Jumla</th><th>Daraja</th><th>Pointi</th></tr>
+        ${marks.map(m => `<tr><td>${m.subject_name}</td><td>${m.ca_score}</td><td>${m.final_score}</td><td><b>${m.total_score}%</b></td><td><b>${m.grade}</b></td><td>${m.points}</td></tr>`).join('') || '<tr><td colspan="6">Hakuna alama zilizopatikana kwa jina hili.</td></tr>'}
+        </table><br>
+        <p><b>Maoni ya Mwalimu wa Darasa:</b> ${tc}</p>
+        <p><b>Maoni & Sahihi ya Mkuu wa Shule (0784 755 173):</b> ${hmc}</p>
+      </div><br><button class="btn btn-indigo" onclick="printSection('rcPrint')">🖨️ Pakua / Chapisha Ripoti (A4 PDF)</button>`;
+  }
+
+  function addTimetable(e) {
+    e.preventDefault();
+    const day = document.getElementById('ttDay').value;
+    const time = document.getElementById('ttTime').value.trim();
+    const cls = document.getElementById('ttClass').value.trim();
+    const teacher = document.getElementById('ttTeacher').value.trim();
+    const existing = SGB.select('smart_timetable');
+
+    // Clash Detection (Zuia mwalimu au darasa kugongana)
+    const clash = existing.find(x => x.day === day && x.time === time && (x.teacher.toLowerCase() === teacher.toLowerCase() || x.cls.toLowerCase() === cls.toLowerCase()));
+    if (clash) {
+      alert(`⛔ MGONGANO WA RATIBA (CLASH DETECTED): ${clash.teacher} au darasa ${clash.cls} tayari lina kipindi siku ya ${day} saa ${time}!`);
+      return;
+    }
+    SGB.insert('smart_timetable', { day, time, cls, teacher });
+    openTab('timetable', document.querySelectorAll('.menu-btn'));
+  }
+
+  function exportCSV() {
+    const marks = SGB.select('exam_results');
+    let csv = 'Mwanafunzi,Somo,CA,Final,Jumla,Daraja,Pointi\n';
+    marks.forEach(m => { csv += `"${m.student_name}","${m.subject_name}",${m.ca_score},${m.final_score},${m.total_score},${m.grade},${m.points}\n`; });
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'Sangabuye_NECTA_Results.csv';
+    a.click();
+  }
+
+  function printSection(id) {
+    const html = document.getElementById(id).innerHTML;
+    const w = window.open('', '', 'width=800,height=650');
+    w.document.write('<html><head><title>Sangabuye Academic Print</title><style>body{font-family:sans-serif;padding:15px;}table{width:100%;border-collapse:collapse;}th,td{border:1px solid #000;padding:6px;font-size:12px;}</style></head><body>' + html + '</body></html>');
+    w.document.close(); w.focus();
+    setTimeout(() => { w.print(); w.close(); }, 300);
+  }
+
+  function refreshAll() {
+    const active = document.querySelector('.menu-btn.active');
+    if (active) active.click();
+  }
+
+  openTab('necta_results', document.querySelector('.menu-btn'));
+</script>
+</body>
+</html>
