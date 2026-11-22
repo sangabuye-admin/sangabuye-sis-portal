@@ -55,26 +55,26 @@
   <div class="content" id="mainContent"></div>
 </div>
 <script>
-  const DB_URL = 'https://firebaseio.com';
-
-  async function sbInsert(table, payload) {
+    async function sbInsert(table, payload) {
     payload.id = Date.now();
     payload.created_at = new Date().toISOString();
-    const res = await fetch(`${DB_URL}/${table}.json`, { method: 'POST', body: JSON.stringify(payload) });
-    if (!res.ok) throw new Error('Imeshindwa kuhifadhi');
-    return await res.json();
+    const res = await fetch(`/api/firebase?path=${table}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+    const data = await res.json();
+    if (!res.ok || (data && data.error)) throw new Error(data.error || 'Imeshindwa');
+    return data;
   }
 
   async function sbSelect(table) {
-    const res = await fetch(`${DB_URL}/${table}.json`);
+    const res = await fetch(`/api/firebase?path=${table}`);
     const data = await res.json();
-    if (!data) return [];
+    if (!data || data.error) return [];
     return Object.keys(data).map(key => ({ _key: key, ...data[key] })).reverse();
   }
 
   async function sbUpdate(table, key, payload) {
-    await fetch(`${DB_URL}/${table}/${key}.json`, { method: 'PATCH', body: JSON.stringify(payload) });
+    await fetch(`/api/firebase?path=${table}/${key}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
   }
+
 
   const modules = {
     admin: `
