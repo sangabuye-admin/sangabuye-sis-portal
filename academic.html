@@ -40,10 +40,11 @@
   <button class="menu-btn active" onclick="openTab('exams_ctrl', this)">📝 1. Usimamizi wa Mitihani & Publish</button>
   <button class="menu-btn" onclick="openTab('necta_master', this)">📊 2. Master Sheet (O & A-Level NECTA)</button>
   <button class="menu-btn" onclick="openTab('seating_isal', this)">🪑 3. Viti 40 (Real Mix), ISAL & CAL</button>
-  <button class="menu-btn" onclick="openTab('analytics_gpa', this)">📈 4. Kijinsia (M/F), GPA & Term Trend</button>
+  <button class="menu-btn" onclick="openTab('analytics_gpa', this)">📈 4. Kijinsia (M/F), GPA & Remedial</button>
   <button class="menu-btn" onclick="openTab('report_card', this)">📄 5. Ripoti Binafsi (A4 PDF)</button>
   <button class="menu-btn" onclick="openTab('subjects_map', this)">📚 6. Tahasusi & Masomo ya Hiari</button>
   <button class="menu-btn" onclick="openTab('timetable', this)">🗓️ 7. Smart Timetable (Clash-Free)</button>
+  <button class="menu-btn" onclick="openTab('transfer_bulk', this)">🎓 8. Transfer Cert & Bulk Marks</button>
   <button class="logout-btn" onclick="SGB.logout()">🚪 Toka (Logout)</button>
 </div>
 
@@ -69,7 +70,6 @@
     document.getElementById('stList').innerHTML = Array.from(names).map(n => `<option value="${n}">`).join('');
   }
 
-  // Kanuni ya NECTA O-Level (Masomo 7 Bora: 7-35)
   function calcOLevelDiv(pts) {
     if (pts >= 7 && pts <= 17) return 'Division I';
     if (pts >= 18 && pts <= 21) return 'Division II';
@@ -78,7 +78,6 @@
     return 'Division 0';
   }
 
-  // Kanuni ya NECTA A-Level (Masomo 3 ya Tahasusi: 3-21)
   function calcALevelDiv(pts) {
     if (pts >= 3 && pts <= 9) return 'Division I';
     if (pts >= 10 && pts <= 12) return 'Division II';
@@ -151,34 +150,66 @@
           <div id="examFormsOutput"></div>
         </div>`;
     }
+
     if (tab === 'analytics_gpa') {
       const marks = SGB.select('exam_results');
+      const maps = SGB.select('student_subjects');
       const bySubj = {};
+      const bySt = {};
+
       marks.forEach(m => {
-        if (m.grade === 'X') return;
-        if (!bySubj[m.subject_name]) bySubj[m.subject_name] = { count: 0, pts: 0, pass: 0 };
-        bySubj[m.subject_name].count++;
-        bySubj[m.subject_name].pts += Number(m.points);
-        if (Number(m.points) <= 4) bySubj[m.subject_name].pass++;
+        const k = m.student_name.toLowerCase();
+        if (!bySt[k]) {
+          const info = maps.find(x => x.student_name.toLowerCase() === k);
+          bySt[k] = { name: m.student_name, sex: info ? info.sex : 'M', pts: [], hasX: false };
+        }
+        if (m.grade === 'X') bySt[k].hasX = true;
+        else if (m.points > 0) bySt[k].pts.push(Number(m.points));
+
+        if (m.grade !== 'X') {
+          if (!bySubj[m.subject_name]) bySubj[m.subject_name] = { count: 0, pts: 0, pass: 0 };
+          bySubj[m.subject_name].count++;
+          bySubj[m.subject_name].pts += Number(m.points);
+          if (Number(m.points) <= 4) bySubj[m.subject_name].pass++;
+        }
+      });
+
+      const genderStats = { F: { I:0, II:0, III:0, IV:0, O:0, X:0 }, M: { I:0, II:0, III:0, IV:0, O:0, X:0 } };
+      Object.values(bySt).forEach(s => {
+        const g = s.sex === 'F' ? 'F' : 'M';
+        if (s.pts.length < 7 && s.hasX) { genderStats[g].X++; return; }
+        const agg = s.pts.sort((a,b)=>a-b).slice(0,7).reduce((a,b)=>a+b,0);
+        if (s.pts.length < 7) return;
+        if (agg <= 17) genderStats[g].I++;
+        else if (agg <= 21) genderStats[g].II++;
+        else if (agg <= 25) genderStats[g].III++;
+        else if (agg <= 33) genderStats[g].IV++;
+        else genderStats[g].O++;
       });
 
       const remedial = marks.filter(m => Number(m.total_score) < 35 && m.grade !== 'X');
 
       area.innerHTML = `
         <div class="panel">
-          <h3>1. Uchambuzi wa Ufaulu Kila Somo (Subject GPA & Pass Rate)</h3>
+          <h3>1. NECTA Gender Division Summary (Wasichana vs Wavulana)</h3>
+          <table><tr><th>Jinsia (Sex)</th><th>Div I</th><th>Div II</th><th>Div III</th><th>Div IV</th><th>Div 0</th><th>ABS ('X')</th><th>Jumla</th></tr>
+          <tr><td><b>Wasichana (F)</b></td><td>${genderStats.F.I}</td><td>${genderStats.F.II}</td><td>${genderStats.F.III}</td><td>${genderStats.F.IV}</td><td>${genderStats.F.O}</td><td>${genderStats.F.X}</td><td><b>${Object.values(genderStats.F).reduce((a,b)=>a+b,0)}</b></td></tr>
+          <tr><td><b>Wavulana (M)</b></td><td>${genderStats.M.I}</td><td>${genderStats.M.II}</td><td>${genderStats.M.III}</td><td>${genderStats.M.IV}</td><td>${genderStats.M.O}</td><td>${genderStats.M.X}</td><td><b>${Object.values(genderStats.M).reduce((a,b)=>a+b,0)}</b></td></tr>
+          </table>
+        </div>
+        <div class="panel">
+          <h3>2. Wastani wa Ufaulu Kila Somo (Subject GPA & Pass Rate)</h3>
           <table><tr><th>Somo</th><th>Watahiniwa</th><th>Waliofaulu (A–D)</th><th>Wastani wa GPA</th></tr>
           ${Object.entries(bySubj).map(([sub, d]) => `<tr><td><b>${sub}</b></td><td>${d.count}</td><td>${d.pass} (${Math.round((d.pass/d.count)*100)}%)</td><td><b>${(d.pts/d.count).toFixed(2)}</b></td></tr>`).join('') || '<tr><td colspan="4">Hakuna alama bado.</td></tr>'}
           </table>
         </div>
         <div class="panel">
-          <h3>2. Mlinganisho wa Mwenendo wa Wanafunzi (Term-to-Term Trend & Remedial List &lt; 35%)</h3>
-          <table><tr><th>Mwanafunzi</th><th>Somo</th><th>Alama</th><th>Daraja</th><th>Hali ya Mwenendo</th></tr>
-          ${remedial.map(r => `<tr><td><b>${r.student_name}</b></td><td>${r.subject_name}</td><td style="color:#dc2626;"><b>${r.total_score}%</b></td><td>${r.grade}</td><td>⚠️ Inahitaji Remedial</td></tr>`).join('') || '<tr><td colspan="5">Hakuna mwanafunzi wa Remedial kwa sasa.</td></tr>'}
+          <h3>3. Orodha ya Wanafunzi wa Msaada Maalum (Remedial List &lt; 35%)</h3>
+          <table><tr><th>Mwanafunzi</th><th>Somo</th><th>Alama</th><th>Daraja</th></tr>
+          ${remedial.map(r => `<tr><td><b>${r.student_name}</b></td><td>${r.subject_name}</td><td style="color:#dc2626;"><b>${r.total_score}%</b></td><td>${r.grade}</td></tr>`).join('') || '<tr><td colspan="4">Hakuna mwanafunzi wa Remedial.</td></tr>'}
           </table>
         </div>`;
     }
-
     if (tab === 'report_card') {
       area.innerHTML = `
         <div class="panel">
@@ -225,6 +256,31 @@
           </form>
           <table><tr><th>Siku</th><th>Muda</th><th>Darasa</th><th>Mwalimu & Somo</th></tr>
           ${tt.map(t => `<tr><td><b>${t.day}</b></td><td>${t.time}</td><td>${t.cls}</td><td>${t.teacher}</td></tr>`).join('')}
+          </table>
+        </div>`;
+    }
+
+    if (tab === 'transfer_bulk') {
+      const marks = SGB.select('exam_results');
+      area.innerHTML = `
+        <div class="panel">
+          <h3>1. Barua Rasmi ya Uhamisho (Transfer Out Certificate PDF + QR)</h3>
+          <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:12px;">
+            <input type="text" id="trName" list="stList" placeholder="Jina la Mwanafunzi">
+            <input type="text" id="trToSchool" placeholder="Shule Anakohamia (Mfano: Mwanza Sec)">
+            <input type="text" id="trReason" value="Uhamisho wa Wazazi Kikazi" placeholder="Sababu ya Uhamisho">
+            <button class="btn btn-indigo" style="grid-column: span 3;" onclick="buildTransferCert()">📜 Zalisha Barua ya Uhamisho (PDF)</button>
+          </div>
+          <div id="trOutput"></div>
+        </div>
+        <div class="panel">
+          <h3>2. Kupakia Alama kwa Mkupuo (Bulk Marks CSV) & Kurekebisha Alama</h3>
+          <p style="font-size:12px; color:#475569;">Muundo: <b>Jina la Mwanafunzi, Somo, CA(30), Final(70)</b></p>
+          <textarea id="bulkMarksTxt" rows="4" placeholder="Amina Hassan, Mathematics, 24, 58&#10;Baraka John, Mathematics, 19, 46"></textarea><br><br>
+          <button class="btn btn-green" onclick="importBulkMarks()">📥 Pakia Alama Zote Sasa</button>
+          <h4>Rekebisha Alama Iliyokosewa:</h4>
+          <table><tr><th>Mwanafunzi</th><th>Somo</th><th>Jumla</th><th>Daraja</th><th>Hatua</th></tr>
+          ${marks.slice(0, 15).map(m => `<tr><td>${m.student_name}</td><td>${m.subject_name}</td><td>${m.total_score}%</td><td><b>${m.grade}</b></td><td><button class="btn btn-amber" onclick="editMark(${m.id}, ${m.ca_score}, ${m.final_score})">✏️ Rekebisha</button></td></tr>`).join('')}
           </table>
         </div>`;
     }
@@ -324,7 +380,6 @@
         ${cands.map((c, i) => `<tr><td>${i+1}</td><td>${c.no}</td><td><b>${c.name}</b></td><td>[ ] Present   [ ] Absent</td></tr>`).join('')}</table>
       </div><br><button class="btn btn-amber" onclick="printSection('examPrint')">🖨️ Chapisha CAL (PDF)</button>`;
   }
-
   function buildReportCard() {
     const name = document.getElementById('rcName').value.trim();
     const cls = document.getElementById('rcClass').value.trim() || 'Form 4';
@@ -340,6 +395,54 @@
         ${marks.map(m => `<tr><td>${m.subject_name}</td><td>${m.ca_score}</td><td>${m.final_score}</td><td><b>${m.total_score}%</b></td><td><b>${m.grade}</b></td><td>${m.points}</td></tr>`).join('')}</table><br>
         <p><b>Maoni ya Mwalimu wa Darasa:</b> ${tc}</p><p><b>Maoni & Sahihi ya Mkuu wa Shule (0784 755 173):</b> ${hmc}</p>
       </div><br><button class="btn btn-indigo" onclick="printSection('rcPrint')">🖨️ Pakua Ripoti (A4 PDF)</button>`;
+  }
+
+  function buildTransferCert() {
+    const name = document.getElementById('trName').value.trim();
+    const toSch = document.getElementById('trToSchool').value.trim();
+    const rsn = document.getElementById('trReason').value.trim();
+    const qr = SGB.qrImg(`TRANSFER-CERT:${name}|TO:${toSch}`);
+    document.getElementById('trOutput').innerHTML = `
+      <div id="trPrint" style="border:2px solid #0f294a; padding:22px; background:white;">
+        <div style="display:flex; justify-content:space-between;"><div><h2>SANGABUYE SECONDARY SCHOOL</h2><p>S.L.P 11898, Ilemela - Mwanza | Simu: 0784 755 173</p><h4>HATI RASMI YA UHAMISHO WA MWANAFUNZI (TRANSFER CERTIFICATE)</h4></div><img src="${qr}"></div>
+        <p>Inathibitishwa kuwa mwanafunzi <b>${name}</b> amekuwa mwanafunzi halali wa Sangabuye Secondary School na amekamilisha taratibu zote za uhakiki (Clearance) za uhasibu, maktaba, na taaluma.</p>
+        <p><b>Shule Anakohamia:</b> ${toSch}<br><b>Sababu ya Uhamisho:</b> ${rsn}<br><b>Tarehe ya Kutolewa:</b> ${new Date().toLocaleDateString('sw-TZ')}</p><br>
+        <p><b>Imethibitishwa na Mkuu wa Shule:</b> _______________________ (Simu: 0784 755 173)</p>
+      </div><br><button class="btn btn-indigo" onclick="printSection('trPrint')">🖨️ Chapisha Hati ya Uhamisho (PDF)</button>`;
+  }
+
+  function importBulkMarks() {
+    const lines = document.getElementById('bulkMarksTxt').value.trim().split('\n').filter(Boolean);
+    lines.forEach(l => {
+      const [st, sub, caStr, finStr] = l.split(',').map(x => x.trim());
+      const ca = Number(caStr || 0), finRaw = Number(finStr || 0);
+      const abs = finRaw < 0, fin = abs ? 0 : finRaw, tot = abs ? 0 : (ca + fin);
+      let grade = 'F', points = 5;
+      if (abs) { grade = 'X'; points = 0; }
+      else if (tot >= 75) { grade = 'A'; points = 1; }
+      else if (tot >= 65) { grade = 'B'; points = 2; }
+      else if (tot >= 45) { grade = 'C'; points = 3; }
+      else if (tot >= 30) { grade = 'D'; points = 4; }
+      if (st && sub) SGB.insert('exam_results', { student_name: st, subject_name: sub, ca_score: ca, final_score: fin, total_score: tot, grade, points });
+    });
+    alert(`✅ Alama za wanafunzi ${lines.length} zimepakiwa kikamilifu!`);
+    openTab('transfer_bulk');
+  }
+
+  function editMark(id, oldCa, oldFin) {
+    const newCa = Number(prompt('Ingiza alama mpya ya CA (0-30):', oldCa));
+    const newFin = Number(prompt('Ingiza alama mpya ya Final (0-70 au -1):', oldFin));
+    if (isNaN(newCa) || isNaN(newFin)) return;
+    const abs = newFin < 0, fin = abs ? 0 : newFin, tot = abs ? 0 : (newCa + fin);
+    let grade = 'F', points = 5;
+    if (abs) { grade = 'X'; points = 0; }
+    else if (tot >= 75) { grade = 'A'; points = 1; }
+    else if (tot >= 65) { grade = 'B'; points = 2; }
+    else if (tot >= 45) { grade = 'C'; points = 3; }
+    else if (tot >= 30) { grade = 'D'; points = 4; }
+    SGB.update('exam_results', id, { ca_score: newCa, final_score: fin, total_score: tot, grade, points });
+    alert('✅ Alama imerekebishwa!');
+    openTab('transfer_bulk');
   }
 
   function saveSubjMap(e) {
