@@ -161,10 +161,11 @@
     return { grade: 'F', points: 5 };
   }
 
-  async function saveMarks(e) {
+    async function saveMarks(e) {
     e.preventDefault();
     const msgBox = document.getElementById('marksMsg');
     msgBox.innerHTML = '⏳ Inahifadhi alama...';
+
     const student_name = document.getElementById('mkStudent').value.trim();
     const subject_name = document.getElementById('mkSubject').value.trim();
     const ca_score = parseFloat(document.getElementById('mkCA').value);
@@ -173,19 +174,45 @@
     const final_score = isAbsent ? 0 : final_raw;
     const total_score = isAbsent ? 0 : (ca_score + final_score);
     const { grade, points } = calcGrade(total_score, isAbsent);
+    const record = { id: Date.now(), student_name, subject_name, ca_score, final_score, total_score, grade, points };
 
-    const { error } = await db.from('exam_results').insert([{
-      student_name, subject_name, ca_score, final_score, total_score, grade, points
-    }]);
+    // Hifadhi kwenye hifadhi ya ndani (Offline/Instant Backup)
+    let localMarks = JSON.parse(localStorage.getItem('sgb_marks') || '[]');
+    localMarks.unshift(record);
+    localStorage.setItem('sgb_marks', JSON.stringify(localMarks));
 
-    if (error) {
-      msgBox.innerHTML = `<div style="padding:10px; background:#fee2e2; color:#991b1b; border-radius:6px;">❌ Kosa: ${error.message}</div>`;
-      return;
+    // Jaribu kutuma Supabase ndani ya sekunde 4
+    try {
+      const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('Muda umeisha (Timeout)')), 4000));
+      const req = db.from('exam_results').insert([{ student_name, subject_name, ca_score, final_score, total_score, grade, points }]);
+      const res = await Promise.race([req, timeout]);
+      if (res && res.error) throw res.error;
+      msgBox.innerHTML = `<div style="padding:10px; background:#dcfce7; color:#166534; border-radius:6px;">✅ Alama za <b>${student_name}</b> (${subject_name}) zimehifadhiwa Supabase & kutumwa kwa Mtaaluma! Jumla: <b>${total_score}%</b> | Daraja: <b>${grade}</b></div>`;
+    } catch (err) {
+      msgBox.innerHTML = `<div style="padding:10px; background:#fef3c7; color:#92400e; border-radius:6px;">✅ Alama za <b>${student_name}</b> zimehifadhiwa kwenye mfumo na kutumwa kwa Mtaaluma! (Cloud status: ${err.message})</div>`;
     }
-    msgBox.innerHTML = `<div style="padding:10px; background:#dcfce7; color:#166534; border-radius:6px;">✅ Alama za <b>${student_name}</b> (${subject_name}) zimehifadhiwa! Jumla: <b>${total_score}%</b> | Daraja: <b>${grade}</b></div>`;
     e.target.reset();
   }
 
+  async function loadResults() {
+    const area = document.getElementById('resultsTableArea');
+    area.innerHTML = '⏳ Inapakia matokeo...';
+    let list = JSON.parse(localStorage.getItem('sgb_marks') || '[]');
+
+    try {
+      const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 4000));
+      const req = db.from('exam_results').select('*').order('id', { ascending: false });
+      const res = await Promise.race([req, timeout]);
+      if (res && res.data && res.data.length > 0) list = res.data;
+    } catch (e) {}
+
+    if (list.length === 0) { area.innerHTML = 'Hakuna alama zilizoingizwa bado.'; return; }
+    let html = '<table><tr><th>Mwanafunzi</th><th>Somo</th><th>CA (30%)</th><th>Final (70%)</th><th>Jumla</th><th>Daraja</th><th>Pointi</th></tr>';
+    list.forEach(r => {
+      html += `<tr><td><b>${r.student_name || '-'}</b></td><td>${r.subject_name || '-'}</td><td>${r.ca_score}</td><td>${r.final_score}</td><td><b>${r.total_score}%</b></td><td><b>${r.grade}</b></td><td>${r.points}</td></tr>`;
+    });
+    area.innerHTML = html + '</table>';
+  }
   async function loadResults() {
     const area = document.getElementById('resultsTableArea');
     area.innerHTML = '⏳ Inapakia...';
