@@ -5,31 +5,30 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashibodi | Sangabuye SIS Portal</title>
   <script src="https://jsdelivr.net"></script>
-  <script src="supabase-config.js"></script>
-
   <style>
     * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
     body { margin: 0; background: #f1f5f9; display: flex; min-height: 100vh; color: #1e293b; }
-    .sidebar { width: 260px; background: #0f294a; color: white; display: flex; flex-direction: column; padding: 20px 15px; }
-    .sidebar h2 { font-size: 16px; margin: 0 0 5px; color: #fbbf24; text-align: center; }
-    .sidebar p { font-size: 11px; text-align: center; color: #cbd5e1; margin: 0 0 20px; }
-    .menu-btn { background: transparent; border: none; color: #e2e8f0; text-align: left; padding: 11px 12px; border-radius: 8px; cursor: pointer; font-size: 13px; margin-bottom: 5px; transition: 0.2s; }
+    .sidebar { width: 255px; background: #0f294a; color: white; display: flex; flex-direction: column; padding: 18px 12px; }
+    .sidebar h2 { font-size: 15px; margin: 0 0 4px; color: #fbbf24; text-align: center; }
+    .sidebar p { font-size: 11px; text-align: center; color: #cbd5e1; margin: 0 0 18px; }
+    .menu-btn { background: transparent; border: none; color: #e2e8f0; text-align: left; padding: 10px 12px; border-radius: 8px; cursor: pointer; font-size: 13px; margin-bottom: 4px; }
     .menu-btn:hover, .menu-btn.active { background: #1d4ed8; color: white; font-weight: bold; }
     .main { flex: 1; display: flex; flex-direction: column; }
-    .topbar { background: white; padding: 14px 25px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
-    .content { padding: 25px; }
-    .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
-    .card { background: white; padding: 16px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border-left: 4px solid #1d4ed8; }
-    .card h4 { margin: 0 0 6px; font-size: 12px; color: #64748b; }
-    .card .val { font-size: 18px; font-weight: bold; color: #0f294a; }
-    .panel { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 20px; }
-    input, select { padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; width: 100%; }
+    .topbar { background: white; padding: 14px 22px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
+    .content { padding: 22px; }
+    .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px; margin-bottom: 18px; }
+    .card { background: white; padding: 15px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border-left: 4px solid #1d4ed8; }
+    .card h4 { margin: 0 0 5px; font-size: 11px; color: #64748b; text-transform: uppercase; }
+    .card .val { font-size: 17px; font-weight: bold; color: #0f294a; }
+    .panel { background: white; padding: 18px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 18px; }
+    input, select, textarea { padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; width: 100%; }
     table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 13px; }
-    th, td { padding: 10px; border-bottom: 1px solid #e2e8f0; text-align: left; }
+    th, td { padding: 9px; border-bottom: 1px solid #e2e8f0; text-align: left; }
     th { background: #f8fafc; color: #0f294a; }
     .btn { padding: 8px 14px; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold; }
     .btn-green { background: #16a34a; color: white; }
     .btn-blue { background: #1d4ed8; color: white; }
+    .btn-red { background: #dc2626; color: white; }
     .btn-amber { background: #d97706; color: white; }
     .logout-btn { background: #dc2626; color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: bold; margin-top: auto; }
   </style>
@@ -46,38 +45,49 @@
   <button class="menu-btn" onclick="loadModule('teacher', this)">📚 6. Walimu (Alama & Kazi)</button>
   <button class="menu-btn" onclick="loadModule('parent', this)">👨‍👩‍👧 7. Tovuti ya Mzazi</button>
   <button class="menu-btn" onclick="loadModule('student', this)">🎒 8. Tovuti ya Mwanafunzi</button>
-  <button class="logout-btn" onclick="logout()">🚪 Toka Kwenye Mfumo (Logout)</button>
+  <button class="logout-btn" onclick="window.location.href='index.html'">🚪 Toka (Logout)</button>
 </div>
 
 <div class="main">
   <div class="topbar">
-    <div><strong id="pageTitle">🛡️ 1. Super Admin & IT</strong> <span style="font-size:12px; color:#16a34a;">● Online</span></div>
+    <div><strong id="pageTitle">🛡️ 1. Super Admin & IT</strong> <span style="font-size:12px; color:#16a34a;">● Supabase Live</span></div>
     <button class="btn btn-blue" onclick="location.reload()">🔄 Refresh</button>
   </div>
   <div class="content" id="mainContent"></div>
 </div>
 <script>
+  const SUPABASE_URL = 'https://supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_I5QzeQGfG15VGaYBr7Nj7A_3MDlh7U5';
+  const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
   const modules = {
     admin: `
       <div class="cards">
-        <div class="card"><h4>Hali ya Database</h4><div class="val" style="color:#16a34a;">● Supabase Imeunganishwa</div></div>
-        <div class="card"><h4>Akaunti ya CRDB</h4><div class="val">0150838972100</div></div>
+        <div class="card"><h4>Database</h4><div class="val" style="color:#16a34a;">● Imeunganishwa</div></div>
+        <div class="card"><h4>CRDB Bank</h4><div class="val">0150838972100</div></div>
       </div>
       <div class="panel">
         <h3>Watumiaji Waliojisajili (Approval Queue)</h3>
-        <button class="btn btn-blue" onclick="loadUsers()">🔄 Pakia Watumiaji Kutoka Database</button>
-        <div id="usersTableArea" style="margin-top:12px;">Bofya kitufe hapo juu kuona waliojisajili...</div>
+        <button class="btn btn-blue" onclick="loadUsers()">🔄 Pakia Watumiaji</button>
+        <div id="usersTableArea" style="margin-top:12px;">Bofya kitufe hapo juu...</div>
       </div>`,
     director: `
       <div class="cards">
         <div class="card" style="border-color:#16a34a;"><h4>CRDB: SHULE YA SEKONDARI SANGABUYE E.K</h4><div class="val">0150838972100</div></div>
-        <div class="card"><h4>Hali ya Uendeshaji</h4><div class="val">O-Level & A-Level</div></div>
+        <div class="card"><h4>Ngazi za Elimu</h4><div class="val">O-Level & A-Level</div></div>
       </div>
-      <div class="panel"><h3>Ripoti Kuu ya Mkurugenzi</h3><p>Muhtasari wa makusanyo ya benki ya CRDB, pesa taslimu (Cash), na maendeleo ya taaluma.</p></div>`,
+      <div class="panel"><h3>Muhtasari wa Mkurugenzi</h3><p>Ufuatiliaji wa mapato ya benki ya CRDB, pesa taslimu (Cash), na matokeo ya mitihani.</p></div>`,
     headmaster: `
       <div class="panel">
-        <h3>Ofisi ya Mkuu wa Shule (0784 755 173)</h3>
-        <p>Idhini ya Kikao cha Kamati ya Manunuzi, Vocha za Matumizi, Taarifa za Michango ya Wanafunzi, na Gate Pass.</p>
+        <h3>Ofisi ya Mkuu wa Shule (0784 755 173) — Kamati ya Manunuzi</h3>
+        <form onsubmit="saveProcurement(event)" style="display:grid; gap:10px; margin-bottom:15px;">
+          <input type="text" id="procTitle" required placeholder="Kichwa cha Kikao / Manunuzi">
+          <input type="number" id="procBudget" required placeholder="Makadirio ya Bajeti (TZS)">
+          <textarea id="procSummary" rows="2" required placeholder="Muhtasari wa maamuzi ya kamati..."></textarea>
+          <button type="submit" class="btn btn-blue">📤 Wasilisha Kwa Mkuu wa Shule</button>
+        </form>
+        <button class="btn btn-green" onclick="loadProcurements()">🔄 Pakia Maombi ya Manunuzi</button>
+        <div id="procListArea" style="margin-top:12px;"></div>
       </div>`,
     accountant: `
       <div class="panel">
@@ -87,9 +97,7 @@
           <input type="text" id="stReg" required placeholder="Namba ya Usajili (Mfano: S.2026/001)">
           <div style="grid-column: span 2;">
             <input type="text" id="payCat" list="mchangoList" required placeholder="Andika Aina ya Mchango (Mfano: Ada, Chakula, Mahafali, Sare...)">
-            <datalist id="mchangoList">
-              <option value="Ada ya Shule (School Fees)"><option value="Mchango wa Chakula"><option value="Mchango wa Mitihani"><option value="Ujenzi na Maendeleo">
-            </datalist>
+            <datalist id="mchangoList"><option value="Ada ya Shule"><option value="Mchango wa Chakula"><option value="Mchango wa Mitihani"><option value="Ujenzi"></datalist>
           </div>
           <select id="payMethod" required>
             <option value="CRDB_Bank">CRDB Bank (0150838972100)</option>
@@ -103,40 +111,43 @@
         <div id="receiptPreview" style="margin-top:20px;"></div>
       </div>`,
     academic: `
-      <div class="cards">
-        <div class="card"><h4>Mfumo wa Alama (Dynamic)</h4><div class="val">CA 30% + Final 70%</div></div>
-        <div class="card"><h4>Vyumba vya Mitihani</h4><div class="val">Viti 40 (Safu 5 x 8)</div></div>
-        <div class="card"><h4>Fomu za NECTA</h4><div class="val">ISAL & CAL</div></div>
-      </div>
       <div class="panel">
-        <h3>1. Uchambuzi wa Matokeo & NECTA Division (Kutoka Database)</h3>
+        <h3>1. Matokeo Yaliyotumwa na Walimu (NECTA Grading)</h3>
         <button class="btn btn-blue" onclick="loadResults()">🔄 Pakia Alama Zote za Wanafunzi</button>
         <button class="btn btn-green" onclick="window.print()">🖨️ Chapisha Master Sheet (PDF)</button>
         <div id="resultsTableArea" style="margin-top:12px;">Bofya kitufe kupakia matokeo...</div>
       </div>
       <div class="panel">
-        <h3>2. Upangaji wa Vyumba vya Mitihani (Viti 40) & Fomu za ISAL / CAL</h3>
+        <h3>2. Upangaji wa Vyumba vya Mitihani (Viti 40) & ISAL/CAL</h3>
         <div style="display:flex; gap:10px; margin-bottom:12px;">
-          <input type="text" id="roomName" placeholder="Jina la Chumba (Mfano: Form 4 Room A)" style="max-width:280px;">
-          <button class="btn btn-amber" onclick="generateSeating()">🪑 Zalisha Mpangilio wa Viti 40 (ISAL/CAL)</button>
+          <input type="text" id="roomName" placeholder="Jina la Chumba (Mfano: Form 4 Room A)" style="max-width:260px;">
+          <button class="btn btn-amber" onclick="generateSeating()">🪑 Zalisha Viti 40 (ISAL/CAL)</button>
         </div>
         <div id="seatingArea"></div>
       </div>`,
     teacher: `
       <div class="panel">
         <h3>Ingiza Alama za Somo (CA 30% + Final 70%)</h3>
-        <p style="font-size:12px; color:#475569;">Kumbuka: Kama mwanafunzi alikuwa mgonjwa hakufanya mtihani, weka alama <b>-1</b> ili mfumo umpe alama <b>X</b>.</p>
+        <p style="font-size:12px; color:#475569;">Weka <b>-1</b> kwenye Final kwa mwanafunzi mgonjwa ili apate alama <b>X</b>.</p>
         <form onsubmit="saveMarks(event)" style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:12px;">
           <input type="text" id="mkStudent" required placeholder="Majina Kamili ya Mwanafunzi">
-          <input type="text" id="mkSubject" required placeholder="Somo (Mfano: Mathematics, Kiswahili, Physics)">
+          <input type="text" id="mkSubject" required placeholder="Somo (Mfano: Mathematics, Kiswahili)">
           <input type="number" step="0.1" max="30" id="mkCA" required placeholder="Alama za CA (Kati ya 30)">
-          <input type="number" step="0.1" min="-1" max="70" id="mkFinal" required placeholder="Alama za Mtihani wa Mwisho (Kati ya 70 au -1 kwa Mgonjwa)">
+          <input type="number" step="0.1" min="-1" max="70" id="mkFinal" required placeholder="Alama za Final (Kati ya 70 au -1)">
           <button type="submit" class="btn btn-green" style="grid-column: span 2; padding:12px;">💾 Hifadhi Alama & Tuma Kwa Mtaaluma</button>
         </form>
         <div id="marksMsg" style="margin-top:12px;"></div>
       </div>`,
-    parent: `<div class="panel"><h3>Tovuti ya Mzazi</h3><p>Lipa michango kupitia <b>CRDB Bank: SHULE YA SEKONDARI SANGABUYE E.K (0150838972100)</b> au Cash kwa Mhasibu (0615 000 305).</p></div>`,
-    student: `<div class="panel"><h3>Tovuti ya Mwanafunzi</h3><p>Pakua kazi za nyumbani, fanya mitihani ya majaribio (CBT), na angalia ratiba yako.</p></div>`
+    parent: `
+      <div class="panel">
+        <h3>Tovuti ya Mzazi — Angalia Risiti za Malipo & Matokeo ya Mtoto</h3>
+        <div style="display:flex; gap:10px; margin-bottom:12px;">
+          <input type="text" id="searchChildName" placeholder="Andika Jina Kamili la Mwanafunzi..." style="max-width:300px;">
+          <button class="btn btn-blue" onclick="searchChildData()">🔍 Tafuta Taarifa</button>
+        </div>
+        <div id="parentDataArea"></div>
+      </div>`,
+    student: `<div class="panel"><h3>Tovuti ya Mwanafunzi</h3><p>Karibu Sangabuye SIS Portal! Wasiliana na mwalimu wa somo kupata kazi za nyumbani na mitihani ya majaribio (CBT).</p></div>`
   };
   function calcGrade(total, isAbsent) {
     if (isAbsent) return { grade: 'X', points: 0 };
@@ -147,14 +158,12 @@
     return { grade: 'F', points: 5 };
   }
 
-    async function saveMarks(e) {
+  async function saveMarks(e) {
     e.preventDefault();
-    if (typeof db === 'undefined') {
-      alert('❌ KOSA: Faili la supabase-config.js halijasomwa. Hakikisha lipo kwenye GitHub na limeitwa juu ya dashboard.html.');
-      return;
-    }
-    const student_name = document.getElementById('mkStudent').value;
-    const subject_name = document.getElementById('mkSubject').value;
+    const msgBox = document.getElementById('marksMsg');
+    msgBox.innerHTML = '⏳ Inahifadhi alama kwenye database...';
+    const student_name = document.getElementById('mkStudent').value.trim();
+    const subject_name = document.getElementById('mkSubject').value.trim();
     const ca_score = parseFloat(document.getElementById('mkCA').value);
     const final_raw = parseFloat(document.getElementById('mkFinal').value);
     const isAbsent = final_raw < 0;
@@ -167,30 +176,81 @@
     }]);
 
     if (error) {
-      alert('❌ KOSA LA SUPABASE: ' + error.message);
+      msgBox.innerHTML = `<div style="padding:10px; background:#fee2e2; color:#991b1b; border-radius:6px;">❌ Kosa: ${error.message}</div>`;
       return;
     }
-    document.getElementById('marksMsg').innerHTML = `<div style="padding:10px; background:#dcfce7; color:#166534; border-radius:6px;">✅ Alama za <b>${student_name}</b> (${subject_name}) zimehifadhiwa! Jumla: <b>${total_score}%</b> | Daraja: <b>${grade}</b> (Pointi: ${points})</div>`;
+    msgBox.innerHTML = `<div style="padding:10px; background:#dcfce7; color:#166534; border-radius:6px;">✅ Alama za <b>${student_name}</b> (${subject_name}) zimehifadhiwa na kutumwa kwa Mtaaluma! Jumla: <b>${total_score}%</b> | Daraja: <b>${grade}</b></div>`;
     e.target.reset();
   }
-
   async function loadResults() {
+    const area = document.getElementById('resultsTableArea');
+    area.innerHTML = '⏳ Inapakia matokeo...';
     const { data, error } = await db.from('exam_results').select('*').order('id', { ascending: false });
-    if (error) { alert(error.message); return; }
+    if (error) { area.innerHTML = '❌ Kosa: ' + error.message; return; }
+    if (!data || data.length === 0) { area.innerHTML = 'Hakuna alama zilizoingizwa bado.'; return; }
     let html = '<table><tr><th>Mwanafunzi</th><th>Somo</th><th>CA (30%)</th><th>Final (70%)</th><th>Jumla</th><th>Daraja</th><th>Pointi</th></tr>';
     data.forEach(r => {
       html += `<tr><td><b>${r.student_name || '-'}</b></td><td>${r.subject_name || '-'}</td><td>${r.ca_score}</td><td>${r.final_score}</td><td><b>${r.total_score}%</b></td><td><b>${r.grade}</b></td><td>${r.points}</td></tr>`;
     });
-    document.getElementById('resultsTableArea').innerHTML = html + '</table>';
+    area.innerHTML = html + '</table>';
   }
 
   function generateSeating() {
-    const room = document.getElementById('roomName').value || 'Chumba Cha Mtihani 01';
-    let grid = `<h4>Ramani ya Viti 40 (Safu 5 x 8) & Fomu ya ISAL/CAL — ${room}</h4><div style="display:grid; grid-template-columns:repeat(5, 1fr); gap:8px;">`;
+    const room = document.getElementById('roomName').value || 'Chumba 01';
+    let grid = `<h4>Ramani ya Viti 40 (Safu 5 x 8) & ISAL/CAL — ${room}</h4><div style="display:grid; grid-template-columns:repeat(5, 1fr); gap:6px;">`;
     for (let i = 1; i <= 40; i++) {
-      grid += `<div style="border:1px solid #0f294a; padding:8px; border-radius:6px; text-align:center; font-size:11px; background:#f8fafc;"><b>Kiti #${i}</b><br>S.2026/${String(i).padStart(4,'0')}<br>[Saini ISAL]</div>`;
+      grid += `<div style="border:1px solid #0f294a; padding:6px; border-radius:5px; text-align:center; font-size:11px; background:#f8fafc;"><b>Kiti #${i}</b><br>S.2026/${String(i).padStart(4,'0')}<br>[ISAL]</div>`;
     }
     document.getElementById('seatingArea').innerHTML = grid + '</div>';
+  }
+
+  async function saveProcurement(e) {
+    e.preventDefault();
+    const { error } = await db.from('procurement_committee').insert([{
+      meeting_title: document.getElementById('procTitle').value,
+      estimated_budget: document.getElementById('procBudget').value,
+      minutes_summary: document.getElementById('procSummary').value,
+      status: 'pending'
+    }]);
+    if (error) { alert('Kosa: ' + error.message); return; }
+    alert('✅ Muhtasari umetumwa kwa Mkuu wa Shule!');
+    e.target.reset(); loadProcurements();
+  }
+  async function loadProcurements() {
+    const { data, error } = await db.from('procurement_committee').select('*').order('id', { ascending: false });
+    if (error) { alert(error.message); return; }
+    let html = '<table><tr><th>Kikao</th><th>Bajeti (TZS)</th><th>Hali</th><th>Maamuzi</th></tr>';
+    data.forEach(p => {
+      html += `<tr><td><b>${p.meeting_title}</b><br><small>${p.minutes_summary}</small></td><td>${Number(p.estimated_budget).toLocaleString()}</td><td><b>${p.status}</b></td>
+      <td><button class="btn btn-green" onclick="decideProc(${p.id}, 'accepted')">Accept</button> <button class="btn btn-red" onclick="decideProc(${p.id}, 'rejected')">Reject</button></td></tr>`;
+    });
+    document.getElementById('procListArea').innerHTML = html + '</table>';
+  }
+
+  async function decideProc(id, status) {
+    await db.from('procurement_committee').update({ status }).eq('id', id);
+    loadProcurements();
+  }
+
+  async function searchChildData() {
+    const name = document.getElementById('searchChildName').value.trim();
+    const area = document.getElementById('parentDataArea');
+    if (!name) return;
+    const { data: receipts } = await db.from('accounting_receipts').select('*').ilike('student_name', `%${name}%`);
+    const { data: marks } = await db.from('exam_results').select('*').ilike('student_name', `%${name}%`);
+    let html = '<h4>Risiti za Malipo (CRDB 0150838972100 & Cash)</h4>';
+    if (receipts && receipts.length) {
+      html += '<table><tr><th>Risiti Na.</th><th>Mchango</th><th>Njia</th><th>Kiasi (TZS)</th></tr>';
+      receipts.forEach(r => html += `<tr><td>${r.receipt_number}</td><td>${r.payment_category}</td><td>${r.payment_method}</td><td><b>${Number(r.amount_paid).toLocaleString()}</b></td></tr>`);
+      html += '</table>';
+    } else { html += '<p>Hakuna risiti zilizopatikana.</p>'; }
+    html += '<h4>Matokeo ya Mitihani</h4>';
+    if (marks && marks.length) {
+      html += '<table><tr><th>Somo</th><th>Jumla</th><th>Daraja</th></tr>';
+      marks.forEach(m => html += `<tr><td>${m.subject_name}</td><td>${m.total_score}%</td><td><b>${m.grade}</b></td></tr>`);
+      html += '</table>';
+    } else { html += '<p>Hakuna matokeo yaliyopatikana.</p>'; }
+    area.innerHTML = html;
   }
 
   async function loadUsers() {
@@ -206,7 +266,7 @@
 
   async function approveUser(id) {
     await db.from('users_profile').update({ status: 'approved' }).eq('id', id);
-    alert('Akaunti imeidhinishwa!'); loadUsers();
+    alert('✅ Akaunti imeidhinishwa!'); loadUsers();
   }
 
   async function saveReceipt(e) {
@@ -224,7 +284,7 @@
     const { error } = await db.from('accounting_receipts').insert([{
       receipt_number, student_name, student_reg_no, payment_category, payment_method, bank_ref_no, amount_paid, qr_verification_hash
     }]);
-    if (error) { alert('Hitilafu: ' + error.message); return; }
+    if (error) { alert('Kosa: ' + error.message); return; }
 
     document.getElementById('receiptPreview').innerHTML = `
       <div id="printableReceipt" style="border:2px dashed #0f294a; padding:15px; max-width:300px; background:#fff; font-family:monospace; font-size:12px;">
@@ -250,7 +310,6 @@
     document.getElementById('pageTitle').innerText = btn.innerText;
     document.getElementById('mainContent').innerHTML = modules[key];
   }
-  function logout() { window.location.href = 'index.html'; }
   loadModule('admin', document.querySelector('.menu-btn'));
 </script>
 </body>
