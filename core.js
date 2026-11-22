@@ -14,6 +14,10 @@ const SGB = {
     return item;
   },
   select(table) {
+      getConfig() {
+    return JSON.parse(localStorage.getItem('sgb_school_config') || '{"year":"2026","term":"Term I","crdb":"0150838972100"}');
+  },
+
     return JSON.parse(localStorage.getItem('sgb_' + table) || '[]');
   },
   update(table, id, changes) {
