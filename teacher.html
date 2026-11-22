@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashibodi ya Mwalimu | Sangabuye SIS Portal</title>
+  <script src="core.js"></script>
+  <style>
+    * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
+    body { margin: 0; background: #f1f5f9; display: flex; min-height: 100vh; color: #1e293b; }
+    .sidebar { width: 260px; background: #0f294a; color: white; display: flex; flex-direction: column; padding: 18px 12px; }
+    .sidebar h2 { font-size: 15px; margin: 0 0 4px; color: #fbbf24; text-align: center; }
+    .sidebar p { font-size: 11px; text-align: center; color: #cbd5e1; margin: 0 0 18px; }
+    .menu-btn { background: transparent; border: none; color: #e2e8f0; text-align: left; padding: 10px 12px; border-radius: 8px; cursor: pointer; font-size: 13px; margin-bottom: 4px; }
+    .menu-btn:hover, .menu-btn.active { background: #1d4ed8; color: white; font-weight: bold; }
+    .main { flex: 1; display: flex; flex-direction: column; }
+    .topbar { background: white; padding: 14px 22px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
+    .content { padding: 22px; }
+    .panel { background: white; padding: 18px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 18px; }
+    input, select, textarea { padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; width: 100%; }
+    table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 13px; }
+    th, td { padding: 9px; border-bottom: 1px solid #e2e8f0; text-align: left; }
+    .btn { padding: 8px 14px; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold; background: #1d4ed8; color: white; }
+    .btn-green { background: #059669; color: white; }
+    .logout-btn { background: #dc2626; color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: bold; margin-top: auto; }
+  </style>
+</head>
+<body>
+<div class="sidebar">
+  <h2>DASHIBODI YA MWALIMU</h2>
+  <p>Sangabuye Sec | Subject & Class</p>
+  <button class="menu-btn active" onclick="openTab('marks', this)">📝 Ingiza & Tuma Alama</button>
+  <button class="menu-btn" onclick="openTab('cbt_assign', this)">💻 Kazi za Nyumbani & CBT</button>
+  <button class="menu-btn" onclick="openTab('rollcall', this)">📋 Mahudhurio ya Darasa</button>
+  <button class="logout-btn" onclick="SGB.logout()">🚪 Toka (Logout)</button>
+</div>
+<div class="main">
+  <div class="topbar">
+    <div><strong id="tabTitle">📝 Ingiza & Tuma Alama</strong></div>
+    <button class="btn" onclick="document.querySelector('.menu-btn.active').click()">🔄 Live Refresh</button>
+  </div>
+  <div class="content" id="viewArea"></div>
+  <datalist id="stList"></datalist>
+</div>
+<script>
+  const user = SGB.requireRole(['teacher', 'super_admin']);
+  SGB.startSessionTimer();
+
+  function updateNames() {
+    const names = new Set();
+    SGB.select('users_profile').filter(u => u.role === 'student').forEach(u => names.add(u.full_name));
+    SGB.select('exam_results').forEach(r => names.add(r.student_name));
+    document.getElementById('stList').innerHTML = Array.from(names).map(n => `<option value="${n}">`).join('');
+  }
+
+  function calcGrade(t, abs) {
+    if (abs) return { grade: 'X', points: 0 };
+    if (t >= 75) return { grade: 'A', points: 1 };
+    if (t >= 65) return { grade: 'B', points: 2 };
+    if (t >= 45) return { grade: 'C', points: 3 };
+    if (t >= 30) return { grade: 'D', points: 4 };
+    return { grade: 'F', points: 5 };
+  }
+
+  function openTab(tab, btn) {
+    document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+    if (btn) document.getElementById('tabTitle').innerText = btn.innerText;
+    updateNames();
+    const area = document.getElementById('viewArea');
+
+    if (tab === 'marks') {
+      const marks = SGB.select('exam_results');
+      area.innerHTML = `
+        <div class="panel">
+          <h3>Ingiza Alama za Somo (CA 30% + Final 70% | Weka -1 kwa Mgonjwa 'X')</h3>
+          <form onsubmit="saveMark(event)" style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:15px;">
+            <input type="text" id="mSt" list="stList" required placeholder="Andika herufi chache za jina la mwanafunzi...">
+            <input type="text" id="mSub" required placeholder="Somo (Mfano: Physics, Mathematics)">
+            <input type="number" step="0.1" max="30" id="mCA" required placeholder="Alama za CA (0 - 30)">
+            <input type="number" step="0.1" min="-1" max="70" id="mFin" required placeholder="Alama za Final (0 - 70 au -1)">
+            <button type="submit" class="btn btn-green" style="grid-column: span 2;">🔒 Hifadhi & Tuma Kwa Mtaaluma (Submit & Lock)</button>
+          </form>
+          <table><tr><th>Mwanafunzi</th><th>Somo</th><th>CA</th><th>Final</th><th>Jumla</th><th>Daraja</th><th>Hali</th></tr>
+          ${marks.map(m => `<tr><td><b>${m.student_name}</b></td><td>${m.subject_name}</td><td>${m.ca_score}</td><td>${m.final_score}</td><td><b>${m.total_score}%</b></td><td><b>${m.grade}</b></td><td>🔒 Imefungwa (Sent)</td></tr>`).join('')}
+          </table>
+        </div>`;
+    }
+
+    if (tab === 'cbt_assign') {
+      const items = SGB.select('assignments_cbt');
+      area.innerHTML = `
+        <div class="panel">
+          <h3>Toa Kazi ya Nyumbani (Assignment) au Mtihani wa Mtandaoni (Online CBT)</h3>
+          <form onsubmit="saveCBT(event)" style="display:grid; gap:10px; margin-bottom:15px;">
+            <input type="text" id="cTitle" required placeholder="Kichwa cha Kazi / Jaribio (Mfano: Form 3 Physics Quiz 1)">
+            <textarea id="cQuestion" rows="2" required placeholder="Andika swali la mwanafunzi..."></textarea>
+            <input type="text" id="cOptions" required placeholder="Chaguo 4 (tenganisha kwa koma, mfano: A. Nguvu, B. Kasi, C. Joto, D. Mwanga)">
+            <input type="text" id="cAns" required placeholder="Herufi ya Jibu Sahihi (Mfano: A)">
+            <button type="submit" class="btn">📤 Chapisha Kwa Wanafunzi</button>
+          </form>
+          <table><tr><th>Kichwa</th><th>Swali</th><th>Jibu Sahihi</th></tr>
+          ${items.map(i => `<tr><td><b>${i.title}</b></td><td>${i.question}</td><td><b>${i.answer}</b></td></tr>`).join('')}
+          </table>
+        </div>`;
+    }
+
+    if (tab === 'rollcall') {
+      const rc = SGB.select('rollcall_logs');
+      area.innerHTML = `
+        <div class="panel">
+          <h3>Mahudhurio ya Darasa (Digital Roll Call)</h3>
+          <form onsubmit="saveRoll(event)" style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:15px;">
+            <input type="text" id="rcSt" list="stList" required placeholder="Jina la Mwanafunzi">
+            <select id="rcStat"><option value="Amehudhuria (Present)">Amehudhuria (Present)</option><option value="Hayupo (Absent - Tuma Taarifa Kwa Mzazi)">Hayupo (Absent)</option></select>
+            <button type="submit" class="btn btn-green" style="grid-column: span 2;">✅ Rekodi Mahudhurio</button>
+          </form>
+          <table><tr><th>Mwanafunzi</th><th>Hali</th><th>Tarehe</th></tr>
+          ${rc.map(r => `<tr><td><b>${r.student_name}</b></td><td>${r.status}</td><td>${r.created_at}</td></tr>`).join('')}
+          </table>
+        </div>`;
+    }
+  }
+
+  function saveMark(e) {
+    e.preventDefault();
+    const ca = Number(document.getElementById('mCA').value);
+    const finRaw = Number(document.getElementById('mFin').value);
+    const abs = finRaw < 0;
+    const fin = abs ? 0 : finRaw;
+    const tot = abs ? 0 : (ca + fin);
+    const { grade, points } = calcGrade(tot, abs);
+    SGB.insert('exam_results', { student_name: document.getElementById('mSt').value.trim(), subject_name: document.getElementById('mSub').value.trim(), ca_score: ca, final_score: fin, total_score: tot, grade, points });
+    alert('✅ Alama zimehifadhiwa, zimefungwa (Locked), na kutumwa kwa Mtaaluma!');
+    openTab('marks');
+  }
+  function saveCBT(e) {
+    e.preventDefault();
+    SGB.insert('assignments_cbt', { title: document.getElementById('cTitle').value, question: document.getElementById('cQuestion').value, options: document.getElementById('cOptions').value, answer: document.getElementById('cAns').value.trim().toUpperCase() });
+    alert('✅ Jaribio limetumwa kwa wanafunzi!');
+    openTab('cbt_assign');
+  }
+  function saveRoll(e) {
+    e.preventDefault();
+    SGB.insert('rollcall_logs', { student_name: document.getElementById('rcSt').value.trim(), status: document.getElementById('rcStat').value });
+    openTab('rollcall');
+  }
+
+  openTab('marks', document.querySelector('.menu-btn'));
+</script>
+</body>
+</html>
