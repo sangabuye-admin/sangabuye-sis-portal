@@ -42,6 +42,7 @@
   <button class="menu-btn" onclick="openTab('bulk_promo', this)">📥 3. Bulk Import & Class Promotion</button>
   <button class="menu-btn" onclick="openTab('operations', this)">🏛️ 4. Maktaba, Mabweni & Getini</button>
   <button class="menu-btn" onclick="openTab('audit_secret', this)">🛡️ 5. Live Audit Logs & Sanduku la Siri</button>
+  <button class="menu-btn" onclick="openTab('sys_tools', this)">⚙️ 6. Mipangilio, QR Verifier & Cleanup</button>
   <button class="logout-btn" onclick="SGB.logout()">🚪 Toka (Logout)</button>
 </div>
 
@@ -173,6 +174,7 @@
           </table>
         </div>`;
     }
+
     if (tab === 'audit_secret') {
       const logs = SGB.select('audit_logs');
       const notes = SGB.select('secret_reports');
@@ -190,8 +192,40 @@
           </table>
         </div>`;
     }
-  }
 
+    if (tab === 'sys_tools') {
+      const cfg = JSON.parse(localStorage.getItem('sgb_school_config') || '{"year":"2026","term":"Term I","crdb":"0150838972100"}');
+      area.innerHTML = `
+        <div class="panel">
+          <h3>1. Mipangilio ya Mwaka wa Masomo & Taarifa za Shule</h3>
+          <form onsubmit="saveSchoolCfg(event)" style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px;">
+            <input type="text" id="cfgYear" value="${cfg.year}" required placeholder="Mwaka wa Masomo (2026)">
+            <select id="cfgTerm"><option ${cfg.term==='Term I'?'selected':''}>Term I</option><option ${cfg.term==='Term II'?'selected':''}>Term II</option></select>
+            <input type="text" id="cfgCrdb" value="${cfg.crdb}" required placeholder="Akaunti ya CRDB">
+            <button type="submit" class="btn btn-green" style="grid-column: span 3;">💾 Hifadhi Mipangilio ya Shule</button>
+          </form>
+        </div>
+        <div class="panel">
+          <h3>2. Uhakiki wa Uhalali wa Risiti / Nyaraka (QR & Receipt Verifier)</h3>
+          <div style="display:flex; gap:10px; max-width:450px;">
+            <input type="text" id="qrSearch" placeholder="Weka Namba ya Risiti (Mfano: SGB-123456)...">
+            <button class="btn btn-blue" onclick="verifyDoc()">🔍 Hakiki Sasa</button>
+          </div>
+          <div id="qrResult" style="margin-top:10px;"></div>
+        </div>
+        <div class="panel">
+          <h3>3. Usafishaji wa Data za Majaribio (Master Data Cleanup)</h3>
+          <p style="font-size:12px; color:#475569;">Chagua jedwali ili kuona na kufuta rekodi za majaribio zilizokosewa:</p>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <button class="btn btn-amber" onclick="inspectTable('exam_results')">Kagua Alama (Exam Results)</button>
+            <button class="btn btn-amber" onclick="inspectTable('accounting_receipts')">Kagua Risiti (Receipts)</button>
+            <button class="btn btn-amber" onclick="inspectTable('store_inventory')">Kagua Stoo (Store)</button>
+            <button class="btn btn-red" onclick="localStorage.removeItem('sgb_lock_until'); alert('✅ Akaunti zote zilizofungwa zimefunguliwa!');">🔓 Fungua Akaunti (Unlock All)</button>
+          </div>
+          <div id="cleanupArea" style="margin-top:12px;"></div>
+        </div>`;
+    }
+  }
   function createDirectUser(e) {
     e.preventDefault();
     SGB.insert('users_profile', {
@@ -252,15 +286,47 @@
     SGB.insert('library_loans', { student_name: document.getElementById('lbSt').value, book: document.getElementById('lbBook').value, status: 'Ameazima (Borrowed)' });
     openTab('operations');
   }
+
   function addHostel(e) {
     e.preventDefault();
     SGB.insert('hostel_beds', { student_name: document.getElementById('hsSt').value, room_bed: document.getElementById('hsRoom').value });
     openTab('operations');
   }
+
   function addVisitor(e) {
     e.preventDefault();
     SGB.insert('gate_visitors', { name: document.getElementById('vsName').value, purpose: document.getElementById('vsPurpose').value });
     openTab('operations');
+  }
+
+  function saveSchoolCfg(e) {
+    e.preventDefault();
+    const cfg = { year: document.getElementById('cfgYear').value, term: document.getElementById('cfgTerm').value, crdb: document.getElementById('cfgCrdb').value };
+    localStorage.setItem('sgb_school_config', JSON.stringify(cfg));
+    SGB.logAction(`Amebadilisha mipangilio ya shule: ${cfg.year} ${cfg.term}`);
+    alert('✅ Mipangilio ya shule imehifadhiwa!');
+  }
+
+  function verifyDoc() {
+    const q = document.getElementById('qrSearch').value.trim().toUpperCase();
+    const rec = SGB.select('accounting_receipts').find(r => r.receipt_number.toUpperCase() === q);
+    document.getElementById('qrResult').innerHTML = rec
+      ? `<div style="padding:10px; background:#dcfce7; color:#166534; border-radius:6px;">✅ <b>NYARAKA HALALI:</b> Risiti <b>${rec.receipt_number}</b> ya <b>${rec.student_name}</b> (TZS ${Number(rec.amount_paid).toLocaleString()}) imethibitishwa!</div>`
+      : `<div style="padding:10px; background:#fee2e2; color:#991b1b; border-radius:6px;">❌ <b>ONYO:</b> Namba hii haipo kwenye kumbukumbu za Sangabuye Secondary School!</div>`;
+  }
+
+  function inspectTable(tbl) {
+    const rows = SGB.select(tbl);
+    document.getElementById('cleanupArea').innerHTML = `<table><tr><th>ID</th><th>Maelezo</th><th>Tarehe</th><th>Hatua</th></tr>
+      ${rows.map(r => `<tr><td>${r.id}</td><td>${r.student_name || r.item_name || '-'} (${r.subject_name || r.payment_category || r.quantity || ''})</td><td>${r.created_at}</td><td><button class="btn btn-red" onclick="deleteRec('${tbl}', ${r.id})">🗑️ Futa</button></td></tr>`).join('') || '<tr><td colspan="4">Jedwali liko tupu.</td></tr>'}</table>`;
+  }
+
+  function deleteRec(tbl, id) {
+    if (!confirm('Futa rekodi hii kabisa?')) return;
+    const filtered = SGB.select(tbl).filter(x => x.id !== id);
+    localStorage.setItem('sgb_' + tbl, JSON.stringify(filtered));
+    SGB.logAction(`Super Admin amefuta rekodi ID ${id} kutoka ${tbl}`);
+    inspectTable(tbl);
   }
 
   openTab('users', document.querySelector('.menu-btn'));
