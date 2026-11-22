@@ -173,7 +173,8 @@
     }
 
     try {
-      const res = await fetch(`${DB_URL}/users_profile.json`);
+      const res = await fetch(`'/api/firebase?path=users_profile'
+`);
       const data = await res.json();
       const users = data ? Object.values(data) : [];
       const found = users.find(u => (u.phone_number === user || u.reg_or_staff_no === user) && u.password_hash === pass);
