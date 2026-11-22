@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tovuti ya Mzazi | Sangabuye SIS Portal</title>
+  <script src="core.js"></script>
+  <style>
+    * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
+    body { margin: 0; background: #f1f5f9; color: #1e293b; }
+    .topbar { background: #0f294a; color: white; padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; }
+    .container { max-width: 900px; margin: 20px auto; padding: 0 15px; }
+    .panel { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-bottom: 18px; }
+    input, textarea { padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; width: 100%; }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
+    th, td { padding: 9px; border-bottom: 1px solid #e2e8f0; text-align: left; }
+    .btn { padding: 9px 15px; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold; background: #1d4ed8; color: white; }
+    .btn-red { background: #dc2626; }
+  </style>
+</head>
+<body>
+<div class="topbar">
+  <div><strong>👨‍👩‍👧 TOVUTI YA MZAZI — SANGABUYE SECONDARY SCHOOL</strong></div>
+  <button class="btn btn-red" onclick="SGB.logout()">🚪 Toka</button>
+</div>
+<div class="container">
+  <div class="panel">
+    <h3>Multi-Child Switcher — Chagua / Tafuta Mtoto Wako</h3>
+    <div style="display:flex; gap:10px;">
+      <input type="text" id="childInput" list="stList" placeholder="Andika herufi chache za jina la mtoto wako...">
+      <button class="btn" onclick="loadChild()">🔍 Fungua Taarifa za Mtoto</button>
+    </div>
+    <datalist id="stList"></datalist>
+  </div>
+  <div id="childArea"></div>
+</div>
+<script>
+  SGB.requireRole(['parent', 'super_admin']);
+  SGB.startSessionTimer();
+
+  const names = new Set();
+  SGB.select('accounting_receipts').forEach(r => names.add(r.student_name));
+  SGB.select('exam_results').forEach(m => names.add(m.student_name));
+  document.getElementById('stList').innerHTML = Array.from(names).map(n => `<option value="${n}">`).join('');
+
+  function loadChild() {
+    const name = document.getElementById('childInput').value.trim();
+    if (!name) return;
+    const recs = SGB.select('accounting_receipts').filter(r => r.student_name.toLowerCase() === name.toLowerCase());
+    const marks = SGB.select('exam_results').filter(m => m.student_name.toLowerCase() === name.toLowerCase());
+    const rolls = SGB.select('rollcall_logs').filter(x => x.student_name.toLowerCase() === name.toLowerCase());
+    const sick = SGB.select('sickbay_records').filter(x => x.student_name.toLowerCase() === name.toLowerCase());
+    const totalPaid = recs.reduce((s, r) => s + Number(r.amount_paid), 0);
+
+    document.getElementById('childArea').innerHTML = `
+      <div class="panel">
+        <h3>1. Taarifa ya Michango & Risiti (CRDB: 0150838972100 & Cash)</h3>
+        <p>Jumla Aliyolipa: <b style="color:#059669;">TZS ${totalPaid.toLocaleString()}</b></p>
+        <table><tr><th>Risiti Na.</th><th>Mchango</th><th>Njia</th><th>Kiasi (TZS)</th><th>Tarehe</th></tr>
+        ${recs.map(r => `<tr><td><b>${r.receipt_number}</b></td><td>${r.payment_category}</td><td>${r.payment_method}</td><td>${Number(r.amount_paid).toLocaleString()}</td><td>${r.created_at}</td></tr>`).join('') || '<tr><td colspan="5">Hakuna risiti bado.</td></tr>'}
+        </table><br><button class="btn" onclick="window.print()">🖨️ Pakua Taarifa ya Michango & Ripoti (PDF)</button>
+      </div>
+      <div class="panel">
+        <h3>2. Matokeo ya Mitihani ya Mtoto</h3>
+        <table><tr><th>Somo</th><th>CA (30%)</th><th>Final (70%)</th><th>Jumla</th><th>Daraja</th></tr>
+        ${marks.map(m => `<tr><td><b>${m.subject_name}</b></td><td>${m.ca_score}</td><td>${m.final_score}</td><td><b>${m.total_score}%</b></td><td><b>${m.grade}</b></td></tr>`).join('') || '<tr><td colspan="5">Hakuna matokeo bado.</td></tr>'}
+        </table>
+      </div>
+      <div class="panel">
+        <h3>3. Mahudhurio, Afya (Zahanati) & Ombi la Gate Pass</h3>
+        <p><b>Rekodi za Zahanati:</b> ${sick.map(s => `${s.diagnosis} (${s.created_at})`).join(', ') || 'Hakuna tatizo la afya lililorekodiwa.'}</p>
+        <p><b>Mahudhurio:</b> ${rolls.map(r => `${r.status} (${r.created_at})`).join(', ') || 'Hakuna rekodi ya kutokuwepo.'}</p>
+        <form onsubmit="reqPass(event, '${name}')" style="display:flex; gap:10px; margin-top:10px;">
+          <input type="text" id="gpWhy" required placeholder="Andika sababu ya kuomba ruhusa ya mtoto (Gate Pass)...">
+          <button type="submit" class="btn">🎫 Omba Gate Pass</button>
+        </form>
+      </div>`;
+  }
+
+  function reqPass(e, name) {
+    e.preventDefault();
+    SGB.insert('gate_passes', { student_name: name, reason: document.getElementById('gpWhy').value, return_date: 'Inasubiri Mkuu wa Shule', status: 'Pending (Ombi la Mzazi)' });
+    alert('✅ Ombi la Gate Pass limetumwa kwa Mkuu wa Shule (0784 755 173)!');
+    e.target.reset();
+  }
+</script>
+</body>
+</html>
