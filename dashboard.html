@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashibodi | Sangabuye SIS Portal</title>
+  <style>
+    * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
+    body { margin: 0; background: #f1f5f9; display: flex; min-height: 100vh; color: #1e293b; }
+    .sidebar { width: 260px; background: #0f294a; color: white; display: flex; flex-direction: column; padding: 20px 15px; }
+    .sidebar h2 { font-size: 16px; margin: 0 0 5px; color: #fbbf24; text-align: center; }
+    .sidebar p { font-size: 11px; text-align: center; color: #cbd5e1; margin: 0 0 20px; }
+    .menu-btn { background: transparent; border: none; color: #e2e8f0; text-align: left; padding: 11px 12px; border-radius: 8px; cursor: pointer; font-size: 13px; margin-bottom: 5px; transition: 0.2s; }
+    .menu-btn:hover, .menu-btn.active { background: #1d4ed8; color: white; font-weight: bold; }
+    .main { flex: 1; display: flex; flex-direction: column; }
+    .topbar { background: white; padding: 14px 25px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
+    .content { padding: 25px; }
+    .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 15px; margin-bottom: 25px; }
+    .card { background: white; padding: 18px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border-left: 4px solid #1d4ed8; }
+    .card h4 { margin: 0 0 8px; font-size: 12px; color: #64748b; text-transform: uppercase; }
+    .card .val { font-size: 20px; font-weight: bold; color: #0f294a; }
+    .panel { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+    table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 13px; }
+    th, td { padding: 10px; border-bottom: 1px solid #e2e8f0; text-align: left; }
+    th { background: #f8fafc; color: #0f294a; }
+    .btn { padding: 7px 12px; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold; }
+    .btn-green { background: #16a34a; color: white; }
+    .btn-red { background: #dc2626; color: white; }
+    .btn-blue { background: #1d4ed8; color: white; }
+    .logout-btn { background: #dc2626; color: white; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-weight: bold; margin-top: auto; }
+  </style>
+</head>
+<body>
+<div class="sidebar">
+  <h2>SANGABUYE SIS PORTAL</h2>
+  <p>S.L.P 11898, Ilemela - Mwanza</p>
+  <button class="menu-btn active" onclick="loadModule('admin', this)">🛡️ 1. Super Admin & IT</button>
+  <button class="menu-btn" onclick="loadModule('director', this)">📊 2. Mkurugenzi (Director)</button>
+  <button class="menu-btn" onclick="loadModule('headmaster', this)">🏫 3. Mkuu wa Shule (0784 755 173)</button>
+  <button class="menu-btn" onclick="loadModule('accountant', this)">💰 4. Mhasibu & CRDB (0615 000 305)</button>
+  <button class="menu-btn" onclick="loadModule('academic', this)">🎓 5. Mtaaluma & NECTA (ISAL/CAL)</button>
+  <button class="menu-btn" onclick="loadModule('teacher', this)">📚 6. Walimu (Alama & Kazi)</button>
+  <button class="menu-btn" onclick="loadModule('parent', this)">👨‍👩‍👧 7. Tovuti ya Mzazi</button>
+  <button class="menu-btn" onclick="loadModule('student', this)">🎒 8. Tovuti ya Mwanafunzi</button>
+  <button class="logout-btn" onclick="logout()">🚪 Toka Kwenye Mfumo (Logout)</button>
+</div>
+<div class="main">
+  <div class="topbar">
+    <div><strong id="pageTitle">Dashibodi ya Super Admin & IT</strong> <span style="font-size:12px; color:#16a34a;">● Online (Supabase Ready)</span></div>
+    <div>
+      <button class="btn btn-blue" onclick="location.reload()">🔄 Live Refresh</button>
+    </div>
+  </div>
+  <div class="content" id="mainContent"></div>
+</div>
+<script>
+  const modules = {
+    admin: `
+      <div class="cards">
+        <div class="card"><h4>Wanafunzi Wote</h4><div class="val">840 (O & A-Level)</div></div>
+        <div class="card"><h4>Watumishi & Walimu</h4><div class="val">54</div></div>
+        <div class="card"><h4>Akaunti Zinazosubiri Idhini</h4><div class="val" style="color:#d97706;">3 Pending</div></div>
+        <div class="card"><h4>Hali ya Seva & Backup</h4><div class="val" style="color:#16a34a;">100% Salama</div></div>
+      </div>
+      <div class="panel">
+        <h3>Foleni ya Kuidhinisha Akaunti Mpya (User Approval Queue)</h3>
+        <table>
+          <tr><th>Jina Kamili</th><th>Nafasi (Role)</th><th>Namba</th><th>Hatua</th></tr>
+          <tr><td>Mwl. Neema Charles</td><td>Mwalimu (Teacher)</td><td>0754 112 233</td><td><button class="btn btn-green" onclick="alert('Akaunti Imeidhinishwa!')">Approve</button> <button class="btn btn-red">Reject</button></td></tr>
+          <tr><td>Juma Mwita</td><td>Mwanafunzi (Form 3A)</td><td>S.2026/0045</td><td><button class="btn btn-green" onclick="alert('Akaunti Imeidhinishwa!')">Approve</button> <button class="btn btn-red">Reject</button></td></tr>
+        </table>
+      </div>`,
+    accountant: `
+      <div class="cards">
+        <div class="card" style="border-color:#16a34a;"><h4>CRDB Bank (0150838972100)</h4><div class="val">TZS 380,500,000</div></div>
+        <div class="card"><h4>Pesa Taslimu (Cash Box)</h4><div class="val">TZS 14,200,000</div></div>
+        <div class="card" style="border-color:#dc2626;"><h4>Madeni ya Ada Yaliyobaki</h4><div class="val">TZS 42,800,000</div></div>
+      </div>
+      <div class="panel">
+        <h3>Mapokezi ya Fedha: SHULE YA SEKONDARI SANGABUYE E.K (CRDB: 0150838972100) & Cash</h3>
+        <p style="font-size:12px; color:#475569;">Mhasibu (0615 000 305) anaweza kurekodi malipo ya CRDB, Pesa Taslimu (Cash), au Vyakula/Vifaa vya Stoo na kuchapisha risiti ya Thermal Printer (58/80mm).</p>
+        <table>
+          <tr><th>Risiti Na.</th><th>Mwanafunzi</th><th>Njia ya Malipo</th><th>Kiasi (TZS)</th><th>Risiti</th></tr>
+          <tr><td>#SGB-2026-089</td><td>Amina Hassan (Form 4B)</td><td>CRDB Bank (Ref: CRDB9921)</td><td>310,000</td><td><button class="btn btn-blue" onclick="window.print()">🖨️ Print Thermal</button></td></tr>
+          <tr><td>#SGB-2026-090</td><td>Baraka Said (Form 1A)</td><td>Cash (Pesa Taslimu)</td><td>180,000</td><td><button class="btn btn-blue" onclick="window.print()">🖨️ Print Thermal</button></td></tr>
+        </table>
+      </div>`,
+    academic: `
+      <div class="cards">
+        <div class="card"><h4>Mfumo wa Alama</h4><div class="val">CA 30% + Final 70%</div></div>
+        <div class="card"><h4>Vyumba vya Mitihani</h4><div class="val">Viti 40 (Safu 5 x 8)</div></div>
+        <div class="card"><h4>Fomu za NECTA</h4><div class="val">ISAL & CAL Tayari</div></div>
+      </div>
+      <div class="panel">
+        <h3>Uchambuzi wa Matokeo ya NECTA (Division I - IV) & Upangaji wa Vyumba</h3>
+        <button class="btn btn-blue" onclick="alert('Ramani ya Vyumba vya Viti 40, ISAL na CAL imezalishwa kwa PDF!')">📄 Zalisha Viti 40, ISAL & CAL (PDF)</button>
+        <button class="btn btn-green" onclick="window.print()">🖨️ Pakua Master Sheet (A4 PDF)</button>
+      </div>`
+  };
+  function loadModule(key, btn) {
+    document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('pageTitle').innerText = btn.innerText;
+    document.getElementById('mainContent').innerHTML = modules[key] || `<div class="panel"><h3>${btn.innerText}</h3><p>Moduli hii ipo tayari kuunganishwa na majedwali ya Supabase Database (v6.3).</p></div>`;
+  }
+  function logout() { window.location.href = 'index.html'; }
+  // Auto-Logout baada ya dakika 20 (Usalama wa Data)
+  setTimeout(() => { alert('Muda wa kikao (dakika 20) umeisha. Tafadhali ingia tena.'); logout(); }, 1200000);
+  loadModule('admin', document.querySelector('.menu-btn'));
+</script>
+</body>
+</html>
