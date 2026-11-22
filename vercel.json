@@ -1,8 +1,0 @@
-{
-  "rewrites": [
-    {
-      "source": "/api/db/:path*",
-      "destination": "https://supabase.co*"
-    }
-  ]
-}
