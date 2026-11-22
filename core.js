@@ -1,8 +1,7 @@
-// INJINI KUU YA SANGABUYE SIS PORTAL (v5.1 - LIVE SYNC, FULL BILINGUAL & GLOBAL BACKUP)
+// INJINI KUU YA SANGABUYE SIS PORTAL (v5.2 - FIXED & STABLE)
 const SGB = {
   lang: localStorage.getItem('sgb_lang') || 'sw',
 
-  // 1. HIFADHI NA USOMAJI WA DATA
   insert(table, item) {
     item.id = Date.now() + Math.floor(Math.random() * 100);
     item.created_at = new Date().toLocaleString('sw-TZ');
@@ -10,14 +9,10 @@ const SGB = {
     list.unshift(item);
     localStorage.setItem('sgb_' + table, JSON.stringify(list));
     this.logAction(`Ameongeza taarifa kwenye ${table}`);
-    this.notifySync('Data zimehifadhiwa na kusasishwa!');
+    this.notifySync('✅ Data zimehifadhiwa na kusasishwa!');
     return item;
   },
   select(table) {
-      getConfig() {
-    return JSON.parse(localStorage.getItem('sgb_school_config') || '{"year":"2026","term":"Term I","crdb":"0150838972100"}');
-  },
-
     return JSON.parse(localStorage.getItem('sgb_' + table) || '[]');
   },
   update(table, id, changes) {
@@ -26,21 +21,19 @@ const SGB = {
     );
     localStorage.setItem('sgb_' + table, JSON.stringify(list));
     this.logAction(`Amebadilisha taarifa kwenye ${table} (ID: ${id})`);
-    this.notifySync('Mabadiliko yamehifadhiwa!');
+    this.notifySync('✅ Mabadiliko yamehifadhiwa!');
+  },
+  getConfig() {
+    return JSON.parse(localStorage.getItem('sgb_school_config') || '{"year":"2026","term":"Term I","crdb":"0150838972100"}');
   },
 
-  // 2. LIVE REFRESH & REAL-TIME SYNC
   liveRefresh(silent = false) {
     const activeMenu = document.querySelector('.menu-btn.active');
-    if (activeMenu) {
-      activeMenu.click();
-    } else if (typeof renderStudentPortal === 'function') {
-      renderStudentPortal();
-    } else if (typeof loadChild === 'function' && document.getElementById('childInput')?.value) {
-      loadChild();
-    }
+    if (activeMenu) activeMenu.click();
+    else if (typeof renderStudentPortal === 'function') renderStudentPortal();
+    else if (typeof loadChild === 'function' && document.getElementById('childInput') && document.getElementById('childInput').value) loadChild();
     const syncEl = document.getElementById('syncTime');
-    if (syncEl) syncEl.innerText = ` • Live synced: ${new Date().toLocaleTimeString()}`;
+    if (syncEl) syncEl.innerText = ' • Live synced: ' + new Date().toLocaleTimeString();
     this.applyLanguage();
     if (!silent) this.notifySync(this.lang === 'en' ? '✅ Live data refreshed!' : '✅ Data zote zimesasishwa (Live)!');
   },
@@ -59,17 +52,16 @@ const SGB = {
     this._toastTimer = setTimeout(() => { toast.style.opacity = '0'; }, 2500);
   },
 
-  // 3. BACKUP & RESTORE YA MFUMO MZIMA
   exportBackup() {
     const backup = { portal: 'Sangabuye SIS Portal', exported_at: new Date().toISOString(), data: {} };
     for (let i = 0; i < localStorage.length; i++) {
       const k = localStorage.key(i);
-      if (k.startsWith('sgb_')) backup.data[k] = JSON.parse(localStorage.getItem(k));
+      if (k && k.startsWith('sgb_')) backup.data[k] = JSON.parse(localStorage.getItem(k));
     }
     const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = `Sangabuye_SIS_Backup_${new Date().toISOString().slice(0,10)}.json`;
+    a.download = 'Sangabuye_SIS_Backup_' + new Date().toISOString().slice(0, 10) + '.json';
     a.click();
     this.logAction('Amepakua nakala ya mfumo (System Backup)');
     this.notifySync('💾 Nakala ya mfumo (Backup) imepakuliwa!');
@@ -100,36 +92,15 @@ const SGB = {
     };
     inp.click();
   },
-  // 4. MFUMO WA LUGHA MBILI KWA TAARIFA ZOTE (BILINGUAL ENGINE: SW | EN)
+
   dict: [
     ['OFISI YA MHASIBU', 'ACCOUNTANT OFFICE'],
     ['OFISI YA MTAALUMA', 'ACADEMIC MASTER OFFICE'],
     ['DASHIBODI YA MWALIMU', 'TEACHER DASHBOARD'],
     ['MKUU WA SHULE', 'HEADMASTER OFFICE'],
     ['MKURUGENZI (DIRECTOR)', 'SCHOOL DIRECTOR'],
-    ['IT & SUPER ADMIN', 'IT & SUPER ADMIN'],
     ['TOVUTI YA MZAZI', 'PARENT PORTAL'],
     ['TOVUTI YA MWANAFUNZI', 'STUDENT PORTAL'],
-    ['Muhtasari wa Fedha & CRDB', 'Finance & CRDB Summary'],
-    ['Mapokezi & Risiti (58/80mm)', 'Receipts & POS (58/80mm)'],
-    ['Stoo ya Vyakula & Mali', 'Food & Store Inventory'],
-    ['Taarifa ya Michango (PDF)', 'Contribution Statement (PDF)'],
-    ['Kikao cha Manunuzi', 'Procurement Committee'],
-    ['Bank-Style Statement & Matumizi', 'Bank-Style Statement & Expenses'],
-    ['Uhakiki wa Kuhama (Clearance)', 'Student Clearance Checklist'],
-    ['1. Usimamizi wa Mitihani & Publish', '1. Exam Management & Publish'],
-    ['2. Master Sheet (O & A-Level NECTA)', '2. Master Sheet (O & A-Level NECTA)'],
-    ['3. Viti 40 (Real Mix), ISAL & CAL', '3. 40-Seat Rooms, ISAL & CAL'],
-    ['4. Kijinsia (M/F), GPA & Remedial', '4. Gender (M/F), GPA & Remedial'],
-    ['5. Ripoti Binafsi (A4 PDF)', '5. Student Report Card (A4 PDF)'],
-    ['6. Tahasusi & Masomo ya Hiari', '6. Combinations & Subject Allocation'],
-    ['7. Smart Timetable (Clash-Free)', '7. Smart Timetable (Clash-Free)'],
-    ['8. Transfer Cert & Bulk Marks', '8. Transfer Cert & Bulk Marks'],
-    ['1. Masomo & Madarasa Yangu', '1. My Allocated Subjects & Classes'],
-    ['2. Jedwali la Alama (Darasa Zima)', '2. Bulk Class Marks Grid'],
-    ['3. Mitihani Binafsi ya Somo', '3. Private Subject Tests'],
-    ['4. Assignments, CBT & Sahihisha', '4. Assignments, CBT & Grading'],
-    ['5. Mahudhurio & Benki ya Maswali', '5. Digital Roll Call & Question Bank'],
     ['Toka (Logout)', 'Sign Out (Logout)'],
     ['Jina la Mwanafunzi', 'Student Full Name'],
     ['Mwanafunzi', 'Student'],
@@ -149,9 +120,7 @@ const SGB = {
     ['Salio', 'Balance'],
     ['Tahadhari', 'Alert'],
     ['Inatosha', 'In Stock'],
-    ['Kinakaribia Kuisha', 'Low Stock'],
-    ['Hakuna alama bado.', 'No marks recorded yet.'],
-    ['Hakuna miamala bado.', 'No transactions recorded yet.']
+    ['Kinakaribia Kuisha', 'Low Stock']
   ],
 
   toggleLang() {
@@ -176,7 +145,6 @@ const SGB = {
     }
   },
 
-  // 5. AUDIT LOGS, SECURITY & AUTO-TOOLBAR
   logAction(action) {
     const user = this.getUser();
     const logs = JSON.parse(localStorage.getItem('sgb_audit_logs') || '[]');
@@ -211,7 +179,6 @@ const SGB = {
   }
 };
 
-// UNGANISHA LIVE REFRESH, BACKUP/RESTORE & LUGHA KWENYE KILA UKURASA KIOTOMATIKI
 window.addEventListener('DOMContentLoaded', () => {
   const topbar = document.querySelector('.topbar');
   if (topbar) {
@@ -232,7 +199,6 @@ window.addEventListener('DOMContentLoaded', () => {
   setTimeout(() => SGB.applyLanguage(), 150);
 });
 
-// Sasisha tabo zingine zilizofunguliwa papo hapo (Cross-Tab Live Sync)
 window.addEventListener('storage', (e) => {
   if (e.key && e.key.startsWith('sgb_')) SGB.liveRefresh(true);
 });
