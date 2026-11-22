@@ -49,10 +49,11 @@
 
 <div class="main">
   <div class="topbar">
-    <div><strong id="pageTitle">🛡️ 1. Super Admin & IT</strong> <span style="font-size:12px; color:#16a34a;">● Toleo Kamili (v6.4)</span></div>
+    <div><strong id="pageTitle">🛡️ 1. Super Admin & IT</strong> <span style="font-size:12px; color:#16a34a;">● Toleo Kamili (v6.5)</span></div>
     <button class="btn btn-blue" onclick="location.reload()">🔄 Refresh</button>
   </div>
   <div class="content" id="mainContent"></div>
+  <datalist id="studentAutoList"></datalist>
 </div>
 <script>
   async function sbInsert(table, payload) {
@@ -107,7 +108,7 @@
       <div class="panel">
         <h3>2. Ruhusa za Wanafunzi Nje ya Shule (Gate Pass & Zahanati)</h3>
         <form onsubmit="saveGatePass(event)" style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px;">
-          <input type="text" id="gpStudent" required placeholder="Majina Kamili ya Mwanafunzi">
+          <input type="text" id="gpStudent" list="studentAutoList" required placeholder="Andika herufi chache za jina la mwanafunzi...">
           <input type="text" id="gpReason" required placeholder="Sababu (Mfano: Rufaa Hospitali / Ruhusa ya Mzazi)">
           <input type="date" id="gpReturn" required style="grid-column: span 2;">
           <button type="submit" class="btn btn-amber" style="grid-column: span 2;">🎫 Toa Gate Pass Rasmi</button>
@@ -119,7 +120,7 @@
       <div class="panel">
         <h3>1. Mapokezi ya Fedha: SHULE YA SEKONDARI SANGABUYE E.K (CRDB: 0150838972100) & Cash</h3>
         <form onsubmit="saveReceipt(event)" style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:12px;">
-          <input type="text" id="stName" required placeholder="Majina Kamili ya Mwanafunzi">
+          <input type="text" id="stName" list="studentAutoList" required placeholder="Andika herufi chache za jina la mwanafunzi...">
           <input type="text" id="stReg" required placeholder="Namba ya Usajili (Mfano: S.2026/001)">
           <div style="grid-column: span 2;">
             <input type="text" id="payCat" list="mchangoList" required placeholder="Andika Aina ya Mchango (Mfano: Ada, Chakula, Mahafali, Sare...)">
@@ -144,7 +145,6 @@
           <input type="text" id="stUnit" required placeholder="Kipimo (Mfano: Magunia / Kg / Boksi)">
           <button type="submit" class="btn btn-blue" style="grid-column: span 3;">📦 Hifadhi Kwenye Stoo</button>
         </form>
-        <button class="btn btn-green" onclick="loadStoreItems()">🔄 Angalia Salio la Stoo</button>
         <div id="storeTableArea" style="margin-top:12px;"></div>
       </div>`,
     academic: `
@@ -166,7 +166,7 @@
       <div class="panel">
         <h3>3. Fomu ya Kuhama / Kuhitimu (Student Clearance Checklist)</h3>
         <form onsubmit="saveClearance(event)" style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px;">
-          <input type="text" id="clStudent" required placeholder="Majina Kamili ya Mwanafunzi">
+          <input type="text" id="clStudent" list="studentAutoList" required placeholder="Andika herufi chache za jina la mwanafunzi...">
           <select id="clReason"><option value="Kuhitimu Kidato cha 4 / 6">Kuhitimu Kidato cha 4 / 6</option><option value="Uhamisho wa Shule">Uhamisho wa Shule</option></select>
           <label><input type="checkbox" id="clFin" style="width:auto;"> Uhasibu (CRDB/Cash) Amemaliza</label>
           <label><input type="checkbox" id="clLib" style="width:auto;"> Maktaba & Maabara Amerudisha Vifaa</label>
@@ -179,7 +179,7 @@
         <h3>Ingiza Alama za Somo (CA 30% + Final 70%)</h3>
         <p style="font-size:12px; color:#475569;">Weka <b>-1</b> kwenye Final kwa mwanafunzi mgonjwa ili apate alama <b>X</b>.</p>
         <form onsubmit="saveMarks(event)" style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:12px;">
-          <input type="text" id="mkStudent" required placeholder="Majina Kamili ya Mwanafunzi">
+          <input type="text" id="mkStudent" list="studentAutoList" required placeholder="Andika herufi chache za jina la mwanafunzi...">
           <input type="text" id="mkSubject" required placeholder="Somo (Mfano: Mathematics, Kiswahili)">
           <input type="number" step="0.1" max="30" id="mkCA" required placeholder="Alama za CA (Kati ya 30)">
           <input type="number" step="0.1" min="-1" max="70" id="mkFinal" required placeholder="Alama za Final (Kati ya 70 au -1)">
@@ -191,13 +191,25 @@
       <div class="panel">
         <h3>Tovuti ya Mzazi — Angalia Risiti za Malipo & Matokeo ya Mtoto</h3>
         <div style="display:flex; gap:10px; margin-bottom:12px;">
-          <input type="text" id="searchChildName" placeholder="Andika Jina Kamili la Mwanafunzi..." style="max-width:300px;">
+          <input type="text" id="searchChildName" list="studentAutoList" placeholder="Andika herufi chache za jina la mwanafunzi..." style="max-width:320px;">
           <button class="btn btn-blue" onclick="searchChildData()">🔍 Tafuta Taarifa</button>
         </div>
         <div id="parentDataArea"></div>
       </div>`,
     student: `<div class="panel"><h3>Tovuti ya Mwanafunzi</h3><p>Karibu Sangabuye SIS Portal! Wasiliana na mwalimu wa somo kupata kazi za nyumbani, mitihani ya majaribio (CBT), na fomu yako ya Clearance.</p></div>`
   };
+  async function refreshStudentAutocomplete() {
+    const users = await sbSelect('users_profile');
+    const receipts = await sbSelect('accounting_receipts');
+    const marks = await sbSelect('exam_results');
+    const names = new Set();
+    users.filter(u => u.role === 'student').forEach(u => names.add(u.full_name));
+    receipts.forEach(r => { if (r.student_name) names.add(r.student_name); });
+    marks.forEach(m => { if (m.student_name) names.add(m.student_name); });
+    const dl = document.getElementById('studentAutoList');
+    if (dl) dl.innerHTML = Array.from(names).map(n => `<option value="${n}">`).join('');
+  }
+
   function calcGrade(total, isAbsent) {
     if (isAbsent) return { grade: 'X', points: 0 };
     if (total >= 75) return { grade: 'A', points: 1 };
@@ -228,10 +240,10 @@
     const { grade, points } = calcGrade(total_score, isAbsent);
 
     await sbInsert('exam_results', { student_name, subject_name, ca_score, final_score, total_score, grade, points });
+    refreshStudentAutocomplete();
     msgBox.innerHTML = `<div style="padding:10px; background:#dcfce7; color:#166534; border-radius:6px;">✅ Alama za <b>${student_name}</b> (${subject_name}) zimehifadhiwa! Jumla: <b>${total_score}%</b> | Daraja: <b>${grade}</b></div>`;
     e.target.reset();
   }
-
   async function loadResults() {
     const area = document.getElementById('resultsTableArea');
     const divArea = document.getElementById('divisionSummary');
@@ -260,6 +272,7 @@
     });
     area.innerHTML = html + '</table>';
   }
+
   function generateSeating() {
     const room = document.getElementById('roomName').value || 'Chumba 01';
     let grid = `<h4>Ramani ya Viti 40 (Safu 5 x 8) & ISAL/CAL — ${room}</h4><div style="display:grid; grid-template-columns:repeat(5, 1fr); gap:6px;">`;
@@ -280,25 +293,35 @@
 
   async function saveStoreItem(e) {
     e.preventDefault();
-    await sbInsert('store_inventory', {
-      item_name: document.getElementById('stItem').value,
-      quantity: parseFloat(document.getElementById('stQty').value),
-      unit: document.getElementById('stUnit').value
-    });
-    alert('✅ Bidhaa imehifadhiwa kwenye Stoo!');
-    e.target.reset(); loadStoreItems();
+    const item_name = document.getElementById('stItem').value.trim();
+    const quantity = parseFloat(document.getElementById('stQty').value);
+    const unit = document.getElementById('stUnit').value.trim();
+    await sbInsert('store_inventory', { item_name, quantity, unit });
+    e.target.reset();
+    await loadStoreItems();
+    alert(`✅ ${item_name} (${quantity} ${unit}) imehifadhiwa kwenye Stoo!`);
+  }
+
+  async function useStoreItem(key, currentQty) {
+    const used = parseFloat(prompt('Ingiza kiasi kilichotumika kutoka stoo:'));
+    if (isNaN(used) || used <= 0) return;
+    const newQty = Math.max(0, currentQty - used);
+    await sbUpdate('store_inventory', key, { quantity: newQty });
+    loadStoreItems();
   }
 
   async function loadStoreItems() {
+    const area = document.getElementById('storeTableArea');
+    if (!area) return;
     const data = await sbSelect('store_inventory');
-    let html = '<table><tr><th>Bidhaa</th><th>Kiasi</th><th>Hali</th></tr>';
+    if (!data.length) { area.innerHTML = '<p style="font-size:12px; color:#64748b;">Hakuna bidhaa stoo bado.</p>'; return; }
+    let html = '<table><tr><th>Bidhaa</th><th>Salio</th><th>Hali</th><th>Matumizi</th></tr>';
     data.forEach(s => {
-      const alertTxt = s.quantity <= 10 ? '<span style="color:#dc2626; font-weight:bold;">⚠️ Kinakaribia Kuisha</span>' : '<span style="color:#16a34a;">● Inatosha</span>';
-      html += `<tr><td><b>${s.item_name}</b></td><td>${s.quantity} ${s.unit}</td><td>${alertTxt}</td></tr>`;
+      const alertTxt = Number(s.quantity) <= 10 ? '<span style="color:#dc2626; font-weight:bold;">⚠️ Kinakaribia Kuisha</span>' : '<span style="color:#16a34a;">● Inatosha</span>';
+      html += `<tr><td><b>${s.item_name}</b></td><td>${s.quantity} ${s.unit}</td><td>${alertTxt}</td><td><button class="btn btn-amber" onclick="useStoreItem('${s._key}', ${s.quantity})">- Toa Stoo</button></td></tr>`;
     });
-    document.getElementById('storeTableArea').innerHTML = html + '</table>';
+    area.innerHTML = html + '</table>';
   }
-
   async function saveGatePass(e) {
     e.preventDefault();
     await sbInsert('gate_passes', {
@@ -319,6 +342,7 @@
     });
     document.getElementById('gpTableArea').innerHTML = html + '</table>';
   }
+
   async function saveProcurement(e) {
     e.preventDefault();
     await sbInsert('procurement_committee', {
@@ -381,7 +405,7 @@
 
   async function approveUser(key) {
     await sbUpdate('users_profile', key, { status: 'approved' });
-    alert('✅ Akaunti imeidhinishwa!'); loadUsers();
+    alert('✅ Akaunti imeidhinishwa!'); loadUsers(); refreshStudentAutocomplete();
   }
 
   async function saveReceipt(e) {
@@ -399,6 +423,7 @@
     await sbInsert('accounting_receipts', {
       receipt_number, student_name, student_reg_no, payment_category, payment_method, bank_ref_no, amount_paid, qr_verification_hash
     });
+    refreshStudentAutocomplete();
 
     document.getElementById('receiptPreview').innerHTML = `
       <div id="printableReceipt" style="border:2px dashed #0f294a; padding:15px; max-width:300px; background:#fff; font-family:monospace; font-size:12px;">
@@ -423,6 +448,8 @@
     btn.classList.add('active');
     document.getElementById('pageTitle').innerText = btn.innerText;
     document.getElementById('mainContent').innerHTML = modules[key];
+    refreshStudentAutocomplete();
+    if (key === 'accountant') loadStoreItems();
   }
   loadModule('admin', document.querySelector('.menu-btn'));
 </script>
