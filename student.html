@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tovuti ya Mwanafunzi | Sangabuye SIS Portal</title>
+  <script src="core.js"></script>
+  <style>
+    * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
+    body { margin: 0; background: #f1f5f9; color: #1e293b; }
+    .topbar { background: #1e40af; color: white; padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; }
+    .container { max-width: 900px; margin: 20px auto; padding: 0 15px; }
+    .panel { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-bottom: 18px; }
+    input, textarea { padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; width: 100%; }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
+    th, td { padding: 9px; border-bottom: 1px solid #e2e8f0; text-align: left; }
+    .btn { padding: 8px 14px; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold; background: #1d4ed8; color: white; }
+    .btn-red { background: #dc2626; }
+  </style>
+</head>
+<body>
+<div class="topbar">
+  <div><strong>🎒 TOVUTI YA MWANAFUNZI — SANGABUYE SIS PORTAL</strong></div>
+  <button class="btn btn-red" onclick="SGB.logout()">🚪 Toka</button>
+</div>
+<div class="container" id="stBody"></div>
+<script>
+  const user = SGB.requireRole(['student', 'super_admin']);
+  SGB.startSessionTimer();
+
+  const cbts = SGB.select('assignments_cbt');
+  const myMarks = SGB.select('exam_results').filter(m => m.student_name.toLowerCase().includes(user.full_name.toLowerCase()));
+  const tt = SGB.select('smart_timetable');
+
+  document.getElementById('stBody').innerHTML = `
+    <div class="panel">
+      <h3>Karibu, ${user.full_name}!</h3>
+      <p>Hapa unaweza kufanya majaribio ya mtandaoni (Online CBT), kuona matokeo yako, ratiba ya vipindi, na kutuma maoni ya siri.</p>
+    </div>
+    <div class="panel">
+      <h3>1. Kazi za Nyumbani & Mitihani ya Mtandaoni (Online CBT)</h3>
+      ${cbts.map(c => `<div style="border:1px solid #cbd5e1; padding:12px; border-radius:8px; margin-bottom:10px;">
+        <b>${c.title}</b><p>${c.question}</p><small>Chaguo: ${c.options}</small><br><br>
+        <div style="display:flex; gap:8px; max-width:320px;">
+          <input type="text" id="ans_${c.id}" placeholder="Weka herufi (A, B, C au D)">
+          <button class="btn" onclick="checkCBT(${c.id}, '${c.answer}')">Wasilisha Jibu</button>
+        </div>
+      </div>`).join('') || '<p>Hakuna kazi au jaribio lililowekwa na walimu kwa sasa.</p>'}
+    </div>
+    <div class="panel">
+      <h3>2. Matokeo Yangu ya Mitihani</h3>
+      <table><tr><th>Somo</th><th>CA (30%)</th><th>Final (70%)</th><th>Jumla</th><th>Daraja</th></tr>
+      ${myMarks.map(m => `<tr><td><b>${m.subject_name}</b></td><td>${m.ca_score}</td><td>${m.final_score}</td><td><b>${m.total_score}%</b></td><td><b>${m.grade}</b></td></tr>`).join('') || '<tr><td colspan="5">Hakuna matokeo yaliyopatikana kwa jina lako bado.</td></tr>'}
+      </table>
+    </div>
+    <div class="panel">
+      <h3>3. Ratiba ya Vipindi & Maktaba ya Past Papers</h3>
+      <table><tr><th>Siku</th><th>Muda</th><th>Darasa</th><th>Mwalimu & Somo</th></tr>
+      ${tt.map(t => `<tr><td>${t.day}</td><td>${t.time}</td><td>${t.cls}</td><td>${t.teacher}</td></tr>`).join('') || '<tr><td colspan="4">Ratiba haijapakiwa bado.</td></tr>'}
+      </table>
+    </div>
+    <div class="panel">
+      <h3>4. Sanduku la Maoni la Siri (Whistleblower Box)</h3>
+      <form onsubmit="sendSecret(event)" style="display:flex; gap:10px;">
+        <input type="text" id="secTxt" required placeholder="Andika taarifa nyeti kwa Mkuu wa Shule bila jina lako kuonekana...">
+        <button type="submit" class="btn">🔒 Tuma Kwa Siri</button>
+      </form>
+    </div>`;
+
+  function checkCBT(id, correct) {
+    const val = document.getElementById('ans_' + id).value.trim().toUpperCase();
+    if (!val) return;
+    if (val === correct) alert('🎉 HONGERA! Jibu lako (' + val + ') ni SAHIHI (100%)!');
+    else alert('❌ Si sahihi. Jibu sahihi lilikuwa: ' + correct);
+  }
+
+  function sendSecret(e) {
+    e.preventDefault();
+    SGB.insert('secret_reports', { message: document.getElementById('secTxt').value });
+    alert('🔒 Ujumbe wako wa siri umetumwa kwa Super Admin & Mkuu wa Shule bila utambulisho wako!');
+    e.target.reset();
+  }
+</script>
+</body>
+</html>
