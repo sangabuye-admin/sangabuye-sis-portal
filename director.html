@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashibodi ya Mkurugenzi | Sangabuye SIS Portal</title>
+  <script src="core.js"></script>
+  <style>
+    * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
+    body { margin: 0; background: #f1f5f9; display: flex; min-height: 100vh; color: #1e293b; }
+    .sidebar { width: 265px; background: #1e293b; color: white; display: flex; flex-direction: column; padding: 18px 12px; }
+    .sidebar h2 { font-size: 15px; margin: 0 0 4px; color: #fbbf24; text-align: center; }
+    .sidebar p { font-size: 11px; text-align: center; color: #cbd5e1; margin: 0 0 18px; }
+    .menu-btn { background: transparent; border: none; color: #e2e8f0; text-align: left; padding: 10px 12px; border-radius: 8px; cursor: pointer; font-size: 13px; margin-bottom: 4px; }
+    .menu-btn:hover, .menu-btn.active { background: #0284c7; color: white; font-weight: bold; }
+    .main { flex: 1; display: flex; flex-direction: column; }
+    .topbar { background: white; padding: 14px 22px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
+    .content { padding: 22px; }
+    .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-bottom: 18px; }
+    .card { background: white; padding: 16px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border-left: 4px solid #0284c7; }
+    .card h4 { margin: 0 0 5px; font-size: 11px; color: #64748b; text-transform: uppercase; }
+    .card .val { font-size: 19px; font-weight: bold; color: #0f172a; }
+    .panel { background: white; padding: 18px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 18px; }
+    input, textarea { padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; width: 100%; }
+    table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 13px; }
+    th, td { padding: 9px; border-bottom: 1px solid #e2e8f0; text-align: left; }
+    .btn { padding: 8px 14px; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold; background: #0284c7; color: white; }
+    .logout-btn { background: #dc2626; color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: bold; margin-top: auto; }
+  </style>
+</head>
+<body>
+<div class="sidebar">
+  <h2>MKURUGENZI (DIRECTOR)</h2>
+  <p>Executive Overview | Sangabuye</p>
+  <button class="menu-btn active" onclick="openTab('exec', this)">📊 Takwimu Kuu za Fedha & Shule</button>
+  <button class="menu-btn" onclick="openTab('board', this)">📁 Kumbukumbu za Bodi ya Shule</button>
+  <button class="logout-btn" onclick="SGB.logout()">🚪 Toka (Logout)</button>
+</div>
+<div class="main">
+  <div class="topbar">
+    <div><strong id="tabTitle">📊 Takwimu Kuu za Fedha & Shule</strong></div>
+    <button class="btn" onclick="document.querySelector('.menu-btn.active').click()">🔄 Live Refresh</button>
+  </div>
+  <div class="content" id="viewArea"></div>
+</div>
+<script>
+  const user = SGB.requireRole(['director', 'super_admin']);
+  SGB.startSessionTimer();
+
+  function openTab(tab, btn) {
+    document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+    const area = document.getElementById('viewArea');
+
+    if (tab === 'exec') {
+      const recs = SGB.select('accounting_receipts');
+      const vchs = SGB.select('expense_vouchers');
+      const users = SGB.select('users_profile');
+      const procs = SGB.select('procurement_committee');
+      const income = recs.reduce((s, r) => s + Number(r.amount_paid), 0);
+      const expense = vchs.reduce((s, v) => s + Number(v.amount), 0);
+
+      area.innerHTML = `
+        <div class="cards">
+          <div class="card" style="border-color:#059669;"><h4>Jumla ya Mapato (CRDB & Cash)</h4><div class="val">TZS ${income.toLocaleString()}</div></div>
+          <div class="card" style="border-color:#dc2626;"><h4>Jumla ya Matumizi</h4><div class="val">TZS ${expense.toLocaleString()}</div></div>
+          <div class="card"><h4>Wanafunzi Waliosajiliwa</h4><div class="val">${users.filter(u => u.role === 'student').length}</div></div>
+          <div class="card"><h4>Watumishi & Walimu</h4><div class="val">${users.filter(u => u.role !== 'student' && u.role !== 'parent').length}</div></div>
+        </div>
+        <div class="panel">
+          <h3>Nakala za Maamuzi ya Kamati ya Manunuzi</h3>
+          <table><tr><th>Kikao</th><th>Bajeti (TZS)</th><th>Hali ya Idhini</th><th>Maoni ya Mkuu wa Shule</th></tr>
+          ${procs.map(p => `<tr><td><b>${p.meeting_title}</b></td><td>${Number(p.estimated_budget).toLocaleString()}</td><td><b>${p.status}</b></td><td>${p.hm_comments || '-'}</td></tr>`).join('') || '<tr><td colspan="4">Hakuna kumbukumbu za manunuzi bado.</td></tr>'}
+          </table>
+        </div>`;
+    }
+
+    if (tab === 'board') {
+      const notes = SGB.select('board_minutes');
+      area.innerHTML = `
+        <div class="panel">
+          <h3>Hifadhi Nyaraka & Muhtasari wa Vikao vya Bodi ya Shule</h3>
+          <form onsubmit="addBoard(event)" style="display:grid; gap:10px; margin-bottom:15px;">
+            <input type="text" id="bTitle" required placeholder="Kichwa cha Kikao cha Bodi">
+            <textarea id="bText" rows="3" required placeholder="Maazimio ya Bodi ya Shule..."></textarea>
+            <button type="submit" class="btn">💾 Hifadhi Kumbukumbu za Bodi</button>
+          </form>
+          <table><tr><th>Kikao</th><th>Maazimio</th><th>Tarehe</th></tr>
+          ${notes.map(n => `<tr><td><b>${n.title}</b></td><td>${n.text}</td><td>${n.created_at}</td></tr>`).join('')}
+          </table>
+        </div>`;
+    }
+  }
+
+  function addBoard(e) {
+    e.preventDefault();
+    SGB.insert('board_minutes', { title: document.getElementById('bTitle').value, text: document.getElementById('bText').value });
+    openTab('board');
+  }
+
+  openTab('exec', document.querySelector('.menu-btn'));
+</script>
+</body>
+</html>
