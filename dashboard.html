@@ -139,6 +139,7 @@
     const bank_ref_no = document.getElementById('bankRef').value || 'CASH';
     const amount_paid = document.getElementById('payAmount').value;
     const qr_verification_hash = 'QR-' + Date.now();
+    const tarehe = new Date().toLocaleString('sw-TZ');
 
     const { error } = await db.from('accounting_receipts').insert([{
       receipt_number, student_name, student_reg_no, payment_category, payment_method, bank_ref_no, amount_paid, qr_verification_hash
@@ -147,17 +148,45 @@
     if (error) { alert('Hitilafu: ' + error.message); return; }
 
     document.getElementById('receiptPreview').innerHTML = `
-      <div style="border:2px dashed #0f294a; padding:15px; max-width:320px; background:#fff; font-family:monospace;">
-        <center><b>SANGABUYE SECONDARY SCHOOL</b><br>S.L.P 11898, ILEMELA - MWANZA<br>RISITI HALALI YA MALIPO</center><hr>
-        Risiti Na: <b>${receipt_number}</b><br>
-        Mwanafunzi: <b>${student_name}</b> (${student_reg_no})<br>
-        Malipo: ${payment_category}<br>
-        Njia: <b>${payment_method}</b> (Ref: ${bank_ref_no})<br>
-        Akaunti: SHULE YA SEKONDARI SANGABUYE E.K (0150838972100)<br>
-        Kiasi: <b>TZS ${Number(amount_paid).toLocaleString()}/=</b><hr>
-        <center><button class="btn btn-blue" onclick="window.print()">🖨️ Chapisha Risiti (Thermal 58/80mm)</button></center>
-      </div>`;
+      <div id="printableReceipt" style="border:2px dashed #0f294a; padding:15px; max-width:300px; background:#fff; font-family:monospace; font-size:12px;">
+        <div style="text-align:center;">
+          <b>SANGABUYE SECONDARY SCHOOL</b><br>
+          S.L.P 11898, ILEMELA - MWANZA<br>
+          Simu: 0784 755 173 / 0615 000 305<br>
+          --------------------------------<br>
+          <b>RISITI HALALI YA MALIPO</b>
+        </div><br>
+        <b>Risiti Na:</b> ${receipt_number}<br>
+        <b>Tarehe:</b> ${tarehe}<br>
+        <b>Mwanafunzi:</b> ${student_name}<br>
+        <b>Namba:</b> ${student_reg_no}<br>
+        <b>Mchango:</b> ${payment_category}<br>
+        <b>Njia:</b> ${payment_method}<br>
+        <b>Ref/Slip:</b> ${bank_ref_no}<br>
+        <b>Akaunti:</b> SHULE YA SEKONDARI SANGABUYE E.K (0150838972100)<br>
+        --------------------------------<br>
+        <div style="font-size:14px;"><b>KIASI: TZS ${Number(amount_paid).toLocaleString()}/=</b></div>
+        --------------------------------<br>
+        <div style="text-align:center; font-size:10px;">
+          Uthibitisho: ${qr_verification_hash}<br>
+          Asante kwa kushirikiana nasi!
+        </div>
+      </div>
+      <br>
+      <button class="btn btn-blue" onclick="printThermalReceipt()">🖨️ Chapisha Risiti Sasa (Print / Save PDF)</button>`;
   }
+
+  function printThermalReceipt() {
+    const content = document.getElementById('printableReceipt').innerHTML;
+    const printWindow = window.open('', '', 'width=350,height=600');
+    printWindow.document.write('<html><head><title>Risiti - Sangabuye SIS</title>');
+    printWindow.document.write('<style>body{font-family:monospace; font-size:12px; width:280px; margin:10px auto;}</style>');
+    printWindow.document.write('</head><body>' + content + '</body></html>');
+    printWindow.document.close();
+    printWindow.focus();
+    setTimeout(() => { printWindow.print(); printWindow.close(); }, 300);
+  }
+
 
   function loadModule(key, btn) {
     document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('active'));
