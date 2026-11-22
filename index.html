@@ -36,8 +36,6 @@
     .alert-error { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
     .alert-success { background: #dcfce7; color: #166534; border: 1px solid #86efac; }
   </style>
-   <script src="https://jsdelivr.net"></script>
-<script src="supabase-config.js"></script>
 </head>
 <body>
 <div class="container">
@@ -54,21 +52,25 @@
       Mkuu wa Shule: 0784 755 173 | Mhasibu: 0615 000 305
     </div>
   </div>
+
   <div class="form-side">
     <div class="top-bar">
       <button class="refresh-btn" onclick="location.reload()" title="Live Refresh">🔄 Refresh</button>
       <button class="lang-btn active" id="btnSW" onclick="setLang('sw')">SW</button>
       <button class="lang-btn" id="btnEN" onclick="setLang('en')">EN</button>
     </div>
+
     <div class="tabs">
       <div class="tab active" id="tabLogin" onclick="switchTab('login')">Ingia (Login)</div>
       <div class="tab" id="tabRegister" onclick="switchTab('register')">Jisajili (Register)</div>
     </div>
+
     <div id="alertBox" class="alert"></div>
+
     <form id="loginForm" onsubmit="handleLogin(event)">
       <div class="form-group">
-        <label id="lblUser">Barua Pepe / Namba ya Simu / Namba ya Usajili</label>
-        <input type="text" id="loginUser" required placeholder="Mfano: 0784755173 au S1234/0001">
+        <label id="lblUser">Namba ya Simu / Namba ya Usajili / Username</label>
+        <input type="text" id="loginUser" required placeholder="Mfano: 0784755173 au S.2026/0045">
       </div>
       <div class="form-group">
         <label id="lblPass">Nenosiri (Password)</label>
@@ -77,7 +79,9 @@
       </div>
       <a class="forgot-link" id="linkForgot" onclick="switchTab('otp')">Umesahau Nenosiri? (OTP Email & SMS)</a>
       <button type="submit" class="btn-primary" id="btnSubmitLogin">Ingia Kwenye Mfumo 🔒</button>
-      <div class="notice-box" id="noticeApproval">⚠️ <b>Kumbuka:</b> Akaunti mpya zinahitaji idhini (Approval) ya IT / Super Admin kabla ya kuingia.</div>
+      <div class="notice-box" id="noticeApproval">
+        ⚠️ <b>Kumbuka:</b> Akaunti mpya zinahitaji idhini (Approval) ya IT / Super Admin kabla ya kuingia.
+      </div>
     </form>
     <form id="registerForm" class="hidden" onsubmit="handleRegister(event)">
       <div class="form-group">
@@ -116,6 +120,7 @@
       </div>
       <button type="submit" class="btn-primary">Tuma Maombi ya Usajili ✅</button>
     </form>
+
     <form id="otpForm" class="hidden" onsubmit="handleOtp(event)">
       <p style="font-size:13px; color:#475569;">Weka Barua Pepe au Namba yako ya Simu ili kupokea namba ya siri ya muda (OTP tarakimu 6).</p>
       <div class="form-group">
@@ -128,11 +133,14 @@
   </div>
 </div>
 <script>
+  const DB_URL = 'https://firebaseio.com';
   let attempts = 0;
+
   function togglePass(id) {
     const inp = document.getElementById(id);
     inp.type = inp.type === 'password' ? 'text' : 'password';
   }
+
   function switchTab(tab) {
     document.getElementById('alertBox').style.display = 'none';
     ['loginForm', 'registerForm', 'otpForm'].forEach(f => document.getElementById(f).classList.add('hidden'));
@@ -141,59 +149,90 @@
     if (tab === 'register') { document.getElementById('registerForm').classList.remove('hidden'); document.getElementById('tabRegister').classList.add('active'); }
     if (tab === 'otp') { document.getElementById('otpForm').classList.remove('hidden'); }
   }
+
   function showAlert(msg, type) {
     const box = document.getElementById('alertBox');
     box.className = 'alert ' + (type === 'error' ? 'alert-error' : 'alert-success');
-    box.innerHTML = msg; box.style.display = 'block';
+    box.innerHTML = msg;
+    box.style.display = 'block';
   }
-  function handleLogin(e) {
+
+  async function handleLogin(e) {
     e.preventDefault();
-    if (attempts >= 5) { showAlert('⛔ Akaunti imefungwa kwa dakika 15 (Brute-Force Lock) baada ya kukosea mara 5.', 'error'); return; }
+    if (attempts >= 5) {
+      showAlert('⛔ Akaunti imefungwa kwa dakika 15 (Brute-Force Lock) baada ya kukosea mara 5.', 'error');
+      return;
+    }
     const user = document.getElementById('loginUser').value.trim();
     const pass = document.getElementById('loginPass').value.trim();
+
     if (user === 'admin' && pass === '123456') {
-      showAlert('✅ Umefanikiwa kuingia! Tunafungua Dashibodi ya Super Admin...', 'success');
-      setTimeout(() => { window.location.href = 'dashboard.html'; }, 1000);
-    } else {
-      attempts++;
-      showAlert(`❌ Taarifa si sahihi au akaunti bado haijaidhinishwa (Jaribio ${attempts}/5).`, 'error');
+      showAlert('✅ Umefanikiwa kuingia kama Super Admin! Tunafungua Dashibodi...', 'success');
+      setTimeout(() => { window.location.href = 'dashboard.html'; }, 800);
+      return;
+    }
+
+    try {
+      const res = await fetch(`${DB_URL}/users_profile.json`);
+      const data = await res.json();
+      const users = data ? Object.values(data) : [];
+      const found = users.find(u => (u.phone_number === user || u.reg_or_staff_no === user) && u.password_hash === pass);
+
+      if (!found) {
+        attempts++;
+        showAlert(`❌ Taarifa si sahihi (Jaribio ${attempts}/5).`, 'error');
+      } else if (found.status !== 'approved') {
+        showAlert('⏳ Akaunti yako bado inasubiri idhini (Approval) ya Super Admin / IT.', 'error');
+      } else {
+        showAlert(`✅ Karibu <b>${found.full_name}</b>! Tunafungua mfumo...`, 'success');
+        setTimeout(() => { window.location.href = 'dashboard.html'; }, 800);
+      }
+    } catch (err) {
+      showAlert('❌ Hitilafu ya mtandao: ' + err.message, 'error');
     }
   }
+
   async function handleRegister(e) {
-  e.preventDefault();
-  const full_name = document.getElementById('regName').value.trim();
-  const role = document.getElementById('regRole').value;
-  const reg_or_staff_no = document.getElementById('regNo').value.trim();
-  const phone_number = document.getElementById('regPhone').value.trim();
-  const password_hash = document.getElementById('regPass').value.trim();
+    e.preventDefault();
+    const payload = {
+      full_name: document.getElementById('regName').value.trim(),
+      role: document.getElementById('regRole').value,
+      reg_or_staff_no: document.getElementById('regNo').value.trim(),
+      phone_number: document.getElementById('regPhone').value.trim(),
+      password_hash: document.getElementById('regPass').value.trim(),
+      status: 'pending',
+      created_at: new Date().toISOString()
+    };
 
-  const { error } = await db.from('users_profile').insert([
-    { full_name, role, reg_or_staff_no, phone_number, password_hash, status: 'pending' }
-  ]);
-
-  if (error) {
-    showAlert('❌ Hitilafu: ' + error.message, 'error');
-  } else {
-    showAlert(`✅ Asante <b>${full_name}</b>! Taarifa zako zimehifadhiwa kwenye Database ya shule na zinasubiri idhini ya Admin.`, 'success');
-    document.getElementById('registerForm').reset();
+    try {
+      const res = await fetch(`${DB_URL}/users_profile.json`, { method: 'POST', body: JSON.stringify(payload) });
+      if (!res.ok) throw new Error('Imeshindwa kuhifadhi');
+      showAlert(`✅ Asante <b>${payload.full_name}</b>! Maombi yako yamehifadhiwa na yanasubiri idhini ya Admin.`, 'success');
+      document.getElementById('registerForm').reset();
+    } catch (err) {
+      showAlert('❌ Hitilafu: ' + err.message, 'error');
+    }
   }
-}
 
   function handleOtp(e) {
     e.preventDefault();
     const contact = document.getElementById('otpContact').value;
-    showAlert(`📲 Namba ya OTP (tarakimu 6) imetumwa kwenda <b>${contact}</b> kupitia Brevo Email & SMS Gateway.`, 'success');
+    showAlert(`📲 Namba ya OTP (tarakimu 6) imetumwa kwenda <b>${contact}</b> kupitia Email & SMS Gateway.`, 'success');
   }
+
   function setLang(lang) {
     document.getElementById('btnSW').classList.toggle('active', lang === 'sw');
     document.getElementById('btnEN').classList.toggle('active', lang === 'en');
     const isEn = lang === 'en';
     document.getElementById('tabLogin').innerText = isEn ? 'Sign In (Login)' : 'Ingia (Login)';
     document.getElementById('tabRegister').innerText = isEn ? 'Register Account' : 'Jisajili (Register)';
-    document.getElementById('lblUser').innerText = isEn ? 'Email / Phone Number / Registration No.' : 'Barua Pepe / Namba ya Simu / Namba ya Usajili';
+    document.getElementById('lblUser').innerText = isEn ? 'Phone Number / Registration No. / Username' : 'Namba ya Simu / Namba ya Usajili / Username';
     document.getElementById('lblPass').innerText = isEn ? 'Password' : 'Nenosiri (Password)';
     document.getElementById('linkForgot').innerText = isEn ? 'Forgot Password? (OTP Email & SMS)' : 'Umesahau Nenosiri? (OTP Email & SMS)';
     document.getElementById('btnSubmitLogin').innerText = isEn ? 'Sign In to Portal 🔒' : 'Ingia Kwenye Mfumo 🔒';
+    document.getElementById('noticeApproval').innerHTML = isEn
+      ? '⚠️ <b>Note:</b> New accounts require IT / Super Admin approval before login.'
+      : '⚠️ <b>Kumbuka:</b> Akaunti mpya zinahitaji idhini (Approval) ya IT / Super Admin kabla ya kuingia.';
   }
 </script>
 </body>
