@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sangabuye SIS Portal | S.L.P 11898, Ilemela - Mwanza</title>
+  <script src="core.js"></script>
   <style>
     :root { --primary: #0f294a; --accent: #1d4ed8; --bg: #f1f5f9; --text: #1e293b; }
     * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
@@ -44,7 +45,7 @@
     <h1>SANGABUYE SECONDARY SCHOOL</h1>
     <p>S.L.P 11898, ILEMELA - MWANZA, TANZANIA</p>
     <p style="font-size:12px; margin-top:6px;">O-Level (Form 1–4) & A-Level (Form 5–6)</p>
-    <div><span class="badge" id="portalBadge">Sangabuye SIS Portal (v6.3)</span></div>
+    <div><span class="badge" id="portalBadge">Sangabuye SIS Portal (Toleo 5.0)</span></div>
     <div class="bank-box">
       <strong id="bankTitle">Taarifa Rasmi za Malipo (CRDB Bank):</strong><br>
       Jina: <b>SHULE YA SEKONDARI SANGABUYE E.K</b><br>
@@ -67,20 +68,10 @@
 
     <div id="alertBox" class="alert"></div>
 
-      const ROLE_PAGES = {
-    super_admin: 'admin.html',
-    director: 'director.html',
-    headmaster: 'headmaster.html',
-    accountant: 'accountant.html',
-    academic: 'academic.html',
-    teacher: 'teacher.html',
-    parent: 'parent.html',
-    student: 'student.html'
-  };
-
+    <form id="loginForm" onsubmit="handleLogin(event)">
       <div class="form-group">
         <label id="lblUser">Namba ya Simu / Namba ya Usajili / Username</label>
-        <input type="text" id="loginUser" required placeholder="Mfano: 0784755173 au S.2026/0045">
+        <input type="text" id="loginUser" required placeholder="Mfano: accountant, academic, admin, 0784755173">
       </div>
       <div class="form-group">
         <label id="lblPass">Nenosiri (Password)</label>
@@ -90,7 +81,7 @@
       <a class="forgot-link" id="linkForgot" onclick="switchTab('otp')">Umesahau Nenosiri? (OTP Email & SMS)</a>
       <button type="submit" class="btn-primary" id="btnSubmitLogin">Ingia Kwenye Mfumo 🔒</button>
       <div class="notice-box" id="noticeApproval">
-        ⚠️ <b>Kumbuka:</b> Akaunti mpya zinahitaji idhini (Approval) ya IT / Super Admin kabla ya kuingia.
+        ⚠️ <b>Kumbuka:</b> Kila mtumiaji hupelekwa moja kwa moja kwenye Dashibodi yake mahususi kulingana na nafasi yake.
       </div>
     </form>
     <form id="registerForm" class="hidden" onsubmit="handleRegister(event)">
@@ -145,6 +136,17 @@
 <script>
   let attempts = 0;
 
+  const ROLE_PAGES = {
+    super_admin: 'admin.html',
+    director: 'director.html',
+    headmaster: 'headmaster.html',
+    accountant: 'accountant.html',
+    academic: 'academic.html',
+    teacher: 'teacher.html',
+    parent: 'parent.html',
+    student: 'student.html'
+  };
+
   function togglePass(id) {
     const inp = document.getElementById(id);
     inp.type = inp.type === 'password' ? 'text' : 'password';
@@ -175,13 +177,27 @@
     const user = document.getElementById('loginUser').value.trim();
     const pass = document.getElementById('loginPass').value.trim();
 
-    if (user === 'admin' && pass === '123456') {
-      showAlert('✅ Umefanikiwa kuingia kama Super Admin! Tunafungua Dashibodi...', 'success');
-      setTimeout(() => { window.location.href = 'dashboard.html'; }, 800);
+    const builtIn = {
+      'admin': { full_name: 'Super Admin (IT)', role: 'super_admin' },
+      'director': { full_name: 'Mkurugenzi wa Shule', role: 'director' },
+      'headmaster': { full_name: 'Mkuu wa Shule (0784 755 173)', role: 'headmaster' },
+      'accountant': { full_name: 'Mhasibu wa Shule (0615 000 305)', role: 'accountant' },
+      'academic': { full_name: 'Mtaaluma (Academic Master)', role: 'academic' },
+      'teacher': { full_name: 'Mwalimu wa Somo', role: 'teacher' },
+      'parent': { full_name: 'Mzazi / Mlezi', role: 'parent' },
+      'student': { full_name: 'Mwanafunzi (Sangabuye)', role: 'student' }
+    };
+
+    if (builtIn[user.toLowerCase()] && pass === '123456') {
+      const acc = builtIn[user.toLowerCase()];
+      sessionStorage.setItem('sgb_active_user', JSON.stringify(acc));
+      SGB.logAction('Ameingia kwenye mfumo (Login)');
+      showAlert(`✅ Karibu <b>${acc.full_name}</b>! Tunafungua Dashibodi yako...`, 'success');
+      setTimeout(() => { window.location.href = ROLE_PAGES[acc.role]; }, 700);
       return;
     }
 
-    const users = JSON.parse(localStorage.getItem('sgb_users_profile') || '[]');
+    const users = SGB.select('users_profile');
     const found = users.find(u => (u.phone_number === user || u.reg_or_staff_no === user) && u.password_hash === pass);
 
     if (!found) {
@@ -190,29 +206,23 @@
     } else if (found.status !== 'approved') {
       showAlert('⏳ Akaunti yako bado inasubiri idhini (Approval) ya Super Admin / IT.', 'error');
     } else {
-      showAlert(`✅ Karibu <b>${found.full_name}</b>! Tunafungua mfumo...`, 'success');
-      setTimeout(() => { window.location.href = 'dashboard.html'; }, 800);
+      sessionStorage.setItem('sgb_active_user', JSON.stringify(found));
+      SGB.logAction('Ameingia kwenye mfumo (Login)');
+      showAlert(`✅ Karibu <b>${found.full_name}</b>! Tunafungua Dashibodi yako...`, 'success');
+      setTimeout(() => { window.location.href = ROLE_PAGES[found.role] || 'index.html'; }, 700);
     }
   }
 
   function handleRegister(e) {
     e.preventDefault();
-    const payload = {
-      id: Date.now(),
-      _key: String(Date.now()),
+    const payload = SGB.insert('users_profile', {
       full_name: document.getElementById('regName').value.trim(),
       role: document.getElementById('regRole').value,
       reg_or_staff_no: document.getElementById('regNo').value.trim(),
       phone_number: document.getElementById('regPhone').value.trim(),
       password_hash: document.getElementById('regPass').value.trim(),
-      status: 'pending',
-      created_at: new Date().toISOString()
-    };
-
-    let users = JSON.parse(localStorage.getItem('sgb_users_profile') || '[]');
-    users.unshift(payload);
-    localStorage.setItem('sgb_users_profile', JSON.stringify(users));
-
+      status: 'pending'
+    });
     showAlert(`✅ Asante <b>${payload.full_name}</b>! Maombi yako yamehifadhiwa na yanasubiri idhini ya Admin.`, 'success');
     document.getElementById('registerForm').reset();
   }
@@ -220,7 +230,7 @@
   function handleOtp(e) {
     e.preventDefault();
     const contact = document.getElementById('otpContact').value;
-    showAlert(`📲 Namba ya OTP (tarakimu 6) imetumwa kwenda <b>${contact}</b> kupitia Email & SMS Gateway.`, 'success');
+    showAlert(`📲 Namba ya OTP (tarakimu 6) imetumwa kwenda <b>${contact}</b> kupitia Brevo Email & SMS Gateway.`, 'success');
   }
 
   function setLang(lang) {
@@ -229,13 +239,10 @@
     const isEn = lang === 'en';
     document.getElementById('tabLogin').innerText = isEn ? 'Sign In (Login)' : 'Ingia (Login)';
     document.getElementById('tabRegister').innerText = isEn ? 'Register Account' : 'Jisajili (Register)';
-    document.getElementById('lblUser').innerText = isEn ? 'Phone Number / Registration No. / Username' : 'Namba ya Simu / Namba ya Usajili / Username';
+    document.getElementById('lblUser').innerText = isEn ? 'Phone / Registration No. / Username' : 'Namba ya Simu / Namba ya Usajili / Username';
     document.getElementById('lblPass').innerText = isEn ? 'Password' : 'Nenosiri (Password)';
     document.getElementById('linkForgot').innerText = isEn ? 'Forgot Password? (OTP Email & SMS)' : 'Umesahau Nenosiri? (OTP Email & SMS)';
     document.getElementById('btnSubmitLogin').innerText = isEn ? 'Sign In to Portal 🔒' : 'Ingia Kwenye Mfumo 🔒';
-    document.getElementById('noticeApproval').innerHTML = isEn
-      ? '⚠️ <b>Note:</b> New accounts require IT / Super Admin approval before login.'
-      : '⚠️ <b>Kumbuka:</b> Akaunti mpya zinahitaji idhini (Approval) ya IT / Super Admin kabla ya kuingia.';
   }
 </script>
 </body>
