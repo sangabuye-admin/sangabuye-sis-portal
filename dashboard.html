@@ -147,8 +147,12 @@
     return { grade: 'F', points: 5 };
   }
 
-  async function saveMarks(e) {
+    async function saveMarks(e) {
     e.preventDefault();
+    if (typeof db === 'undefined') {
+      alert('❌ KOSA: Faili la supabase-config.js halijasomwa. Hakikisha lipo kwenye GitHub na limeitwa juu ya dashboard.html.');
+      return;
+    }
     const student_name = document.getElementById('mkStudent').value;
     const subject_name = document.getElementById('mkSubject').value;
     const ca_score = parseFloat(document.getElementById('mkCA').value);
@@ -162,7 +166,10 @@
       student_name, subject_name, ca_score, final_score, total_score, grade, points
     }]);
 
-    if (error) { alert('Hitilafu: ' + error.message); return; }
+    if (error) {
+      alert('❌ KOSA LA SUPABASE: ' + error.message);
+      return;
+    }
     document.getElementById('marksMsg').innerHTML = `<div style="padding:10px; background:#dcfce7; color:#166534; border-radius:6px;">✅ Alama za <b>${student_name}</b> (${subject_name}) zimehifadhiwa! Jumla: <b>${total_score}%</b> | Daraja: <b>${grade}</b> (Pointi: ${points})</div>`;
     e.target.reset();
   }
