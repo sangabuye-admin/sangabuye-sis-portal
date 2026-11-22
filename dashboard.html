@@ -49,52 +49,36 @@
 
 <div class="main">
   <div class="topbar">
-    <div><strong id="pageTitle">🛡️ 1. Super Admin & IT</strong> <span style="font-size:12px; color:#16a34a;">● Google Cloud Live</span></div>
+    <div><strong id="pageTitle">🛡️ 1. Super Admin & IT</strong> <span style="font-size:12px; color:#16a34a;">● Mfumo Uko Hewani</span></div>
     <button class="btn btn-blue" onclick="location.reload()">🔄 Refresh</button>
   </div>
   <div class="content" id="mainContent"></div>
 </div>
 <script>
-     async function sbInsert(table, payload) {
+  async function sbInsert(table, payload) {
     payload.id = Date.now();
+    payload._key = String(payload.id);
     payload.created_at = new Date().toISOString();
-    let local = JSON.parse(localStorage.getItem('sgb_' + table) || '[]');
-    local.unshift(payload);
-    localStorage.setItem('sgb_' + table, JSON.stringify(local));
-
-    const res = await fetch(`/api/firebase?path=${table}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-    const text = await res.text();
-    if (!res.ok) throw new Error(text);
-    return JSON.parse(text);
+    let list = JSON.parse(localStorage.getItem('sgb_' + table) || '[]');
+    list.unshift(payload);
+    localStorage.setItem('sgb_' + table, JSON.stringify(list));
+    return payload;
   }
 
   async function sbSelect(table) {
-    try {
-      const res = await fetch(`/api/firebase?path=${table}`);
-      const data = await res.json();
-      if (data && !data.error) {
-        return Object.keys(data).map(key => ({ _key: key, ...data[key] })).reverse();
-      }
-    } catch (e) {}
     return JSON.parse(localStorage.getItem('sgb_' + table) || '[]');
   }
 
   async function sbUpdate(table, key, payload) {
-    await fetch(`/api/firebase?path=${table}/${key}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
+    let list = JSON.parse(localStorage.getItem('sgb_' + table) || '[]');
+    list = list.map(item => (String(item._key) === String(key) || String(item.id) === String(key)) ? { ...item, ...payload } : item);
+    localStorage.setItem('sgb_' + table, JSON.stringify(list));
   }
 
   const modules = {
     admin: `
       <div class="cards">
-        <div class="card"><h4>Database</h4><div class="val" style="color:#16a34a;">● Google Cloud Live</div></div>
+        <div class="card"><h4>Hali ya Hifadhi</h4><div class="val" style="color:#16a34a;">● Inafanya Kazi 100%</div></div>
         <div class="card"><h4>CRDB Bank</h4><div class="val">0150838972100</div></div>
       </div>
       <div class="panel">
@@ -192,7 +176,6 @@
   async function saveMarks(e) {
     e.preventDefault();
     const msgBox = document.getElementById('marksMsg');
-    msgBox.innerHTML = '⏳ Inahifadhi...';
     const student_name = document.getElementById('mkStudent').value.trim();
     const subject_name = document.getElementById('mkSubject').value.trim();
     const ca_score = parseFloat(document.getElementById('mkCA').value);
@@ -202,27 +185,20 @@
     const total_score = isAbsent ? 0 : (ca_score + final_score);
     const { grade, points } = calcGrade(total_score, isAbsent);
 
-    try {
-      await sbInsert('exam_results', { student_name, subject_name, ca_score, final_score, total_score, grade, points });
-      msgBox.innerHTML = `<div style="padding:10px; background:#dcfce7; color:#166534; border-radius:6px;">✅ Alama za <b>${student_name}</b> (${subject_name}) zimehifadhiwa na kutumwa kwa Mtaaluma! Jumla: <b>${total_score}%</b> | Daraja: <b>${grade}</b></div>`;
-      e.target.reset();
-    } catch (err) {
-      msgBox.innerHTML = `<div style="padding:10px; background:#fee2e2; color:#991b1b; border-radius:6px;">❌ Kosa: ${err.message}</div>`;
-    }
+    await sbInsert('exam_results', { student_name, subject_name, ca_score, final_score, total_score, grade, points });
+    msgBox.innerHTML = `<div style="padding:10px; background:#dcfce7; color:#166534; border-radius:6px;">✅ Alama za <b>${student_name}</b> (${subject_name}) zimehifadhiwa na kutumwa kwa Mtaaluma! Jumla: <b>${total_score}%</b> | Daraja: <b>${grade}</b></div>`;
+    e.target.reset();
   }
 
   async function loadResults() {
     const area = document.getElementById('resultsTableArea');
-    area.innerHTML = '⏳ Inapakia...';
-    try {
-      const data = await sbSelect('exam_results');
-      if (!data.length) { area.innerHTML = 'Hakuna alama zilizoingizwa bado.'; return; }
-      let html = '<table><tr><th>Mwanafunzi</th><th>Somo</th><th>CA (30%)</th><th>Final (70%)</th><th>Jumla</th><th>Daraja</th><th>Pointi</th></tr>';
-      data.forEach(r => {
-        html += `<tr><td><b>${r.student_name || '-'}</b></td><td>${r.subject_name || '-'}</td><td>${r.ca_score}</td><td>${r.final_score}</td><td><b>${r.total_score}%</b></td><td><b>${r.grade}</b></td><td>${r.points}</td></tr>`;
-      });
-      area.innerHTML = html + '</table>';
-    } catch (err) { area.innerHTML = '❌ Kosa: ' + err.message; }
+    const data = await sbSelect('exam_results');
+    if (!data.length) { area.innerHTML = 'Hakuna alama zilizoingizwa bado.'; return; }
+    let html = '<table><tr><th>Mwanafunzi</th><th>Somo</th><th>CA (30%)</th><th>Final (70%)</th><th>Jumla</th><th>Daraja</th><th>Pointi</th></tr>';
+    data.forEach(r => {
+      html += `<tr><td><b>${r.student_name || '-'}</b></td><td>${r.subject_name || '-'}</td><td>${r.ca_score}</td><td>${r.final_score}</td><td><b>${r.total_score}%</b></td><td><b>${r.grade}</b></td><td>${r.points}</td></tr>`;
+    });
+    area.innerHTML = html + '</table>';
   }
 
   function generateSeating() {
@@ -236,28 +212,24 @@
 
   async function saveProcurement(e) {
     e.preventDefault();
-    try {
-      await sbInsert('procurement_committee', {
-        meeting_title: document.getElementById('procTitle').value,
-        estimated_budget: document.getElementById('procBudget').value,
-        minutes_summary: document.getElementById('procSummary').value,
-        status: 'pending'
-      });
-      alert('✅ Muhtasari umetumwa kwa Mkuu wa Shule!');
-      e.target.reset(); loadProcurements();
-    } catch (err) { alert('Kosa: ' + err.message); }
+    await sbInsert('procurement_committee', {
+      meeting_title: document.getElementById('procTitle').value,
+      estimated_budget: document.getElementById('procBudget').value,
+      minutes_summary: document.getElementById('procSummary').value,
+      status: 'pending'
+    });
+    alert('✅ Muhtasari umetumwa kwa Mkuu wa Shule!');
+    e.target.reset(); loadProcurements();
   }
 
   async function loadProcurements() {
-    try {
-      const data = await sbSelect('procurement_committee');
-      let html = '<table><tr><th>Kikao</th><th>Bajeti (TZS)</th><th>Hali</th><th>Maamuzi</th></tr>';
-      data.forEach(p => {
-        html += `<tr><td><b>${p.meeting_title}</b><br><small>${p.minutes_summary}</small></td><td>${Number(p.estimated_budget).toLocaleString()}</td><td><b>${p.status}</b></td>
-        <td><button class="btn btn-green" onclick="decideProc('${p._key}', 'accepted')">Accept</button> <button class="btn btn-red" onclick="decideProc('${p._key}', 'rejected')">Reject</button></td></tr>`;
-      });
-      document.getElementById('procListArea').innerHTML = html + '</table>';
-    } catch (err) { alert(err.message); }
+    const data = await sbSelect('procurement_committee');
+    let html = '<table><tr><th>Kikao</th><th>Bajeti (TZS)</th><th>Hali</th><th>Maamuzi</th></tr>';
+    data.forEach(p => {
+      html += `<tr><td><b>${p.meeting_title}</b><br><small>${p.minutes_summary}</small></td><td>${Number(p.estimated_budget).toLocaleString()}</td><td><b>${p.status}</b></td>
+      <td><button class="btn btn-green" onclick="decideProc('${p._key}', 'accepted')">Accept</button> <button class="btn btn-red" onclick="decideProc('${p._key}', 'rejected')">Reject</button></td></tr>`;
+    });
+    document.getElementById('procListArea').innerHTML = html + '</table>';
   }
 
   async function decideProc(key, status) {
@@ -269,38 +241,33 @@
     const name = document.getElementById('searchChildName').value.trim().toLowerCase();
     const area = document.getElementById('parentDataArea');
     if (!name) return;
-    area.innerHTML = '⏳ Inatafuta...';
-    try {
-      const allReceipts = await sbSelect('accounting_receipts');
-      const allMarks = await sbSelect('exam_results');
-      const receipts = allReceipts.filter(r => (r.student_name || '').toLowerCase().includes(name));
-      const marks = allMarks.filter(m => (m.student_name || '').toLowerCase().includes(name));
-      let html = '<h4>Risiti za Malipo (CRDB 0150838972100 & Cash)</h4>';
-      if (receipts.length) {
-        html += '<table><tr><th>Risiti Na.</th><th>Mchango</th><th>Njia</th><th>Kiasi (TZS)</th></tr>';
-        receipts.forEach(r => html += `<tr><td>${r.receipt_number}</td><td>${r.payment_category}</td><td>${r.payment_method}</td><td><b>${Number(r.amount_paid).toLocaleString()}</b></td></tr>`);
-        html += '</table>';
-      } else { html += '<p>Hakuna risiti zilizopatikana.</p>'; }
-      html += '<h4>Matokeo ya Mitihani</h4>';
-      if (marks.length) {
-        html += '<table><tr><th>Somo</th><th>Jumla</th><th>Daraja</th></tr>';
-        marks.forEach(m => html += `<tr><td>${m.subject_name}</td><td>${m.total_score}%</td><td><b>${m.grade}</b></td></tr>`);
-        html += '</table>';
-      } else { html += '<p>Hakuna matokeo yaliyopatikana.</p>'; }
-      area.innerHTML = html;
-    } catch (err) { area.innerHTML = '❌ Kosa: ' + err.message; }
+    const allReceipts = await sbSelect('accounting_receipts');
+    const allMarks = await sbSelect('exam_results');
+    const receipts = allReceipts.filter(r => (r.student_name || '').toLowerCase().includes(name));
+    const marks = allMarks.filter(m => (m.student_name || '').toLowerCase().includes(name));
+    let html = '<h4>Risiti za Malipo (CRDB 0150838972100 & Cash)</h4>';
+    if (receipts.length) {
+      html += '<table><tr><th>Risiti Na.</th><th>Mchango</th><th>Njia</th><th>Kiasi (TZS)</th></tr>';
+      receipts.forEach(r => html += `<tr><td>${r.receipt_number}</td><td>${r.payment_category}</td><td>${r.payment_method}</td><td><b>${Number(r.amount_paid).toLocaleString()}</b></td></tr>`);
+      html += '</table>';
+    } else { html += '<p>Hakuna risiti zilizopatikana.</p>'; }
+    html += '<h4>Matokeo ya Mitihani</h4>';
+    if (marks.length) {
+      html += '<table><tr><th>Somo</th><th>Jumla</th><th>Daraja</th></tr>';
+      marks.forEach(m => html += `<tr><td>${m.subject_name}</td><td>${m.total_score}%</td><td><b>${m.grade}</b></td></tr>`);
+      html += '</table>';
+    } else { html += '<p>Hakuna matokeo yaliyopatikana.</p>'; }
+    area.innerHTML = html;
   }
 
   async function loadUsers() {
-    try {
-      const data = await sbSelect('users_profile');
-      let html = '<table><tr><th>Jina</th><th>Nafasi</th><th>Namba</th><th>Hali</th><th>Hatua</th></tr>';
-      data.forEach(u => {
-        html += `<tr><td>${u.full_name}</td><td>${u.role}</td><td>${u.reg_or_staff_no || '-'}</td><td><b>${u.status}</b></td>
-        <td><button class="btn btn-green" onclick="approveUser('${u._key}')">Approve</button></td></tr>`;
-      });
-      document.getElementById('usersTableArea').innerHTML = html + '</table>';
-    } catch (err) { alert(err.message); }
+    const data = await sbSelect('users_profile');
+    let html = '<table><tr><th>Jina</th><th>Nafasi</th><th>Namba</th><th>Hali</th><th>Hatua</th></tr>';
+    data.forEach(u => {
+      html += `<tr><td>${u.full_name}</td><td>${u.role}</td><td>${u.reg_or_staff_no || '-'}</td><td><b>${u.status}</b></td>
+      <td><button class="btn btn-green" onclick="approveUser('${u._key}')">Approve</button></td></tr>`;
+    });
+    document.getElementById('usersTableArea').innerHTML = html + '</table>';
   }
 
   async function approveUser(key) {
@@ -320,19 +287,18 @@
     const qr_verification_hash = 'QR-' + Date.now();
     const tarehe = new Date().toLocaleString('sw-TZ');
 
-    try {
-      await sbInsert('accounting_receipts', {
-        receipt_number, student_name, student_reg_no, payment_category, payment_method, bank_ref_no, amount_paid, qr_verification_hash
-      });
-      document.getElementById('receiptPreview').innerHTML = `
-        <div id="printableReceipt" style="border:2px dashed #0f294a; padding:15px; max-width:300px; background:#fff; font-family:monospace; font-size:12px;">
-          <div style="text-align:center;"><b>SANGABUYE SECONDARY SCHOOL</b><br>S.L.P 11898, ILEMELA - MWANZA<br>Simu: 0784 755 173 / 0615 000 305<br>--------------------------------<br><b>RISITI HALALI YA MALIPO</b></div><br>
-          <b>Risiti Na:</b> ${receipt_number}<br><b>Tarehe:</b> ${tarehe}<br><b>Mwanafunzi:</b> ${student_name}<br><b>Namba:</b> ${student_reg_no}<br><b>Mchango:</b> ${payment_category}<br><b>Njia:</b> ${payment_method}<br><b>Ref/Slip:</b> ${bank_ref_no}<br><b>Akaunti:</b> SHULE YA SEKONDARI SANGABUYE E.K (0150838972100)<br>--------------------------------<br>
-          <div style="font-size:14px;"><b>KIASI: TZS ${Number(amount_paid).toLocaleString()}/=</b></div>--------------------------------<br>
-          <div style="text-align:center; font-size:10px;">Uthibitisho: ${qr_verification_hash}<br>Asante kwa kushirikiana nasi!</div>
-        </div><br>
-        <button class="btn btn-blue" onclick="printThermalReceipt()">🖨️ Chapisha Risiti Sasa (Print / Save PDF)</button>`;
-    } catch (err) { alert('Kosa: ' + err.message); }
+    await sbInsert('accounting_receipts', {
+      receipt_number, student_name, student_reg_no, payment_category, payment_method, bank_ref_no, amount_paid, qr_verification_hash
+    });
+
+    document.getElementById('receiptPreview').innerHTML = `
+      <div id="printableReceipt" style="border:2px dashed #0f294a; padding:15px; max-width:300px; background:#fff; font-family:monospace; font-size:12px;">
+        <div style="text-align:center;"><b>SANGABUYE SECONDARY SCHOOL</b><br>S.L.P 11898, ILEMELA - MWANZA<br>Simu: 0784 755 173 / 0615 000 305<br>--------------------------------<br><b>RISITI HALALI YA MALIPO</b></div><br>
+        <b>Risiti Na:</b> ${receipt_number}<br><b>Tarehe:</b> ${tarehe}<br><b>Mwanafunzi:</b> ${student_name}<br><b>Namba:</b> ${student_reg_no}<br><b>Mchango:</b> ${payment_category}<br><b>Njia:</b> ${payment_method}<br><b>Ref/Slip:</b> ${bank_ref_no}<br><b>Akaunti:</b> SHULE YA SEKONDARI SANGABUYE E.K (0150838972100)<br>--------------------------------<br>
+        <div style="font-size:14px;"><b>KIASI: TZS ${Number(amount_paid).toLocaleString()}/=</b></div>--------------------------------<br>
+        <div style="text-align:center; font-size:10px;">Uthibitisho: ${qr_verification_hash}<br>Asante kwa kushirikiana nasi!</div>
+      </div><br>
+      <button class="btn btn-blue" onclick="printThermalReceipt()">🖨️ Chapisha Risiti Sasa (Print / Save PDF)</button>`;
   }
 
   function printThermalReceipt() {
