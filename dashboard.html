@@ -308,6 +308,51 @@
     w.document.close(); w.focus();
     setTimeout(() => { w.print(); w.close(); }, 300);
   }
+  // 1. STOO YA VYAKULA NA MALI ZA SHULE
+  async function saveStoreItem(e) {
+    e.preventDefault();
+    await sbInsert('store_inventory', {
+      item_name: document.getElementById('stItem').value,
+      quantity: parseFloat(document.getElementById('stQty').value),
+      unit: document.getElementById('stUnit').value
+    });
+    alert('✅ Bidhaa imehifadhiwa kwenye Stoo ya Shule!');
+    e.target.reset();
+    loadStoreItems();
+  }
+
+  async function loadStoreItems() {
+    const data = await sbSelect('store_inventory');
+    let html = '<table><tr><th>Bidhaa (Chakula/Vifaa)</th><th>Kiasi Kilichopo</th><th>Hali</th></tr>';
+    data.forEach(s => {
+      const alertTxt = s.quantity <= 10 ? '<span style="color:#dc2626; font-weight:bold;">⚠️ Kinakaribia Kuisha</span>' : '<span style="color:#16a34a;">● Inatosha</span>';
+      html += `<tr><td><b>${s.item_name}</b></td><td>${s.quantity} ${s.unit}</td><td>${alertTxt}</td></tr>`;
+    });
+    document.getElementById('storeTableArea').innerHTML = html + '</table>';
+  }
+
+  // 2. GATE PASS & RUHUSA ZA WANAFUNZI (MKUU WA SHULE)
+  async function saveGatePass(e) {
+    e.preventDefault();
+    await sbInsert('gate_passes', {
+      student_name: document.getElementById('gpStudent').value,
+      reason: document.getElementById('gpReason').value,
+      return_date: document.getElementById('gpReturn').value,
+      status: 'Imetolewa (Active)'
+    });
+    alert('✅ Gate Pass imetolewa rasmi!');
+    e.target.reset();
+    loadGatePasses();
+  }
+
+  async function loadGatePasses() {
+    const data = await sbSelect('gate_passes');
+    let html = '<table><tr><th>Mwanafunzi</th><th>Sababu ya Ruhusa</th><th>Tarehe ya Kurudi</th><th>Hali</th></tr>';
+    data.forEach(g => {
+      html += `<tr><td><b>${g.student_name}</b></td><td>${g.reason}</td><td>${g.return_date}</td><td><b>${g.status}</b></td></tr>`;
+    });
+    document.getElementById('gpTableArea').innerHTML = html + '</table>';
+  }
 
   function loadModule(key, btn) {
     document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('active'));
