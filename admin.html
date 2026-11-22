@@ -11,7 +11,7 @@
     .sidebar { width: 270px; background: #0f172a; color: white; display: flex; flex-direction: column; padding: 18px 12px; }
     .sidebar h2 { font-size: 15px; margin: 0 0 4px; color: #fbbf24; text-align: center; }
     .sidebar p { font-size: 11px; text-align: center; color: #94a3b8; margin: 0 0 18px; }
-    .menu-btn { background: transparent; border: none; color: #e2e8f0; text-align: left; padding: 10px 12px; border-radius: 8px; cursor: pointer; font-size: 13px; margin-bottom: 4px; }
+    .menu-btn { background: transparent; border: none; color: #e2e8f0; text-align: left; padding: 9px 12px; border-radius: 8px; cursor: pointer; font-size: 12.5px; margin-bottom: 4px; }
     .menu-btn:hover, .menu-btn.active { background: #2563eb; color: white; font-weight: bold; }
     .main { flex: 1; display: flex; flex-direction: column; }
     .topbar { background: white; padding: 14px 22px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
@@ -43,6 +43,7 @@
   <button class="menu-btn" onclick="openTab('operations', this)">🏛️ 4. Maktaba, Mabweni & Getini</button>
   <button class="menu-btn" onclick="openTab('audit_secret', this)">🛡️ 5. Live Audit Logs & Sanduku la Siri</button>
   <button class="menu-btn" onclick="openTab('sys_tools', this)">⚙️ 6. Mipangilio, QR Verifier & Cleanup</button>
+  <button class="menu-btn" onclick="openTab('id_demo', this)">🪪 7. Vitambulisho (ID Cards) & Demo</button>
   <button class="logout-btn" onclick="SGB.logout()">🚪 Toka (Logout)</button>
 </div>
 
@@ -225,6 +226,32 @@
           <div id="cleanupArea" style="margin-top:12px;"></div>
         </div>`;
     }
+
+    if (tab === 'id_demo') {
+      const maint = localStorage.getItem('sgb_maintenance') === 'true';
+      area.innerHTML = `
+        <div class="panel">
+          <h3>1. Jenereta ya Vitambulisho vya Shule (Student & Staff ID Cards + QR)</h3>
+          <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:12px;">
+            <input type="text" id="idName" placeholder="Majina Kamili (Mfano: Amina Hassan)">
+            <input type="text" id="idNo" placeholder="Namba Usajili / Mtumishi (S.2026/0010)">
+            <input type="text" id="idClass" placeholder="Kidato / Nafasi (Form 4A au Mwalimu)">
+            <button class="btn btn-blue" style="grid-column: span 3;" onclick="generateIDCard()">🪪 Tengeneza Kitambulisho (Print / PDF)</button>
+          </div>
+          <div id="idCardOutput"></div>
+        </div>
+        <div class="panel">
+          <h3>2. Data za Majaribio za Papo Hapo (One-Click Demo Data Seeder)</h3>
+          <p style="font-size:12px; color:#475569;">Tumia vitufe hivi kujaza data za mfano (wanafunzi, alama za NECTA na risiti za CRDB) kwa ajili ya mafunzo au maonesho:</p>
+          <button class="btn btn-green" onclick="seedDemoData()">🌱 Jaza Data za Majaribio Sasa</button>
+          <button class="btn btn-red" onclick="clearAllDemoData()">🧹 Futa Data Zote (Reset Clean System)</button>
+        </div>
+        <div class="panel">
+          <h3>3. Hali ya Matengenezo ya Mfumo (Maintenance Mode)</h3>
+          <p style="font-size:12px; color:#475569;">Ukiwasha Maintenance Mode, ni Super Admin pekee atakayeweza kuingia kwenye mfumo.</p>
+          <button class="btn ${maint ? 'btn-green' : 'btn-amber'}" onclick="toggleMaintenance()">${maint ? '✅ Zima Maintenance Mode (Ruhusu Watumiaji)' : '⚙️ Washa Maintenance Mode (Funga Kwa Muda)'}</button>
+        </div>`;
+    }
   }
   function createDirectUser(e) {
     e.preventDefault();
@@ -327,6 +354,71 @@
     localStorage.setItem('sgb_' + tbl, JSON.stringify(filtered));
     SGB.logAction(`Super Admin amefuta rekodi ID ${id} kutoka ${tbl}`);
     inspectTable(tbl);
+  }
+
+  function generateIDCard() {
+    const name = document.getElementById('idName').value.trim();
+    const no = document.getElementById('idNo').value.trim();
+    const cls = document.getElementById('idClass').value.trim();
+    if (!name || !no) return;
+    const qr = SGB.qrImg(`SANGABUYE-ID:${no}|${name}`);
+    document.getElementById('idCardOutput').innerHTML = `
+      <div id="idPrintArea" style="width:330px; border:2px solid #0f294a; border-radius:12px; overflow:hidden; background:#fff; font-family:sans-serif;">
+        <div style="background:#0f294a; color:#fff; padding:10px; text-align:center;">
+          <b style="font-size:13px; color:#fbbf24;">SANGABUYE SECONDARY SCHOOL</b><br>
+          <small style="font-size:10px;">S.L.P 11898, Ilemela - Mwanza | Simu: 0784 755 173</small>
+        </div>
+        <div style="padding:12px; display:flex; justify-content:space-between; align-items:center;">
+          <div style="font-size:12px; line-height:1.6;">
+            <b>JINA:</b> ${name.toUpperCase()}<br>
+            <b>NAMBA:</b> ${no}<br>
+            <b>KIDATO/NAFASI:</b> ${cls}<br>
+            <b>MWAKA:</b> 2026
+          </div>
+          <img src="${qr}" alt="QR" style="width:70px; height:70px;">
+        </div>
+        <div style="background:#f1f5f9; padding:5px; text-align:center; font-size:10px; color:#334155;">
+          Kitambulisho hiki ni mali ya Sangabuye Sec. School
+        </div>
+      </div><br>
+      <button class="btn btn-green" onclick="printIDCard()">🖨️ Chapisha Kitambulisho (Print / PDF)</button>`;
+  }
+
+  function printIDCard() {
+    const html = document.getElementById('idPrintArea').outerHTML;
+    const w = window.open('', '', 'width=420,height=350');
+    w.document.write('<html><head><title>ID Card</title></head><body style="padding:20px;">' + html + '</body></html>');
+    w.document.close(); w.focus();
+    setTimeout(() => { w.print(); w.close(); }, 300);
+  }
+
+  function seedDemoData() {
+    const sampleStudents = [
+      { full_name: 'Amina Hassan Mwita', role: 'student', reg_or_staff_no: 'S.2026/0001', phone_number: '0711000001', password_hash: '123456', status: 'approved' },
+      { full_name: 'Baraka John Maganga', role: 'student', reg_or_staff_no: 'S.2026/0002', phone_number: '0711000002', password_hash: '123456', status: 'approved' },
+      { full_name: 'Neema Charles Makoye', role: 'student', reg_or_staff_no: 'S.2026/0003', phone_number: '0711000003', password_hash: '123456', status: 'approved' }
+    ];
+    sampleStudents.forEach(s => SGB.insert('users_profile', s));
+    SGB.insert('accounting_receipts', { receipt_number: 'SGB-901001', student_name: 'Amina Hassan Mwita', student_reg_no: 'S.2026/0001', payment_category: 'Ada ya Shule', payment_method: 'CRDB_Bank', bank_ref_no: 'CRDB-88412', amount_paid: 250000, waiver: 0 });
+    SGB.insert('accounting_receipts', { receipt_number: 'SGB-901002', student_name: 'Baraka John Maganga', student_reg_no: 'S.2026/0002', payment_category: 'Mchango wa Chakula', payment_method: 'Cash', bank_ref_no: 'CASH', amount_paid: 120000, waiver: 0 });
+    SGB.insert('exam_results', { teacher: 'Mwalimu wa Somo', class_name: 'Form 4A', subject_name: 'Mathematics', student_name: 'Amina Hassan Mwita', ca_score: 26, final_score: 58, total_score: 84, grade: 'A', points: 1 });
+    SGB.insert('exam_results', { teacher: 'Mwalimu wa Somo', class_name: 'Form 4A', subject_name: 'Physics', student_name: 'Amina Hassan Mwita', ca_score: 22, final_score: 49, total_score: 71, grade: 'B', points: 2 });
+    SGB.insert('store_inventory', { item_name: 'Mahindi (Maize)', quantity: 45, unit: 'Magunia', supplier: 'Mzabuni Ilemela', value_tzs: 3600000 });
+    alert('🌱 Data za majaribio (Wanafunzi, Risiti za CRDB & Cash, Alama za NECTA, na Stoo) zimejazwa kikamilifu!');
+  }
+
+  function clearAllDemoData() {
+    if (!confirm('⚠️ Je, una uhakika unataka kufuta data zote za majaribio ili kuanza upya?')) return;
+    Object.keys(localStorage).forEach(k => { if (k.startsWith('sgb_') && k !== 'sgb_lang') localStorage.removeItem(k); });
+    alert('🧹 Mfumo umesafishwa kabisa na uko tayari kwa matumizi rasmi!');
+    openTab('id_demo');
+  }
+
+  function toggleMaintenance() {
+    const next = !(localStorage.getItem('sgb_maintenance') === 'true');
+    localStorage.setItem('sgb_maintenance', String(next));
+    SGB.logAction(next ? 'Amewasha Maintenance Mode' : 'Amezima Maintenance Mode');
+    openTab('id_demo');
   }
 
   openTab('users', document.querySelector('.menu-btn'));
