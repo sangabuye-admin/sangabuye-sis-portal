@@ -227,20 +227,37 @@
 
     if (tab === 'subjects_map') {
       const maps = SGB.select('student_subjects');
+      const allocs = SGB.select('teacher_allocations');
+      const teachers = SGB.select('users_profile').filter(u => u.role === 'teacher');
       area.innerHTML = `
         <div class="panel">
-          <h3>Usajili wa Tahasusi (A-Level) & Masomo ya Hiari (Electives)</h3>
+          <h3>1. Pangia Walimu Masomo na Madarasa (Teacher Allocation)</h3>
+          <form onsubmit="saveTeacherAlloc(event)" style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:10px; margin-bottom:15px;">
+            <input type="text" id="taTeacher" list="tList" required placeholder="Jina la Mwalimu (Mfano: Mwalimu wa Somo)">
+            <datalist id="tList">${teachers.map(t => `<option value="${t.full_name}">`).join('')}<option value="Mwalimu wa Somo"></datalist>
+            <input type="text" id="taClass" required placeholder="Darasa (Mfano: Form 2A)">
+            <input type="text" id="taSubject" required placeholder="Somo (Mfano: Physics)">
+            <select id="taIsClassTeacher"><option value="Hapana">Mwalimu wa Somo Tu</option><option value="Ndiyo">Ndiyo (Class Teacher)</option></select>
+            <button type="submit" class="btn btn-indigo" style="grid-column: span 4;">✅ Mpangie Mwalimu Somo & Darasa</button>
+          </form>
+          <table><tr><th>Mwalimu</th><th>Darasa</th><th>Somo</th><th>Class Teacher?</th><th>Hatua</th></tr>
+          ${allocs.map(a => `<tr><td><b>${a.teacher_name}</b></td><td>${a.class_name}</td><td>${a.subject_name}</td><td>${a.is_class_teacher}</td><td><button class="btn btn-red" onclick="delAlloc(${a.id})">Futa</button></td></tr>`).join('') || '<tr><td colspan="5">Hakuna mwalimu aliyepangiwa bado.</td></tr>'}
+          </table>
+        </div>
+        <div class="panel">
+          <h3>2. Usajili wa Tahasusi (A-Level) & Masomo ya Hiari ya Wanafunzi</h3>
           <form onsubmit="saveSubjMap(event)" style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:15px;">
             <input type="text" id="smName" list="stList" required placeholder="Jina la Mwanafunzi">
             <select id="smSex"><option value="M">Mvulana (M)</option><option value="F">Msichana (F)</option></select>
-            <input type="text" id="smComb" required placeholder="Tahasusi / Electives (Mfano: PCM, HKL au Commerce)">
-            <button type="submit" class="btn btn-green" style="grid-column: span 3;">💾 Hifadhi Usajili wa Masomo</button>
+            <input type="text" id="smComb" required placeholder="Tahasusi / Electives (Mfano: PCM, HKL, Commerce)">
+            <button type="submit" class="btn btn-green" style="grid-column: span 3;">💾 Hifadhi Usajili wa Wanafunzi</button>
           </form>
           <table><tr><th>Mwanafunzi</th><th>Jinsia</th><th>Tahasusi / Masomo ya Hiari</th></tr>
           ${maps.map(m => `<tr><td><b>${m.student_name}</b></td><td>${m.sex}</td><td>${m.combination}</td></tr>`).join('')}
           </table>
         </div>`;
     }
+
 
     if (tab === 'timetable') {
       const tt = SGB.select('smart_timetable');
@@ -472,6 +489,23 @@
   }
 
   openTab('exams_ctrl', document.querySelector('.menu-btn'));
+    function saveTeacherAlloc(e) {
+    e.preventDefault();
+    SGB.insert('teacher_allocations', {
+      teacher_name: document.getElementById('taTeacher').value.trim(),
+      class_name: document.getElementById('taClass').value.trim(),
+      subject_name: document.getElementById('taSubject').value.trim(),
+      is_class_teacher: document.getElementById('taIsClassTeacher').value
+    });
+    alert('✅ Mwalimu amepangiwa darasa na somo kikamilifu!');
+    openTab('subjects_map');
+  }
+  function delAlloc(id) {
+    const list = SGB.select('teacher_allocations').filter(x => x.id !== id);
+    localStorage.setItem('sgb_teacher_allocations', JSON.stringify(list));
+    openTab('subjects_map');
+  }
+
 </script>
 </body>
 </html>
