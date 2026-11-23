@@ -3,27 +3,27 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ofisi ya Mhasibu | Sangabuye SIS Portal</title>
+  <title>Ofisi ya Mhasibu (Enterprise Finance) | Sangabuye SIS</title>
   <script src="core.js"></script>
   <style>
     * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
     body { margin: 0; background: #f1f5f9; display: flex; min-height: 100vh; color: #1e293b; }
-    .sidebar { width: 270px; background: #064e3b; color: white; display: flex; flex-direction: column; padding: 18px 12px; }
+    .sidebar { width: 275px; background: #064e3b; color: white; display: flex; flex-direction: column; padding: 16px 12px; }
     .sidebar h2 { font-size: 15px; margin: 0 0 4px; color: #fde68a; text-align: center; }
-    .sidebar p { font-size: 11px; text-align: center; color: #a7f3d0; margin: 0 0 18px; }
-    .menu-btn { background: transparent; border: none; color: #ecfdf5; text-align: left; padding: 8px 12px; border-radius: 8px; cursor: pointer; font-size: 12.5px; margin-bottom: 3px; }
+    .sidebar p { font-size: 11px; text-align: center; color: #a7f3d0; margin: 0 0 14px; }
+    .menu-btn { background: transparent; border: none; color: #ecfdf5; text-align: left; padding: 8px 11px; border-radius: 7px; cursor: pointer; font-size: 12.5px; margin-bottom: 3px; }
     .menu-btn:hover, .menu-btn.active { background: #059669; color: white; font-weight: bold; }
     .main { flex: 1; display: flex; flex-direction: column; }
-    .topbar { background: white; padding: 14px 22px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
-    .content { padding: 22px; }
-    .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(185px, 1fr)); gap: 14px; margin-bottom: 18px; }
-    .card { background: white; padding: 15px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border-left: 4px solid #059669; }
-    .card h4 { margin: 0 0 5px; font-size: 11px; color: #64748b; text-transform: uppercase; }
-    .card .val { font-size: 17px; font-weight: bold; color: #064e3b; }
+    .topbar { background: white; padding: 13px 22px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
+    .content { padding: 20px; }
+    .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(175px, 1fr)); gap: 12px; margin-bottom: 18px; }
+    .card { background: white; padding: 14px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border-left: 4px solid #059669; }
+    .card h4 { margin: 0 0 5px; font-size: 10.5px; color: #64748b; text-transform: uppercase; }
+    .card .val { font-size: 16px; font-weight: bold; color: #064e3b; }
     .panel { background: white; padding: 18px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 18px; }
-    input, select, textarea { padding: 9px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; width: 100%; }
-    table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 12.5px; }
-    th, td { padding: 8px; border: 1px solid #e2e8f0; text-align: left; }
+    input, select, textarea { padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; width: 100%; }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; }
+    th, td { padding: 7px 8px; border: 1px solid #e2e8f0; text-align: left; }
     th { background: #f8fafc; color: #064e3b; }
     .btn { padding: 7px 12px; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold; }
     .btn-green { background: #059669; color: white; }
@@ -37,23 +37,22 @@
 <div class="sidebar">
   <h2>OFISI YA MHASIBU</h2>
   <p>Sangabuye Sec | Simu: 0615 000 305</p>
-  <button class="menu-btn active" onclick="openTab('overview', this)">📊 1. Muhtasari wa Fedha & CRDB</button>
-  <button class="menu-btn" onclick="openTab('receipts', this)">💵 2. Mapokezi & Risiti (58/80mm)</button>
-  <button class="menu-btn" onclick="openTab('study_camp', this)">⛺ 3. Kambi ya Masomo (Academic Camp)</button>
-  <button class="menu-btn" onclick="openTab('fee_struct', this)">🏷️ 4. Viwango vya Ada (Fee Structure)</button>
-  <button class="menu-btn" onclick="openTab('store', this)">📦 5. Stoo ya Vyakula & Mali</button>
-  <button class="menu-btn" onclick="openTab('statement_pdf', this)">📄 6. Taarifa ya Michango (PDF)</button>
-  <button class="menu-btn" onclick="openTab('procurement', this)">🤝 7. Kamati ya Manunuzi</button>
-  <button class="menu-btn" onclick="openTab('bank_book', this)">📒 8. Bank Statement & Vocha</button>
-  <button class="menu-btn" onclick="openTab('payroll_assets', this)">💼 9. Mishahara, Bajeti & Mali</button>
-  <button class="menu-btn" onclick="openTab('clearance', this)">✅ 10. Clearance & Period Locking</button>
-  <button class="menu-btn" onclick="openTab('school_bus', this)">🚌 11. Usafiri wa Basi (School Bus)</button>
+  <button class="menu-btn active" onclick="openTab('overview', this)">📊 1. Muhtasari wa Fedha & Vyanzo</button>
+  <button class="menu-btn" onclick="openTab('receipts', this)">🛒 2. Mapokezi (Kapu la Michango)</button>
+  <button class="menu-btn" onclick="openTab('expenses', this)">💸 3. Matumizi (Filters & Vocha)</button>
+  <button class="menu-btn" onclick="openTab('procurement', this)">🤝 4. Kamati ya Manunuzi</button>
+  <button class="menu-btn" onclick="openTab('payroll', this)">💼 5. Mishahara (Pre-Audit, PV & Slip)</button>
+  <button class="menu-btn" onclick="openTab('study_camp', this)">⛺ 6. Kambi ya Masomo & Basi</button>
+  <button class="menu-btn" onclick="openTab('fee_struct', this)">🏷️ 7. Viwango vya Ada & Michango</button>
+  <button class="menu-btn" onclick="openTab('store', this)">📦 8. Stoo ya Vyakula & Vifaa</button>
+  <button class="menu-btn" onclick="openTab('reports', this)">📈 9. Ripoti Zote za Kifedha</button>
+  <button class="menu-btn" onclick="openTab('lock_accounts', this)">🔒 10. Funga Hesabu & Clearance</button>
   <button class="logout-btn" onclick="SGB.logout()">🚪 Toka (Logout)</button>
 </div>
 
 <div class="main">
   <div class="topbar">
-    <div><strong id="tabTitle">📊 1. Muhtasari wa Fedha & CRDB</strong> <span id="syncTime" style="font-size:11px; color:#059669;"></span></div>
+    <div><strong id="tabTitle">📊 1. Muhtasari wa Fedha & Vyanzo</strong> <span id="syncTime" style="font-size:11px; color:#059669;"></span></div>
     <div></div>
   </div>
   <div class="content" id="viewArea"></div>
@@ -63,8 +62,14 @@
   const user = SGB.requireRole(['accountant', 'super_admin']);
   SGB.startSessionTimer();
 
-  function isPeriodLocked() {
-    return localStorage.getItem('sgb_finance_locked') === 'true';
+  let receiptCart = [];
+  let procItemsDraft = [];
+
+  function checkLockedDate(isoDate) {
+    const locks = SGB.select('account_locks').filter(l => l.status === 'Locked');
+    if (!locks.length) return false;
+    const d = isoDate || new Date().toISOString().slice(0, 10);
+    return locks.some(l => d >= l.start_date && d <= l.end_date);
   }
 
   function updateNames() {
@@ -75,6 +80,40 @@
     document.getElementById('stList').innerHTML = Array.from(names).map(n => `<option value="${n}">`).join('');
   }
 
+  function autoFillStudentReg() {
+    const typed = (document.getElementById('rName').value || '').trim().toLowerCase();
+    if (!typed) return;
+    const u = SGB.select('users_profile').find(x => (x.full_name || '').toLowerCase() === typed);
+    if (u && u.reg_or_staff_no) {
+      document.getElementById('rReg').value = u.reg_or_staff_no;
+      if (u.phone_number && document.getElementById('rPhone')) document.getElementById('rPhone').value = u.phone_number;
+      return;
+    }
+    const prevRec = SGB.select('accounting_receipts').find(r => (r.student_name || '').toLowerCase() === typed);
+    if (prevRec && prevRec.student_reg_no) {
+      document.getElementById('rReg').value = prevRec.student_reg_no;
+    }
+  }
+
+  function calcFinanceSummary() {
+    const recs = SGB.select('accounting_receipts');
+    const vchs = SGB.select('expense_vouchers').filter(v => v.status === 'Paid');
+    const procs = SGB.select('procurement_committee').filter(p => p.status === 'Paid');
+    const pays = SGB.select('staff_payroll').filter(p => p.status === 'Paid');
+
+    const crdbIn = recs.filter(r => r.payment_method === 'CRDB_Bank').reduce((s, r) => s + Number(r.amount_paid), 0);
+    const cashIn = recs.filter(r => r.payment_method === 'Cash').reduce((s, r) => s + Number(r.amount_paid), 0);
+
+    const kambiIn = recs.filter(r => (r.source_fund || r.payment_category || '').toLowerCase().includes('kambi')).reduce((s, r) => s + Number(r.amount_paid), 0);
+    const hostelIn = recs.filter(r => (r.source_fund || r.payment_category || '').toLowerCase().includes('hostel') || (r.payment_category || '').toLowerCase().includes('bweni')).reduce((s, r) => s + Number(r.amount_paid), 0);
+    const kutwaIn = (crdbIn + cashIn) - kambiIn - hostelIn;
+
+    const totalOut = vchs.reduce((s, v) => s + Number(v.amount), 0)
+                   + procs.reduce((s, p) => s + Number(p.estimated_budget), 0)
+                   + pays.reduce((s, p) => s + Number(p.net_pay), 0);
+
+    return { crdbIn, cashIn, totalIn: crdbIn + cashIn, kambiIn, hostelIn, kutwaIn, totalOut, balance: (crdbIn + cashIn) - totalOut };
+  }
   function openTab(tab, btn) {
     document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('active'));
     if (btn) btn.classList.add('active');
@@ -84,114 +123,275 @@
     const area = document.getElementById('viewArea');
 
     if (tab === 'overview') {
+      const sum = calcFinanceSummary();
       const recs = SGB.select('accounting_receipts');
-      const vchs = SGB.select('expense_vouchers');
-      const pays = SGB.select('staff_payroll');
-      const crdbTotal = recs.filter(r => r.payment_method === 'CRDB_Bank').reduce((s, r) => s + Number(r.amount_paid), 0);
-      const cashTotal = recs.filter(r => r.payment_method === 'Cash').reduce((s, r) => s + Number(r.amount_paid), 0);
-      const campTotal = recs.filter(r => r.payment_category.toLowerCase().includes('kambi')).reduce((s, r) => s + Number(r.amount_paid), 0);
-      const expTotal = vchs.reduce((s, v) => s + Number(v.amount), 0) + pays.reduce((s, p) => s + Number(p.net_pay), 0);
-
       area.innerHTML = `
         <div class="cards">
-          <div class="card"><h4>CRDB (${cfg.crdb})</h4><div class="val">TZS ${crdbTotal.toLocaleString()}</div></div>
-          <div class="card"><h4>Pesa Taslimu (Cash Box)</h4><div class="val">TZS ${cashTotal.toLocaleString()}</div></div>
-          <div class="card" style="border-color:#d97706;"><h4>Makusanyo ya Kambi</h4><div class="val">TZS ${campTotal.toLocaleString()}</div></div>
-          <div class="card" style="border-color:#dc2626;"><h4>Matumizi & Mishahara</h4><div class="val">TZS ${expTotal.toLocaleString()}</div></div>
-          <div class="card" style="border-color:#1d4ed8;"><h4>Salio Halisi (${cfg.year})</h4><div class="val">TZS ${(crdbTotal + cashTotal - expTotal).toLocaleString()}</div></div>
+          <div class="card"><h4>CRDB (${cfg.crdb})</h4><div class="val">TZS ${sum.crdbIn.toLocaleString()}</div></div>
+          <div class="card"><h4>Pesa Taslimu (Cash)</h4><div class="val">TZS ${sum.cashIn.toLocaleString()}</div></div>
+          <div class="card" style="border-color:#dc2626;"><h4>Matumizi Yaliyolipwa</h4><div class="val">TZS ${sum.totalOut.toLocaleString()}</div></div>
+          <div class="card" style="border-color:#1d4ed8;"><h4>Salio Halisi (Net Balance)</h4><div class="val">TZS ${sum.balance.toLocaleString()}</div></div>
+        </div>
+        <div class="cards">
+          <div class="card" style="border-color:#0284c7;"><h4>Pato: Kutwa (Day)</h4><div class="val">TZS ${sum.kutwaIn.toLocaleString()}</div></div>
+          <div class="card" style="border-color:#7c3aed;"><h4>Pato: Hostel (Bweni)</h4><div class="val">TZS ${sum.hostelIn.toLocaleString()}</div></div>
+          <div class="card" style="border-color:#d97706;"><h4>Pato: Kambi ya Masomo</h4><div class="val">TZS ${sum.kambiIn.toLocaleString()}</div></div>
         </div>
         <div class="panel">
-          <h3>Miamala ya Hivi Karibuni (Recent Receipts) ${isPeriodLocked() ? '<span style="color:#dc2626;">[🔒 MAHESABU YAMEFUNGWA]</span>' : ''}</h3>
-          <table><tr><th>Risiti Na.</th><th>Mwanafunzi</th><th>Mchango</th><th>Njia</th><th>Kiasi (TZS)</th><th>Tarehe</th></tr>
-          ${recs.slice(0, 12).map(r => `<tr><td><b>${r.receipt_number}</b></td><td>${r.student_name}</td><td>${r.payment_category}</td><td>${r.payment_method}</td><td><b>${Number(r.amount_paid).toLocaleString()}</b></td><td>${r.created_at}</td></tr>`).join('') || '<tr><td colspan="6">Hakuna miamala bado.</td></tr>'}
+          <h3>Miamala ya Mapokezi ya Hivi Karibuni</h3>
+          <table><tr><th>Risiti Na.</th><th>Mwanafunzi (Reg No.)</th><th>Michango</th><th>Chanzo</th><th>Njia</th><th>Kiasi (TZS)</th><th>Tarehe</th></tr>
+          ${recs.slice(0, 12).map(r => `<tr><td><b>${r.receipt_number}</b></td><td>${r.student_name} <small>(${r.student_reg_no})</small></td><td>${r.payment_category}</td><td>${r.source_fund || 'Kutwa'}</td><td>${r.payment_method}</td><td><b>${Number(r.amount_paid).toLocaleString()}</b></td><td>${r.created_at}</td></tr>`).join('') || '<tr><td colspan="7">Hakuna miamala bado.</td></tr>'}
           </table>
         </div>`;
     }
 
     if (tab === 'receipts') {
-      if (isPeriodLocked()) {
-        area.innerHTML = `<div class="panel" style="border-left:4px solid #dc2626;"><h3>🔒 Mahesabu Yamefungwa (Period Locked)</h3><p>Fungua mahesabu kwanza kwenye sehemu ya <b>10. Clearance & Period Locking</b>.</p></div>`;
-        return;
-      }
+      const fees = SGB.select('fee_structures');
       area.innerHTML = `
         <div class="panel">
-          <h3>Pokea Ada / Michango & Toa Risiti (Thermal + SMS & WhatsApp)</h3>
-          <form onsubmit="createReceipt(event)" style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:12px;">
-            <input type="text" id="rName" list="stList" required placeholder="Andika herufi chache za jina la mwanafunzi...">
-            <input type="text" id="rReg" required placeholder="Namba ya Usajili (Mfano: S.2026/001)">
-            <input type="text" id="rCat" list="catOpts" required placeholder="Aina ya Mchango (Ada, Kambi ya Masomo, Chakula...)">
-            <datalist id="catOpts"><option value="Ada ya Shule"><option value="Kambi ya Masomo (Academic Camp)"><option value="Mchango wa Chakula"><option value="Mchango wa Mitihani"><option value="Ujenzi"></datalist>
+          <h3>Mapokezi ya Ada & Kapu la Michango (Multi-Item Receipt + Auto SMS & WhatsApp)</h3>
+          <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:12px;">
+            <div>
+              <label style="font-size:11px;font-weight:bold;">Jina la Mwanafunzi (Andika herufi chache):</label>
+              <input type="text" id="rName" list="stList" oninput="autoFillStudentReg()" onchange="autoFillStudentReg()" placeholder="Andika jina la mwanafunzi...">
+            </div>
+            <div>
+              <label style="font-size:11px;font-weight:bold;">Namba ya Usajili (Auto-Fill):</label>
+              <input type="text" id="rReg" placeholder="Namba ya Usajili (Mfano: S.2026/001)">
+            </div>
+            <div>
+              <label style="font-size:11px;font-weight:bold;">Simu ya Mzazi (Kwa SMS/WhatsApp):</label>
+              <input type="text" id="rPhone" placeholder="0755123456">
+            </div>
+          </div>
+
+          <div style="background:#f8fafc; padding:12px; border:1px solid #cbd5e1; border-radius:8px; margin-bottom:12px;">
+            <b style="font-size:12px; color:#064e3b;">➕ Ongeza Mchango Kwenye Kapu (Unaweza kuweka zaidi ya mmoja):</b>
+            <div style="display:grid; grid-template-columns:2fr 1fr 1fr auto; gap:8px; margin-top:8px;">
+              <input type="text" id="itemCat" list="catOpts" placeholder="Chagua/Andika Mchango (Ada, Kambi, Hostel, Chakula...)">
+              <datalist id="catOpts">
+                <option value="Ada ya Shule (Kutwa)">
+                <option value="Ada ya Bweni (Hostel)">
+                <option value="Kambi ya Masomo (Academic Camp)">
+                <option value="Mchango wa Chakula">
+                <option value="Mchango wa Mitihani">
+                ${fees.map(f => `<option value="${f.category}">`).join('')}
+              </datalist>
+              <select id="itemSource">
+                <option value="Kutwa">Chanzo: Kutwa</option>
+                <option value="Hostel">Chanzo: Hostel</option>
+                <option value="Kambi ya Masomo">Chanzo: Kambi ya Masomo</option>
+              </select>
+              <input type="number" id="itemAmt" placeholder="Kiasi (TZS)">
+              <button type="button" class="btn btn-blue" onclick="addToReceiptCart()">➕ Weka Kapuni</button>
+            </div>
+            <div id="cartTableArea" style="margin-top:10px;"></div>
+          </div>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px;">
             <select id="rMethod">
               <option value="CRDB_Bank">CRDB Bank (${cfg.crdb})</option>
-              <option value="Cash">Pesa Taslimu (Cash - Ofisi ya Mhasibu)</option>
+              <option value="Cash">Pesa Taslimu (Cash)</option>
             </select>
-            <input type="text" id="rRef" placeholder="Namba ya Slip ya CRDB (Au andika CASH)">
-            <input type="number" id="rAmount" required placeholder="Kiasi Kilicholipwa (TZS)">
-            <input type="number" id="rWaiver" value="0" placeholder="Punguzo / Udhamini (Waiver TZS)">
-            <button type="submit" class="btn btn-green" style="grid-column: span 2; padding:12px;">💾 Hifadhi & Zalisha Risiti yenye QR Code</button>
-          </form>
-          <div id="receiptBox" style="margin-top:20px;"></div>
+            <input type="text" id="rRef" placeholder="Namba ya Slip ya CRDB (Au CASH)">
+            <input type="date" id="rDate" value="${new Date().toISOString().slice(0, 10)}">
+            <button type="button" class="btn btn-green" style="grid-column: span 3; padding:12px;" onclick="finalizeCartReceipt()">💾 Hifadhi Risiti, Chapisha & Tuma SMS/WhatsApp Kwa Mzazi</button>
+          </div>
+          <div id="receiptBox" style="margin-top:18px;"></div>
         </div>`;
+      renderReceiptCart();
     }
 
+    if (tab === 'expenses') {
+      area.innerHTML = `
+        <div class="panel">
+          <h3>1. Andaa Vocha ya Matumizi & Tuma Kwa Mkuu wa Shule Aidhinishe</h3>
+          <form onsubmit="submitExpenseVoucher(event)" style="display:grid; grid-template-columns:2fr 1fr 1fr 1fr; gap:10px; margin-bottom:15px;">
+            <input type="text" id="exDesc" required placeholder="Maelezo ya Matumizi (Mfano: Umeme, Posho, Vifaa)">
+            <select id="exSource">
+              <option value="Kutwa">Chanzo cha Pato: Kutwa</option>
+              <option value="Hostel">Chanzo cha Pato: Hostel</option>
+              <option value="Kambi ya Masomo">Chanzo cha Pato: Kambi ya Masomo</option>
+            </select>
+            <select id="exAcc"><option value="CRDB_${cfg.crdb}">CRDB (${cfg.crdb})</option><option value="Cash_Box">Cash Box</option></select>
+            <input type="number" id="exAmt" required placeholder="Kiasi (TZS)">
+            <input type="date" id="exDate" value="${new Date().toISOString().slice(0, 10)}" required>
+            <button type="submit" class="btn btn-amber" style="grid-column: span 3;">📤 Tuma Kwa Mkuu wa Shule Kwa Idhini</button>
+          </form>
+
+          <h3>2. Orodha ya Matumizi Yote (Chuja kwa Mwezi, Mwaka, Range au Yote)</h3>
+          <div style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:8px; margin-bottom:10px;">
+            <select id="expFilterType" onchange="renderExpensesList()">
+              <option value="ALL">Matumizi Yote (All)</option>
+              <option value="MONTH">Mwezi Huu (This Month)</option>
+              <option value="YEAR">Mwaka Huu (This Year)</option>
+              <option value="RANGE">Kipindi Maalum (Date Range)</option>
+            </select>
+            <input type="date" id="expFrom" onchange="renderExpensesList()">
+            <input type="date" id="expTo" onchange="renderExpensesList()">
+            <button class="btn btn-blue" onclick="printDiv('expPrintArea')">🖨️ Chapisha Matumizi (PDF)</button>
+          </div>
+          <div id="expPrintArea"></div>
+        </div>`;
+      renderExpensesList();
+    }
+    if (tab === 'procurement') {
+      const procs = SGB.select('procurement_committee');
+      area.innerHTML = `
+        <div class="panel">
+          <h3>1. Kikao cha Kamati ya Manunuzi (Wajumbe, Mahitaji & Makadirio Kiotomatiki)</h3>
+          <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:10px;">
+            <input type="text" id="prTitle" placeholder="Kichwa cha Kikao (Mfano: Kikao cha Manunuzi ya Chakula)">
+            <input type="date" id="prDate" value="${new Date().toISOString().slice(0, 10)}">
+            <select id="prSource">
+              <option value="Kutwa">Chanzo cha Pato: Kutwa</option>
+              <option value="Hostel">Chanzo cha Pato: Hostel</option>
+              <option value="Kambi ya Masomo">Chanzo cha Pato: Kambi ya Masomo</option>
+            </select>
+          </div>
+          <textarea id="prMembers" rows="2" placeholder="Andika Majina ya Wajumbe Waliohudhuria na Nyadhifa zao (Mfano: 1. Juma Ali - Mwenyekiti, 2. Asha Musa - Katibu...)"></textarea>
+
+          <div style="background:#f8fafc; padding:12px; border:1px solid #cbd5e1; border-radius:8px; margin:10px 0;">
+            <b style="font-size:12px;">➕ Ongeza Hitaji la Manunuzi (Makadirio ya Bajeti yanajikokotoa yenyewe):</b>
+            <div style="display:grid; grid-template-columns:2fr 1fr 1fr 1fr auto; gap:8px; margin-top:8px;">
+              <input type="text" id="piName" placeholder="Hitaji (Mfano: Maharage, Mchele)">
+              <input type="text" id="piUnit" placeholder="Kipimo (Kg / Gunia)">
+              <input type="number" id="piQty" placeholder="Idadi / Kiasi">
+              <input type="number" id="piPrice" placeholder="Bei ya Kimoja (TZS)">
+              <button type="button" class="btn btn-blue" onclick="addProcItemDraft()">➕ Ongeza</button>
+            </div>
+            <div id="procDraftTable" style="margin-top:8px;"></div>
+          </div>
+          <button type="button" class="btn btn-green" style="width:100%; padding:11px;" onclick="submitProcurement()">📤 Hifadhi & Tuma Muhtasari Kwa Mkuu wa Shule</button>
+        </div>
+
+        <div class="panel">
+          <h3>2. Kumbukumbu za Vikao vya Manunuzi (Approve, Reject/Resend & Lipa)</h3>
+          <table><tr><th>Kikao & Wajumbe</th><th>Chanzo</th><th>Mahitaji & Hali</th><th>Bajeti (TZS)</th><th>Hali & Hatua</th></tr>
+          ${procs.map(p => {
+            const itemsHtml = (p.items || []).map((it, idx) =>
+              `<div style="font-size:11px; border-bottom:1px dashed #cbd5e1; padding:3px 0;">
+                • <b>${it.name}</b> (${it.qty} ${it.unit} @ ${Number(it.price).toLocaleString()} = <b>${Number(it.total).toLocaleString()}</b>)
+                ${it.rejected ? `<span style="color:#dc2626;font-weight:bold;"> [❌ Imerejeshwa: ${it.hm_note || 'Rekebisha'}]</span>` : ''}
+              </div>`
+            ).join('');
+            return `<tr>
+              <td><b>${p.meeting_title}</b> (${p.meeting_date || p.created_at})<br><small><b>Wajumbe:</b> ${p.members || '-'}</small></td>
+              <td><b>${p.source_fund || 'Kutwa'}</b></td>
+              <td>${itemsHtml || p.minutes_summary}</td>
+              <td><b>${Number(p.estimated_budget).toLocaleString()}</b></td>
+              <td>
+                <b>${p.status}</b><br><small style="color:#dc2626;">${p.hm_comments || ''}</small><br>
+                ${p.status.includes('Rejected') ? `<button class="btn btn-amber" onclick="editAndResendProc(${p.id})">🔄 Rekebisha & Resend</button>` : ''}
+                ${p.status === 'Approved' ? `<button class="btn btn-green" onclick="payApprovedProc(${p.id})">💵 Lipa Sasa (Mark Paid)</button>` : ''}
+              </td>
+            </tr>`;
+          }).join('') || '<tr><td colspan="5">Hakuna vikao vya manunuzi bado.</td></tr>'}
+          </table>
+        </div>`;
+      renderProcDraft();
+    }
+
+    if (tab === 'payroll') {
+      const staff = SGB.select('staff_payroll');
+      const approvedCount = staff.filter(s => s.status === 'Pre-Audited & Approved').length;
+      area.innerHTML = `
+        <div class="panel">
+          <h3>1. Andaa Malipo ya Watumishi (PV ya Mishahara — Tuma Kwa Mkuu Kwa Pre-Audit)</h3>
+          <form onsubmit="addStaffPayroll(event)" style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:10px; margin-bottom:12px;">
+            <input type="text" id="pyName" required placeholder="Jina la Mtumishi">
+            <input type="text" id="pyRole" required placeholder="Kazi Anayoifanya (Mfano: Mwalimu / Mlinzi)">
+            <select id="pySource">
+              <option value="Kutwa">Chanzo: Kutwa</option>
+              <option value="Hostel">Chanzo: Hostel</option>
+              <option value="Kambi ya Masomo">Chanzo: Kambi ya Masomo</option>
+            </select>
+            <input type="number" id="pyGross" required placeholder="Kiwango cha Malipo (Gross TZS)">
+            <input type="number" id="pyNssf" value="0" placeholder="Makato NSSF (0 kama hana makato)">
+            <input type="number" id="pyPaye" value="0" placeholder="Makato PAYE (0 kama hana makato)">
+            <button type="submit" class="btn btn-blue" style="grid-column: span 2;">➕ Ongeza Kwenye Orodha ya Malipo</button>
+          </form>
+
+          <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px;">
+            <button class="btn btn-amber" onclick="sendAllPayrollPreAudit()">📤 Tuma Wote Kwa Mkuu wa Shule (Pre-Audit)</button>
+            ${approvedCount > 0 ? `<button class="btn btn-green" onclick="payAllApprovedStaff()">💵 LIPA WOTE WALIOIDHINISHWA (${approvedCount})</button>` : ''}
+            <button class="btn btn-blue" onclick="printPayrollPV()">🖨️ Chapisha PV ya Malipo (A4 PDF)</button>
+          </div>
+
+          <table><tr><th>Mtumishi</th><th>Kazi</th><th>Chanzo</th><th>Gross</th><th>Makato</th><th>Net Pay</th><th>Hali (Pre-Audit)</th><th>Hatua</th></tr>
+          ${staff.map(s => `<tr>
+            <td><b>${s.name}</b></td>
+            <td>${s.job_title || '-'}</td>
+            <td>${s.source_fund || 'Kutwa'}</td>
+            <td>${Number(s.gross).toLocaleString()}</td>
+            <td>${(Number(s.nssf || 0) + Number(s.paye || 0)).toLocaleString()}</td>
+            <td><b style="color:#059669;">${Number(s.net_pay).toLocaleString()}</b></td>
+            <td><b>${s.status || 'Draft'}</b><br><small style="color:#dc2626;">${s.hm_note || ''}</small></td>
+            <td>
+              <button class="btn btn-amber" onclick="editStaffPay(${s.id})">✏️ Edit</button>
+              ${(s.status || '').includes('Draft') || (s.status || '').includes('Returned') ? `<button class="btn btn-blue" onclick="SGB.update('staff_payroll', ${s.id}, {status:'Pending Pre-Audit'}); openTab('payroll')">📤 Tuma Mkuu</button>` : ''}
+              ${s.status === 'Pre-Audited & Approved' ? `<button class="btn btn-green" onclick="paySingleStaff(${s.id})">💵 LIPA</button>` : ''}
+              ${s.status === 'Paid' ? `<button class="btn btn-blue" onclick="printSalarySlip(${s.id}, 'THERMAL')">🧾 Slip (Thermal)</button> <button class="btn btn-green" onclick="printSalarySlip(${s.id}, 'A4')">📄 Slip (A4)</button>` : ''}
+            </td>
+          </tr>`).join('') || '<tr><td colspan="8">Hakuna orodha ya malipo ya watumishi bado.</td></tr>'}
+          </table>
+          <div id="slipPrintContainer" style="margin-top:15px;"></div>
+        </div>`;
+    }
     if (tab === 'study_camp') {
       const campList = SGB.select('camp_students');
-      const recs = SGB.select('accounting_receipts').filter(r => r.payment_category.toLowerCase().includes('kambi'));
-      let totReq = 0, totPaid = 0;
-
-      const rowsHtml = campList.map(c => {
-        const paid = recs.filter(r => r.student_name.toLowerCase() === c.student_name.toLowerCase()).reduce((s, r) => s + Number(r.amount_paid), 0);
-        const bal = Math.max(0, Number(c.fee_required) - paid);
-        totReq += Number(c.fee_required);
-        totPaid += paid;
-        return `<tr>
-          <td><b>${c.student_name}</b></td>
-          <td>${c.class_name}</td>
-          <td>${c.camp_name}</td>
-          <td>${Number(c.fee_required).toLocaleString()}</td>
-          <td style="color:#059669;"><b>${paid.toLocaleString()}</b></td>
-          <td style="color:${bal > 0 ? '#dc2626' : '#059669'};"><b>${bal.toLocaleString()}</b></td>
-          <td>${bal === 0 ? '✅ Amekamilisha' : `<button class="btn btn-green" onclick="quickCampPay('${c.student_name}', ${bal})">💵 Pokea Malipo</button>`}</td>
-        </tr>`;
-      }).join('');
-
+      const busList = SGB.select('school_bus_routes');
+      const recs = SGB.select('accounting_receipts').filter(r => (r.payment_category || '').toLowerCase().includes('kambi'));
       area.innerHTML = `
-        <div class="cards">
-          <div class="card"><h4>Wanafunzi Kwenye Kambi</h4><div class="val">${campList.length}</div></div>
-          <div class="card" style="border-color:#059669;"><h4>Jumla Iliyokusanywa (Kambi)</h4><div class="val">TZS ${totPaid.toLocaleString()}</div></div>
-          <div class="card" style="border-color:#dc2626;"><h4>Deni la Kambi Lililobaki</h4><div class="val">TZS ${Math.max(0, totReq - totPaid).toLocaleString()}</div></div>
+        <div class="panel">
+          <h3>1. Kambi ya Masomo (Academic Camp)</h3>
+          <form onsubmit="addCampStudent(event)" style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:10px; margin-bottom:12px;">
+            <input type="text" id="cpName" list="stList" required placeholder="Jina la Mwanafunzi">
+            <input type="text" id="cpClass" required placeholder="Kidato (Form 4A)">
+            <input type="text" id="cpTitle" value="Kambi ya Maandalizi NECTA 2026" required>
+            <input type="number" id="cpFee" value="150000" required placeholder="Kiwango (TZS)">
+            <button type="submit" class="btn btn-green" style="grid-column: span 4;">⛺ Msajili Kwenye Kambi</button>
+          </form>
+          <table><tr><th>Mwanafunzi</th><th>Kidato</th><th>Kinachotakiwa</th><th>Amelipa</th><th>Deni</th></tr>
+          ${campList.map(c => {
+            const paid = recs.filter(r => r.student_name.toLowerCase() === c.student_name.toLowerCase()).reduce((s, r) => s + Number(r.amount_paid), 0);
+            const bal = Math.max(0, Number(c.fee_required) - paid);
+            return `<tr><td><b>${c.student_name}</b></td><td>${c.class_name}</td><td>${Number(c.fee_required).toLocaleString()}</td><td style="color:#059669;"><b>${paid.toLocaleString()}</b></td><td style="color:#dc2626;"><b>${bal.toLocaleString()}</b></td></tr>`;
+          }).join('')}
+          </table>
         </div>
         <div class="panel">
-          <h3>1. Sajili Mwanafunzi Kwenye Kambi ya Masomo (Academic Camp)</h3>
-          <form onsubmit="addCampStudent(event)" style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:10px; margin-bottom:15px;">
-            <input type="text" id="cpName" list="stList" required placeholder="Jina la Mwanafunzi">
-            <input type="text" id="cpClass" required placeholder="Kidato (Mfano: Form 4A)">
-            <input type="text" id="cpTitle" value="Kambi ya Maandalizi ya NECTA 2026" required placeholder="Jina la Kambi">
-            <input type="number" id="cpFee" value="150000" required placeholder="Kiwango cha Kambi (TZS)">
-            <button type="submit" class="btn btn-green" style="grid-column: span 4;">⛺ Msajili Mwanafunzi Kwenye Kambi</button>
+          <h3>2. Usafiri wa Basi la Shule (School Bus)</h3>
+          <form onsubmit="addBusStudent(event)" style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:10px; margin-bottom:12px;">
+            <input type="text" id="bsName" list="stList" required placeholder="Jina la Mwanafunzi">
+            <input type="text" id="bsRoute" required placeholder="Ruti / Kituo">
+            <input type="number" id="bsPaid" required placeholder="Nauli (TZS)">
+            <input type="text" id="bsPhone" placeholder="Simu ya Mzazi">
+            <button type="submit" class="btn btn-blue" style="grid-column: span 4;">🚌 Sajili Kwenye Basi</button>
           </form>
-
-          <h3>2. Orodha ya Wanafunzi wa Kambi & Hali ya Malipo</h3>
-          <button class="btn btn-blue" onclick="printDiv('campPrintArea')">🖨️ Chapisha Orodha ya Kambi (PDF)</button>
-          <div id="campPrintArea">
-            <table><tr><th>Mwanafunzi</th><th>Kidato</th><th>Kambi</th><th>Kinachotakiwa</th><th>Amelipa</th><th>Deni</th><th>Hatua</th></tr>
-            ${rowsHtml || '<tr><td colspan="7">Hakuna mwanafunzi aliyesajiliwa kwenye kambi bado.</td></tr>'}
-            </table>
-          </div>
+          <table><tr><th>Mwanafunzi</th><th>Ruti</th><th>Nauli (TZS)</th><th>Simu</th></tr>
+          ${busList.map(b => `<tr><td><b>${b.student_name}</b></td><td>${b.route}</td><td><b>${Number(b.paid).toLocaleString()}</b></td><td>${b.phone || '-'}</td></tr>`).join('')}
+          </table>
         </div>`;
     }
+
     if (tab === 'fee_struct') {
       const fees = SGB.select('fee_structures');
       area.innerHTML = `
         <div class="panel">
-          <h3>Weka Viwango vya Ada & Michango Kulingana na Kidato / Bweni (Fee Structure)</h3>
-          <form onsubmit="addFeeStruct(event)" style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:15px;">
-            <input type="text" id="fsCat" required placeholder="Kundi (Mfano: O-Level Day, O-Level Boarding, A-Level)">
-            <input type="number" id="fsAmt" required placeholder="Ada & Michango kwa Mwaka (TZS)">
-            <button type="submit" class="btn btn-green">💾 Hifadhi Kiwango cha Ada</button>
+          <h3>Viwango vya Ada & Michango Mingi (Unlimited Fee Categories)</h3>
+          <form onsubmit="addFeeStruct(event)" style="display:grid; grid-template-columns:2fr 1fr 1fr 1fr; gap:10px; margin-bottom:15px;">
+            <input type="text" id="fsCat" required placeholder="Jina la Mchango / Ada (Mfano: Ada Kidato cha 1, Chakula, Ujenzi, Maabara)">
+            <select id="fsSource">
+              <option value="Kutwa">Chanzo: Kutwa</option>
+              <option value="Hostel">Chanzo: Hostel</option>
+              <option value="Kambi ya Masomo">Chanzo: Kambi ya Masomo</option>
+            </select>
+            <input type="number" id="fsAmt" required placeholder="Kiasi (TZS)">
+            <button type="submit" class="btn btn-green">➕ Hifadhi Kiwango</button>
           </form>
-          <table><tr><th>Kundi la Wanafunzi</th><th>Jumla Inayotakiwa kwa Mwaka (TZS)</th><th>Hatua</th></tr>
-          ${fees.map(f => `<tr><td><b>${f.category}</b></td><td><b>TZS ${Number(f.amount).toLocaleString()}</b></td><td><button class="btn btn-red" onclick="delFeeStruct(${f.id})">Futa</button></td></tr>`).join('') || '<tr><td colspan="3">Weka viwango vya ada (mfano: O-Level Day = 350,000, Boarding = 750,000).</td></tr>'}
+          <table><tr><th>Aina ya Ada / Mchango</th><th>Chanzo cha Pato</th><th>Kiasi Kinachotakiwa (TZS)</th><th>Hatua</th></tr>
+          ${fees.map(f => `<tr><td><b>${f.category}</b></td><td>${f.source_fund || 'Kutwa'}</td><td><b>TZS ${Number(f.amount).toLocaleString()}</b></td><td><button class="btn btn-red" onclick="delFeeStruct(${f.id})">Futa</button></td></tr>`).join('') || '<tr><td colspan="4">Weka viwango vya michango mingi kadri unavyohitaji.</td></tr>'}
           </table>
         </div>`;
     }
@@ -200,249 +400,436 @@
       const items = SGB.select('store_inventory');
       area.innerHTML = `
         <div class="panel">
-          <h3>Mapokezi ya Vyakula & Vifaa (In-Kind Store Receipts + QR)</h3>
+          <h3>Stoo ya Vyakula & Vifaa (Mapokezi kutoka kwa Wadau Mbalimbali)</h3>
           <form onsubmit="addStore(event)" style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:15px;">
             <input type="text" id="sItem" required placeholder="Bidhaa (Mahindi, Maharage, Mchele, Chaki)">
             <input type="number" step="0.1" id="sQty" required placeholder="Kiasi / Kilo / Magunia">
             <input type="text" id="sUnit" required placeholder="Kipimo (Kg / Magunia / Rim)">
-            <input type="text" id="sFrom" required placeholder="Aliyeleta (Mzazi / Mzabuni)">
-            <input type="number" id="sVal" required placeholder="Thamani ya Bidhaa (TZS)" style="grid-column: span 2;">
-            <button type="submit" class="btn btn-green" style="grid-column: span 3;">📦 Hifadhi Stoo & Toa Risiti ya Bidhaa</button>
-          </form>
-          <h4>Salio la Stoo (Low Stock Alerts):</h4>
-          <table><tr><th>Bidhaa</th><th>Salio</th><th>Tahadhari</th><th>Matumizi</th></tr>
-          ${items.map(i => `<tr><td><b>${i.item_name}</b></td><td>${i.quantity} ${i.unit}</td><td>${i.quantity <= 10 ? '<span style="color:#dc2626;font-weight:bold;">⚠️ Kinakaribia Kuisha</span>' : '<span style="color:#059669;">● Inatosha</span>'}</td><td><button class="btn btn-amber" onclick="deductStore(${i.id}, ${i.quantity})">- Toa Matumizi</button></td></tr>`).join('') || '<tr><td colspan="4">Stoo haina bidhaa bado.</td></tr>'}
-          </table>
-        </div>`;
-    }
-
-    if (tab === 'statement_pdf') {
-      const fees = SGB.select('fee_structures');
-      area.innerHTML = `
-        <div class="panel">
-          <h3>Taarifa Rasmi ya Michango ya Mwanafunzi (PDF, SMS & WhatsApp)</h3>
-          <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:15px;">
-            <input type="text" id="stmtName" list="stList" placeholder="Jina Kamili la Mwanafunzi">
-            <input type="text" id="stmtClass" placeholder="Kidato/Mkondo (Mfano: Form 3A)">
-            <select id="stmtFeeSel" onchange="document.getElementById('stmtReq').value = this.value">
-              <option value="450000">-- Chagua Kiwango cha Ada (Au Andika) --</option>
-              ${fees.map(f => `<option value="${f.amount}">${f.category} (TZS ${Number(f.amount).toLocaleString()})</option>`).join('')}
+            <select id="sDonorType">
+              <option value="Mzazi / Mlezi">Mtoaji: Mzazi / Mlezi</option>
+              <option value="Mwanafunzi">Mtoaji: Mwanafunzi</option>
+              <option value="Mfadhili">Mtoaji: Mfadhili</option>
+              <option value="Shirika">Mtoaji: Shirika</option>
+              <option value="Mzabuni">Mtoaji: Mzabuni</option>
+              <option value="Shule">Mtoaji: Shule</option>
             </select>
-            <input type="number" id="stmtReq" value="450000" placeholder="Kiasi Kinachotakiwa kwa Mwaka (TZS)" style="grid-column: span 3;">
-            <button class="btn btn-blue" style="grid-column: span 3;" onclick="buildStatement()">📄 Tengeneza Taarifa ya Michango (PDF)</button>
-          </div>
-          <div id="stmtOutput"></div>
-        </div>`;
-    }
-    if (tab === 'procurement') {
-      const procs = SGB.select('procurement_committee');
-      area.innerHTML = `
-        <div class="panel">
-          <h3>Kikao cha Kamati ya Manunuzi (Accept / Reject / Resend Workflow)</h3>
-          <form onsubmit="sendProc(event)" style="display:grid; gap:10px; margin-bottom:15px;">
-            <input type="text" id="pTitle" required placeholder="Kichwa cha Kikao (Mfano: Kikao cha Manunuzi ya Chakula Muhula wa II)">
-            <input type="number" id="pBudget" required placeholder="Makadirio ya Bajeti (TZS)">
-            <textarea id="pNotes" rows="3" required placeholder="Orodha ya mahitaji na muhtasari wa kikao..."></textarea>
-            <button type="submit" class="btn btn-green">📤 Hifadhi & Tuma Kwa Mkuu wa Shule (0784 755 173)</button>
+            <input type="text" id="sFrom" required placeholder="Jina Kamili la Mtoaji / Mzabuni">
+            <input type="number" id="sVal" required placeholder="Thamani ya Bidhaa (TZS)">
+            <button type="submit" class="btn btn-green" style="grid-column: span 3;">📦 Hifadhi Stoo & Rekodi Mtoaji</button>
           </form>
-          <table><tr><th>Kikao</th><th>Bajeti (TZS)</th><th>Hali</th><th>Maoni ya Mkuu wa Shule</th><th>Hatua</th></tr>
-          ${procs.map(p => `<tr><td><b>${p.meeting_title}</b><br><small>${p.minutes_summary}</small></td><td>${Number(p.estimated_budget).toLocaleString()}</td><td><b>${p.status}</b></td><td>${p.hm_comments || '-'}</td>
-          <td>${p.status.includes('Rejected') ? `<button class="btn btn-amber" onclick="resendProc(${p.id})">🔄 Rekebisha & Resend</button>` : '-'}</td></tr>`).join('')}
+          <table><tr><th>Bidhaa</th><th>Salio</th><th>Mtoaji (Kundi & Jina)</th><th>Tahadhari</th><th>Matumizi</th></tr>
+          ${items.map(i => `<tr><td><b>${i.item_name}</b></td><td>${i.quantity} ${i.unit}</td><td><b>${i.donor_type || '-'}</b>: ${i.supplier}</td><td>${i.quantity <= 10 ? '<span style="color:#dc2626;font-weight:bold;">⚠️ Kinakaribia Kuisha</span>' : '<span style="color:#059669;">● Inatosha</span>'}</td><td><button class="btn btn-amber" onclick="deductStore(${i.id}, ${i.quantity})">- Toa Matumizi</button></td></tr>`).join('') || '<tr><td colspan="5">Stoo haina bidhaa bado.</td></tr>'}
           </table>
         </div>`;
     }
 
-    if (tab === 'bank_book') {
-      const recs = SGB.select('accounting_receipts');
-      const vchs = SGB.select('expense_vouchers');
-      let rows = [];
-      recs.forEach(r => rows.push({ date: r.created_at, desc: `Mapokezi: ${r.student_name} (${r.payment_category})`, ref: r.receipt_number, cr: Number(r.amount_paid), dr: 0 }));
-      vchs.forEach(v => rows.push({ date: v.created_at, desc: `Matumizi: ${v.description}`, ref: v.voucher_no, cr: 0, dr: Number(v.amount) }));
-      let bal = 0;
-
+    if (tab === 'reports') {
       area.innerHTML = `
         <div class="panel">
-          <h3>1. Rekodi Vocha ya Matumizi (Expense Voucher)</h3>
-          <form onsubmit="addVoucher(event)" style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:15px;">
-            <input type="text" id="vDesc" required placeholder="Maelezo ya Matumizi">
-            <select id="vAcc"><option value="CRDB_${cfg.crdb}">CRDB (${cfg.crdb})</option><option value="Cash_Box">Cash Box</option></select>
-            <input type="number" id="vAmt" required placeholder="Kiasi (TZS)">
-            <button type="submit" class="btn btn-amber" style="grid-column: span 3;">💾 Hifadhi Vocha & Tuma Kwa Mkuu wa Shule</button>
-          </form>
-          <h3>2. Taarifa ya Mapato na Matumizi (Bank-Style Statement)</h3>
-          <button class="btn btn-blue" onclick="printDiv('bankPrintArea')">🖨️ Chapisha Statement (A4 PDF)</button>
-          <div id="bankPrintArea">
-            <table><tr><th>Tarehe</th><th>Maelezo ya Muamala</th><th>Risiti/Voucher</th><th>Credit (+)</th><th>Debit (-)</th><th>Running Balance</th></tr>
-            ${rows.reverse().map(x => { bal += (x.cr - x.dr); return `<tr><td>${x.date}</td><td>${x.desc}</td><td>${x.ref}</td><td style="color:#059669;">${x.cr ? x.cr.toLocaleString() : '-'}</td><td style="color:#dc2626;">${x.dr ? x.dr.toLocaleString() : '-'}</td><td><b>${bal.toLocaleString()}</b></td></tr>`; }).join('')}
-            </table>
+          <h3>Kituo cha Ripoti Zote za Kifedha (Financial Statements & Audit Reports)</h3>
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(210px, 1fr)); gap:10px; margin-bottom:15px;">
+            <button class="btn btn-green" onclick="genFinReport('INCOME_EXP')">1. Taarifa ya Mapato & Matumizi</button>
+            <button class="btn btn-blue" onclick="genFinReport('SOURCES')">2. Ripoti ya Vyanzo (Kutwa, Hostel, Kambi)</button>
+            <button class="btn btn-amber" onclick="genFinReport('CASHBOOK')">3. Kitabu cha Fedha (Cashbook / Bank)</button>
+            <button class="btn btn-green" onclick="genFinReport('PAYROLL_REP')">4. Ripoti ya Mishahara Iliyolipwa</button>
           </div>
+          <div id="finReportArea"></div>
         </div>`;
+      genFinReport('INCOME_EXP');
     }
 
-    if (tab === 'payroll_assets') {
-      const pays = SGB.select('staff_payroll');
-      const assets = SGB.select('fixed_assets');
+    if (tab === 'lock_accounts') {
+      const locks = SGB.select('account_locks');
       area.innerHTML = `
-        <div class="panel">
-          <h3>1. Mishahara ya Wafanyakazi (Payroll Calculator: Gross, NSSF 10% & PAYE)</h3>
-          <form onsubmit="addPayroll(event)" style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:12px;">
-            <input type="text" id="pyName" required placeholder="Jina la Mtumishi / Mwalimu">
-            <input type="number" id="pyGross" required placeholder="Mshahara Ghafi (Gross Salary TZS)">
-            <input type="number" id="pyPaye" value="0" required placeholder="Kodi ya PAYE (TZS)">
-            <button type="submit" class="btn btn-green" style="grid-column: span 3;">💵 Kokotoa & Hifadhi Mshahara</button>
+        <div class="panel" style="border-left:4px solid #dc2626;">
+          <h3>1. Funga Hesabu za Mapato na Matumizi (Strict Period Locking)</h3>
+          <p style="font-size:12.5px; color:#dc2626;"><b>ONYO:</b> Ukifunga hesabu kwa kipindi husika, <b>hutaweza kuifungua tena wewe mwenyewe</b> mpaka uombe idhini kwa Mkuu wa Shule au IT Super Admin!</p>
+          <form onsubmit="lockPeriodRange(event)" style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:10px; margin-bottom:15px;">
+            <input type="text" id="lkLabel" required placeholder="Jina la Kipindi (Mfano: Mwezi Novemba 2026)">
+            <input type="date" id="lkStart" required>
+            <input type="date" id="lkEnd" required>
+            <button type="submit" class="btn btn-red">🔒 Funga Hesabu Sasa</button>
           </form>
-          <table><tr><th>Mtumishi</th><th>Gross (TZS)</th><th>NSSF (10%)</th><th>PAYE</th><th>Net Pay (Mkononi)</th></tr>
-          ${pays.map(p => `<tr><td><b>${p.name}</b></td><td>${Number(p.gross).toLocaleString()}</td><td>${Number(p.nssf).toLocaleString()}</td><td>${Number(p.paye).toLocaleString()}</td><td><b style="color:#059669;">${Number(p.net_pay).toLocaleString()}</b></td></tr>`).join('') || '<tr><td colspan="5">Hakuna rekodi za mishahara bado.</td></tr>'}
+          <table><tr><th>Kipindi</th><th>Kuanzia</th><th>Hadi</th><th>Hali</th><th>Hatua / Ombi</th></tr>
+          ${locks.map(l => `<tr><td><b>${l.label}</b></td><td>${l.start_date}</td><td>${l.end_date}</td><td><b style="color:${l.status==='Locked'?'#dc2626':'#059669'};">${l.status}</b></td>
+          <td>${l.status === 'Locked' ? `<button class="btn btn-amber" onclick="requestUnlock(${l.id}, '${l.label}')">📩 Omba Mkuu/Admin Afungue</button>` : '✓ Imefunguliwa'}</td></tr>`).join('') || '<tr><td colspan="5">Hakuna kipindi kilichofungwa bado.</td></tr>'}
           </table>
         </div>
         <div class="panel">
-          <h3>2. Rejista ya Mali za Kudumu za Shule (Fixed Assets)</h3>
-          <form onsubmit="addAsset(event)" style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:12px;">
-            <input type="text" id="asName" required placeholder="Mali (Mfano: Kompyuta 10, Jenereta, Gari)">
-            <input type="text" id="asDept" required placeholder="Idara / Eneo (Mfano: Maabara / Utawala)">
-            <input type="number" id="asVal" required placeholder="Thamani (TZS)">
-            <button type="submit" class="btn btn-blue" style="grid-column: span 3;">🏛️ Sajili Mali ya Shule</button>
-          </form>
-          <table><tr><th>Mali ya Shule</th><th>Idara</th><th>Thamani (TZS)</th><th>Tarehe</th></tr>
-          ${assets.map(a => `<tr><td><b>${a.name}</b></td><td>${a.dept}</td><td>${Number(a.val).toLocaleString()}</td><td>${a.created_at}</td></tr>`).join('')}
-          </table>
-        </div>`;
-    }
-
-    if (tab === 'clearance') {
-      const locked = isPeriodLocked();
-      area.innerHTML = `
-        <div class="panel">
-          <h3>1. Clearance Checklist (Uhakiki wa Madeni ya Fedha & Vitabu vya Maktaba)</h3>
+          <h3>2. Uhakiki wa Clearance ya Mwanafunzi (Fedha & Maktaba)</h3>
           <div style="display:flex; gap:10px; max-width:450px;">
             <input type="text" id="clrName" list="stList" placeholder="Andika jina la mwanafunzi...">
             <button class="btn btn-green" onclick="checkClearance()">🔍 Hakiki Sasa</button>
           </div>
-          <div id="clrResult" style="margin-top:15px;"></div>
-        </div>
-        <div class="panel">
-          <h3>2. Kufunga Mahesabu ya Mwezi / Mwaka (Accounting Period Locking)</h3>
-          <button class="btn ${locked ? 'btn-green' : 'btn-red'}" onclick="togglePeriodLock()">${locked ? '🔓 Fungua Mahesabu (Unlock Period)' : '🔒 Funga Mahesabu Sasa (Lock Period)'}</button>
-        </div>`;
-    }
-
-    if (tab === 'school_bus') {
-      const busList = SGB.select('school_bus_routes');
-      area.innerHTML = `
-        <div class="panel">
-          <h3>Usimamizi wa Usafiri wa Basi la Shule (Routes & Transport Fees)</h3>
-          <form onsubmit="addBusStudent(event)" style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:10px; margin-bottom:15px;">
-            <input type="text" id="bsName" list="stList" required placeholder="Jina la Mwanafunzi">
-            <input type="text" id="bsRoute" required placeholder="Ruti / Kituo (Mfano: Buhongwa - Igoma)">
-            <input type="number" id="bsPaid" required placeholder="Nauli Aliyolipa (TZS)">
-            <input type="text" id="bsPhone" placeholder="Simu ya Mzazi (07...)">
-            <button type="submit" class="btn btn-green" style="grid-column: span 4;">🚌 Sajili Kwenye Basi & Rekodi Nauli</button>
-          </form>
-          <table><tr><th>Mwanafunzi</th><th>Ruti / Kituo</th><th>Nauli (TZS)</th><th>Simu Mzazi</th><th>Tuma Taarifa</th></tr>
-          ${busList.map(b => {
-            const msg = `SANGABUYE SEC: Mzazi wa ${b.student_name}, malipo ya usafiri wa basi (Ruti: ${b.route}) kiasi cha TZS ${Number(b.paid).toLocaleString()} yamepokewa.`;
-            return `<tr><td><b>${b.student_name}</b></td><td>${b.route}</td><td><b>${Number(b.paid).toLocaleString()}</b></td><td>${b.phone || '-'}</td>
-            <td><button class="btn btn-green" onclick="SGB.sendWhatsApp('${b.phone}', '${msg}')">💬 WhatsApp</button> <button class="btn btn-blue" onclick="SGB.sendSMS('${b.phone}', '${msg}')">📲 SMS</button></td></tr>`;
-          }).join('') || '<tr><td colspan="5">Hakuna mwanafunzi aliyesajiliwa kwenye basi bado.</td></tr>'}
-          </table>
+          <div id="clrResult" style="margin-top:12px;"></div>
         </div>`;
     }
   }
-  function createReceipt(e) {
-    e.preventDefault();
-    const cfg = SGB.getConfig();
-    const rec = SGB.insert('accounting_receipts', {
-      receipt_number: 'SGB-' + Math.floor(100000 + Math.random() * 900000),
-      student_name: document.getElementById('rName').value.trim(),
-      student_reg_no: document.getElementById('rReg').value.trim(),
-      payment_category: document.getElementById('rCat').value.trim(),
-      payment_method: document.getElementById('rMethod').value,
-      bank_ref_no: document.getElementById('rRef').value.trim() || 'CASH',
-      amount_paid: Number(document.getElementById('rAmount').value),
-      waiver: Number(document.getElementById('rWaiver').value || 0)
+  function addToReceiptCart() {
+    const cat = document.getElementById('itemCat').value.trim();
+    const src = document.getElementById('itemSource').value;
+    const amt = Number(document.getElementById('itemAmt').value);
+    if (!cat || !amt || amt <= 0) { alert('⚠️ Weka aina ya mchango na kiasi sahihi.'); return; }
+    receiptCart.push({ category: cat, source_fund: src, amount: amt });
+    document.getElementById('itemCat').value = '';
+    document.getElementById('itemAmt').value = '';
+    renderReceiptCart();
+  }
+
+  function removeCartItem(idx) {
+    receiptCart.splice(idx, 1);
+    renderReceiptCart();
+  }
+
+  function renderReceiptCart() {
+    const box = document.getElementById('cartTableArea');
+    if (!box) return;
+    if (!receiptCart.length) { box.innerHTML = '<small style="color:#64748b;">Kapu liko tupu. Ongeza mchango mmoja au zaidi hapo juu.</small>'; return; }
+    const sum = receiptCart.reduce((s, x) => s + x.amount, 0);
+    box.innerHTML = `<table><tr><th>Mchango</th><th>Chanzo</th><th>Kiasi (TZS)</th><th>Futa</th></tr>
+      ${receiptCart.map((x, i) => `<tr><td><b>${x.category}</b></td><td>${x.source_fund}</td><td>${x.amount.toLocaleString()}</td><td><button type="button" class="btn btn-red" onclick="removeCartItem(${i})">✕</button></td></tr>`).join('')}
+      <tr style="background:#ecfdf5;"><td colspan="2"><b>JUMLA KWENYE KAPU</b></td><td colspan="2"><b>TZS ${sum.toLocaleString()}</b></td></tr></table>`;
+  }
+
+  function finalizeCartReceipt() {
+    const name = document.getElementById('rName').value.trim();
+    const reg = document.getElementById('rReg').value.trim() || 'S.2026/NEW';
+    const phone = document.getElementById('rPhone').value.trim();
+    const method = document.getElementById('rMethod').value;
+    const ref = document.getElementById('rRef').value.trim() || 'CASH';
+    const rDate = document.getElementById('rDate').value;
+
+    if (checkLockedDate(rDate)) { alert('🔒 Hesabu za tarehe hiyo zimefungwa! Omba Mkuu/Admin azifungue kwanza.'); return; }
+    if (!name || !receiptCart.length) { alert('⚠️ Jaza jina la mwanafunzi na uweke angalau mchango mmoja kwenye kapu.'); return; }
+
+    const receiptNo = 'SGB-' + Math.floor(100000 + Math.random() * 900000);
+    const totalPaid = receiptCart.reduce((s, x) => s + x.amount, 0);
+    const breakdown = receiptCart.map(x => `${x.category}: ${x.amount.toLocaleString()}`).join(' | ');
+
+    receiptCart.forEach(item => {
+      SGB.insert('accounting_receipts', {
+        receipt_number: receiptNo,
+        student_name: name,
+        student_reg_no: reg,
+        payment_category: item.category,
+        source_fund: item.source_fund,
+        payment_method: method,
+        bank_ref_no: ref,
+        amount_paid: item.amount,
+        tx_date: rDate
+      });
     });
-    updateNames();
-    const qr = SGB.qrImg(`SANGABUYE-RECEIPT:${rec.receipt_number}|TZS:${rec.amount_paid}`);
-    const smsText = `SANGABUYE SEC: Risiti ${rec.receipt_number}. Tumepokea TZS ${rec.amount_paid.toLocaleString()} kwa ajili ya ${rec.payment_category} ya mwanafunzi ${rec.student_name} (${rec.payment_method}). Asante!`;
+
+    const smsText = `SANGABUYE SEC: Risiti ${receiptNo}. Tumepokea TZS ${totalPaid.toLocaleString()} kutoka kwa ${name} (${reg}) [${breakdown}] kupitia ${method}. Asante!`;
+    const qr = SGB.qrImg(`SANGABUYE-RCPT:${receiptNo}|${name}|TZS:${totalPaid}`);
+    const cfg = SGB.getConfig();
 
     document.getElementById('receiptBox').innerHTML = `
-      <div id="printSlip" style="border:2px dashed #064e3b; padding:14px; max-width:290px; background:#fff; font-family:monospace; font-size:12px;">
+      <div id="printSlip" style="border:2px dashed #064e3b; padding:14px; max-width:300px; background:#fff; font-family:monospace; font-size:12px;">
         <center><b>SANGABUYE SECONDARY SCHOOL</b><br>S.L.P 11898, ILEMELA - MWANZA<br>Mhasibu: 0615 000 305<br>----------------------------<br><b>RISITI HALALI (58/80mm)</b></center><br>
-        <b>Risiti:</b> ${rec.receipt_number}<br><b>Tarehe:</b> ${rec.created_at}<br><b>Mwanafunzi:</b> ${rec.student_name} (${rec.student_reg_no})<br><b>Mchango:</b> ${rec.payment_category}<br><b>Njia:</b> ${rec.payment_method} (${rec.bank_ref_no})<br><b>CRDB:</b> SHULE YA SEKONDARI SANGABUYE E.K (${cfg.crdb})<br>----------------------------<br>
-        <div style="font-size:14px;"><b>KIASI: TZS ${rec.amount_paid.toLocaleString()}/=</b></div>
-        ${rec.waiver ? `<small>Punguzo/Udhamini: TZS ${rec.waiver.toLocaleString()}</small><br>` : ''}
-        ----------------------------<br><center><img src="${qr}" alt="QR"><br><small>Scan kuthibitisha uhalali</small></center>
+        <b>Risiti:</b> ${receiptNo}<br><b>Tarehe:</b> ${rDate}<br><b>Mwanafunzi:</b> ${name} (${reg})<br><b>Njia:</b> ${method} (${ref})<br><b>CRDB:</b> ${cfg.crdb}<br>----------------------------<br>
+        ${receiptCart.map(x => `• ${x.category} (${x.source_fund}): <b>${x.amount.toLocaleString()}</b><br>`).join('')}
+        ----------------------------<br>
+        <div style="font-size:14px;"><b>JUMLA: TZS ${totalPaid.toLocaleString()}/=</b></div>
+        ----------------------------<br><center><img src="${qr}"><br><small>Scan kuthibitisha uhalali</small></center>
       </div><br>
       <div style="display:flex; gap:8px; flex-wrap:wrap;">
-        <button class="btn btn-blue" onclick="printDiv('printSlip')">🖨️ Chapisha Risiti</button>
-        <button class="btn btn-green" onclick="SGB.sendWhatsApp('', '${smsText}')">💬 Tuma Kwa WhatsApp</button>
-        <button class="btn btn-amber" onclick="SGB.sendSMS('', '${smsText}')">📲 Tuma Kwa SMS</button>
+        <button class="btn btn-blue" onclick="printDiv('printSlip')">🖨️ Chapisha Risiti (Thermal)</button>
+        <button class="btn btn-green" onclick="SGB.sendWhatsApp('${phone}', '${smsText}')">💬 Tuma WhatsApp Kwa Mzazi</button>
+        <button class="btn btn-amber" onclick="SGB.sendSMS('${phone}', '${smsText}')">📲 Tuma SMS Kwa Mzazi</button>
       </div>`;
+
+    receiptCart = [];
+    renderReceiptCart();
+    if (confirm('✅ Risiti imehifadhiwa! Je, ungependa kumtumia mzazi ujumbe wa WhatsApp sasa hivi?')) {
+      SGB.sendWhatsApp(phone, smsText);
+    }
+  }
+
+  function submitExpenseVoucher(e) {
+    e.preventDefault();
+    const dt = document.getElementById('exDate').value;
+    if (checkLockedDate(dt)) { alert('🔒 Hesabu za tarehe hiyo zimefungwa!'); return; }
+    SGB.insert('expense_vouchers', {
+      voucher_no: 'VCH-' + Math.floor(1000 + Math.random() * 9000),
+      description: document.getElementById('exDesc').value.trim(),
+      source_fund: document.getElementById('exSource').value,
+      source_account: document.getElementById('exAcc').value,
+      amount: Number(document.getElementById('exAmt').value),
+      tx_date: dt,
+      status: 'Pending HM Approval'
+    });
+    alert('✅ Vocha ya matumizi imetumwa kwa Mkuu wa Shule aidhinishe!');
+    openTab('expenses');
+  }
+
+  function renderExpensesList() {
+    const fType = document.getElementById('expFilterType')?.value || 'ALL';
+    const dFrom = document.getElementById('expFrom')?.value;
+    const dTo = document.getElementById('expTo')?.value;
+    const now = new Date();
+    const curMonth = now.toISOString().slice(0, 7);
+    const curYear = now.toISOString().slice(0, 4);
+
+    let list = SGB.select('expense_vouchers');
+    if (fType === 'MONTH') list = list.filter(x => (x.tx_date || '').startsWith(curMonth));
+    if (fType === 'YEAR') list = list.filter(x => (x.tx_date || '').startsWith(curYear));
+    if (fType === 'RANGE' && dFrom && dTo) list = list.filter(x => (x.tx_date || '') >= dFrom && (x.tx_date || '') <= dTo);
+
+    const total = list.reduce((s, x) => s + Number(x.amount), 0);
+    document.getElementById('expPrintArea').innerHTML = `
+      <p><b>Jumla ya Matumizi Kwenye Kichujio Hiki: TZS ${total.toLocaleString()}</b></p>
+      <table><tr><th>Vocha</th><th>Tarehe</th><th>Maelezo</th><th>Chanzo cha Pato</th><th>Kiasi (TZS)</th><th>Hali & Hatua</th></tr>
+      ${list.map(v => `<tr><td><b>${v.voucher_no}</b></td><td>${v.tx_date || v.created_at}</td><td>${v.description}</td><td><b>${v.source_fund || 'Kutwa'}</b></td><td><b>${Number(v.amount).toLocaleString()}</b></td>
+      <td><b>${v.status || 'Paid'}</b> ${v.status === 'Approved' ? `<button class="btn btn-green" onclick="SGB.update('expense_vouchers', ${v.id}, {status:'Paid'}); renderExpensesList()">💵 Lipa</button>` : ''}</td></tr>`).join('') || '<tr><td colspan="6">Hakuna matumizi kwenye kipindi hiki.</td></tr>'}
+      </table>`;
+  }
+  function addProcItemDraft() {
+    const name = document.getElementById('piName').value.trim();
+    const unit = document.getElementById('piUnit').value.trim();
+    const qty = Number(document.getElementById('piQty').value);
+    const price = Number(document.getElementById('piPrice').value);
+    if (!name || !qty || !price) return;
+    procItemsDraft.push({ name, unit, qty, price, total: qty * price, rejected: false, hm_note: '' });
+    document.getElementById('piName').value = '';
+    document.getElementById('piUnit').value = '';
+    document.getElementById('piQty').value = '';
+    document.getElementById('piPrice').value = '';
+    renderProcDraft();
+  }
+
+  function renderProcDraft() {
+    const el = document.getElementById('procDraftTable');
+    if (!el) return;
+    if (!procItemsDraft.length) { el.innerHTML = ''; return; }
+    const grandTotal = procItemsDraft.reduce((s, x) => s + x.total, 0);
+    el.innerHTML = `<table><tr><th>Hitaji</th><th>Kipimo</th><th>Idadi</th><th>Bei</th><th>Jumla (TZS)</th><th>Futa</th></tr>
+      ${procItemsDraft.map((it, i) => `<tr><td>${it.name}</td><td>${it.unit}</td><td>${it.qty}</td><td>${it.price.toLocaleString()}</td><td><b>${it.total.toLocaleString()}</b></td><td><button type="button" class="btn btn-red" onclick="procItemsDraft.splice(${i},1); renderProcDraft()">✕</button></td></tr>`).join('')}
+      <tr style="background:#ecfdf5;"><td colspan="4"><b>MAKADIRIO YA BAJETI (AUTOMATIC TOTAL)</b></td><td colspan="2"><b>TZS ${grandTotal.toLocaleString()}</b></td></tr></table>`;
+  }
+
+  function submitProcurement() {
+    const title = document.getElementById('prTitle').value.trim();
+    const dt = document.getElementById('prDate').value;
+    const src = document.getElementById('prSource').value;
+    const members = document.getElementById('prMembers').value.trim();
+    if (checkLockedDate(dt)) { alert('🔒 Hesabu za tarehe hiyo zimefungwa!'); return; }
+    if (!title || !procItemsDraft.length) { alert('⚠️ Weka kichwa cha kikao na angalau hitaji moja.'); return; }
+    const totalBudget = procItemsDraft.reduce((s, x) => s + x.total, 0);
+
+    SGB.insert('procurement_committee', {
+      meeting_title: title,
+      meeting_date: dt,
+      source_fund: src,
+      members,
+      items: procItemsDraft,
+      estimated_budget: totalBudget,
+      minutes_summary: procItemsDraft.map(x => `${x.name} (${x.qty} ${x.unit})`).join(', '),
+      status: 'Pending (Inasubiri Mkuu wa Shule)'
+    });
+    procItemsDraft = [];
+    alert('✅ Muhtasari wa Kamati ya Manunuzi umetumwa kwa Mkuu wa Shule!');
+    openTab('procurement');
+  }
+
+  function editAndResendProc(id) {
+    const proc = SGB.select('procurement_committee').find(p => p.id === id);
+    if (!proc) return;
+    const updatedItems = (proc.items || []).map(it => {
+      if (it.rejected) {
+        const newPrice = Number(prompt(`Hitaji "${it.name}" lilirejeshwa (${it.hm_note || 'Rekebisha bei'}). Ingiza bei mpya ya kimoja (TZS):`, it.price));
+        if (newPrice > 0) return { ...it, price: newPrice, total: it.qty * newPrice, rejected: false, hm_note: '' };
+      }
+      return it;
+    });
+    const newTotal = updatedItems.reduce((s, x) => s + x.total, 0);
+    SGB.update('procurement_committee', id, { items: updatedItems, estimated_budget: newTotal, status: 'Resent (Imetumwa Upya Kwa Mkuu)' });
+    alert('✅ Marekebisho yamehifadhiwa na kutumwa upya kwa Mkuu wa Shule!');
+    openTab('procurement');
+  }
+
+  function payApprovedProc(id) {
+    const proc = SGB.select('procurement_committee').find(p => p.id === id);
+    if (!proc) return;
+    SGB.update('procurement_committee', id, { status: 'Paid' });
+    alert(`✅ Malipo ya TZS ${Number(proc.estimated_budget).toLocaleString()} (Chanzo: ${proc.source_fund}) yamekamilika na salio limekatwa!`);
+    openTab('procurement');
+  }
+
+  function addStaffPayroll(e) {
+    e.preventDefault();
+    const name = document.getElementById('pyName').value.trim();
+    const job = document.getElementById('pyRole').value.trim();
+    const src = document.getElementById('pySource').value;
+    const gross = Number(document.getElementById('pyGross').value);
+    const nssf = Number(document.getElementById('pyNssf').value || 0);
+    const paye = Number(document.getElementById('pyPaye').value || 0);
+    SGB.insert('staff_payroll', { name, job_title: job, source_fund: src, gross, nssf, paye, net_pay: gross - nssf - paye, status: 'Pending Pre-Audit' });
+    openTab('payroll');
+  }
+
+  function editStaffPay(id) {
+    const s = SGB.select('staff_payroll').find(x => x.id === id);
+    if (!s) return;
+    const newName = prompt('Hariri Jina la Mtumishi:', s.name);
+    const newGross = Number(prompt('Hariri Kiwango cha Malipo (Gross TZS):', s.gross));
+    if (newName && newGross > 0) {
+      SGB.update('staff_payroll', id, { name: newName.trim(), gross: newGross, net_pay: newGross - Number(s.nssf || 0) - Number(s.paye || 0), status: 'Pending Pre-Audit' });
+      openTab('payroll');
+    }
+  }
+
+  function sendAllPayrollPreAudit() {
+    SGB.select('staff_payroll').forEach(s => {
+      if (s.status !== 'Paid') SGB.update('staff_payroll', s.id, { status: 'Pending Pre-Audit' });
+    });
+    alert('📤 Orodha yote ya mishahara imetumwa kwa Mkuu wa Shule kwa ajili ya Pre-Audit!');
+    openTab('payroll');
+  }
+
+  function paySingleStaff(id) {
+    SGB.update('staff_payroll', id, { status: 'Paid', paid_date: new Date().toLocaleDateString('sw-TZ') });
+    alert('✅ Mshahara umelipwa! Sasa unaweza kuchapisha Salary Slip.');
+    openTab('payroll');
+  }
+
+  function payAllApprovedStaff() {
+    SGB.select('staff_payroll').filter(s => s.status === 'Pre-Audited & Approved').forEach(s => {
+      SGB.update('staff_payroll', s.id, { status: 'Paid', paid_date: new Date().toLocaleDateString('sw-TZ') });
+    });
+    alert('✅ Mishahara yote iliyoidhinishwa imelipwa na salio la matumizi limesasishwa!');
+    openTab('payroll');
+  }
+  function printSalarySlip(id, mode) {
+    const s = SGB.select('staff_payroll').find(x => x.id === id);
+    if (!s) return;
+    const qr = SGB.qrImg(`SALARY-SLIP:${s.name}|NET:${s.net_pay}`);
+    const widthStyle = mode === 'THERMAL' ? 'max-width:290px; font-family:monospace;' : 'max-width:650px; font-family:sans-serif;';
+    document.getElementById('slipPrintContainer').innerHTML = `
+      <div id="slipBox" style="border:2px dashed #064e3b; padding:16px; background:#fff; ${widthStyle}">
+        <center><b>SANGABUYE SECONDARY SCHOOL</b><br>S.L.P 11898, ILEMELA - MWANZA<br><b>SALARY SLIP (${mode})</b></center><hr>
+        <b>Mtumishi:</b> ${s.name}<br>
+        <b>Kazi / Cheo:</b> ${s.job_title || '-'}<br>
+        <b>Chanzo cha Malipo:</b> ${s.source_fund || 'Kutwa'}<br>
+        <b>Tarehe ya Malipo:</b> ${s.paid_date || s.created_at}<hr>
+        <b>Malipo Ghafi (Gross):</b> TZS ${Number(s.gross).toLocaleString()}<br>
+        <b>Makato (NSSF + PAYE):</b> TZS ${(Number(s.nssf || 0) + Number(s.paye || 0)).toLocaleString()}<br>
+        <div style="font-size:15px; margin-top:6px;"><b>KIASI ALICHOPOKEA (NET): TZS ${Number(s.net_pay).toLocaleString()}/=</b></div><hr>
+        <center><img src="${qr}"><br><small>Imethibitishwa na Mkuu wa Shule & Mhasibu</small></center>
+      </div><br><button class="btn btn-blue" onclick="printDiv('slipBox')">🖨️ Print Salary Slip (${mode})</button>`;
+  }
+
+  function printPayrollPV() {
+    const list = SGB.select('staff_payroll');
+    const totNet = list.reduce((s, x) => s + Number(x.net_pay), 0);
+    const qr = SGB.qrImg(`PAYROLL-PV|TOTAL:${totNet}`);
+    const html = `
+      <div style="display:flex; justify-content:space-between;"><div><h2>SANGABUYE SECONDARY SCHOOL</h2><p>S.L.P 11898, Ilemela - Mwanza</p><h4>PAYMENT VOUCHER (PV) — MISHAHARA YA WATUMISHI</h4></div><img src="${qr}"></div>
+      <table><tr><th>#</th><th>Mtumishi</th><th>Kazi</th><th>Chanzo</th><th>Gross</th><th>Makato</th><th>Net Pay (TZS)</th><th>Hali</th></tr>
+      ${list.map((s, i) => `<tr><td>${i + 1}</td><td><b>${s.name}</b></td><td>${s.job_title || '-'}</td><td>${s.source_fund || 'Kutwa'}</td><td>${Number(s.gross).toLocaleString()}</td><td>${(Number(s.nssf || 0) + Number(s.paye || 0)).toLocaleString()}</td><td><b>${Number(s.net_pay).toLocaleString()}</b></td><td>${s.status}</td></tr>`).join('')}
+      <tr><td colspan="6"><b>JUMLA KUU YA MALIPO (GRAND TOTAL)</b></td><td colspan="2"><b>TZS ${totNet.toLocaleString()}</b></td></tr></table><br>
+      <p><b>Imeandaliwa na Mhasibu (0615 000 305):</b> ___________________ &nbsp;&nbsp; <b>Imekaguliwa & Kuidhinishwa na Mkuu wa Shule (0784 755 173):</b> ___________________</p>`;
+    const w = window.open('', '', 'width=850,height=650');
+    w.document.write('<html><head><title>Payroll PV A4</title><style>body{font-family:sans-serif;padding:20px;}table{width:100%;border-collapse:collapse;}th,td{border:1px solid #000;padding:7px;font-size:12px;}</style></head><body>' + html + '</body></html>');
+    w.document.close(); w.focus();
+    setTimeout(() => { w.print(); w.close(); }, 300);
+  }
+
+  function genFinReport(type) {
+    const sum = calcFinanceSummary();
+    const recs = SGB.select('accounting_receipts');
+    const vchs = SGB.select('expense_vouchers').filter(v => v.status === 'Paid');
+    const procs = SGB.select('procurement_committee').filter(p => p.status === 'Paid');
+    const pays = SGB.select('staff_payroll').filter(p => p.status === 'Paid');
+    const qr = SGB.qrImg(`SANGABUYE-FIN-REPORT:${type}`);
+
+    let bodyHtml = '';
+    if (type === 'INCOME_EXP') {
+      bodyHtml = `<h4>TAARIFA YA MAPATO NA MATUMIZI (INCOME & EXPENDITURE STATEMENT)</h4>
+        <table><tr><th>Maelezo</th><th>Kiasi (TZS)</th></tr>
+        <tr><td>Mapato: Benki ya CRDB (0150838972100)</td><td>${sum.crdbIn.toLocaleString()}</td></tr>
+        <tr><td>Mapato: Pesa Taslimu (Cash)</td><td>${sum.cashIn.toLocaleString()}</td></tr>
+        <tr style="background:#ecfdf5;"><td><b>JUMLA YA MAPATO YOTE</b></td><td><b>${sum.totalIn.toLocaleString()}</b></td></tr>
+        <tr><td>Matumizi: Vocha za Kawaida Zilizolipwa</td><td>${vchs.reduce((s, v) => s + Number(v.amount), 0).toLocaleString()}</td></tr>
+        <tr><td>Matumizi: Kamati ya Manunuzi Yaliyolipwa</td><td>${procs.reduce((s, p) => s + Number(p.estimated_budget), 0).toLocaleString()}</td></tr>
+        <tr><td>Matumizi: Mishahara ya Watumishi Iliyolipwa</td><td>${pays.reduce((s, p) => s + Number(p.net_pay), 0).toLocaleString()}</td></tr>
+        <tr style="background:#fef2f2;"><td><b>JUMLA YA MATUMIZI YOTE</b></td><td><b>${sum.totalOut.toLocaleString()}</b></td></tr>
+        <tr style="background:#eff6ff;"><td><b>SALIO HALISI (NET BALANCE)</b></td><td><b>TZS ${sum.balance.toLocaleString()}</b></td></tr></table>`;
+    } else if (type === 'SOURCES') {
+      bodyHtml = `<h4>RIPOTI YA VYANZO VYA MAPATO (KUTWA, HOSTEL & KAMBI YA MASOMO)</h4>
+        <table><tr><th>Chanzo cha Pato</th><th>Jumla Iliyokusanywa (TZS)</th></tr>
+        <tr><td>1. Wanafunzi wa Kutwa (Day Scholars)</td><td><b>${sum.kutwaIn.toLocaleString()}</b></td></tr>
+        <tr><td>2. Wanafunzi wa Bweni (Hostel)</td><td><b>${sum.hostelIn.toLocaleString()}</b></td></tr>
+        <tr><td>3. Kambi ya Masomo (Academic Camp)</td><td><b>${sum.kambiIn.toLocaleString()}</b></td></tr>
+        <tr style="background:#ecfdf5;"><td><b>JUMLA KUU</b></td><td><b>TZS ${sum.totalIn.toLocaleString()}</b></td></tr></table>`;
+    } else if (type === 'CASHBOOK') {
+      bodyHtml = `<h4>KITABU CHA FEDHA (CASHBOOK & BANK LEDGER)</h4>
+        <table><tr><th>Tarehe</th><th>Maelezo</th><th>Chanzo</th><th>Mapato (+)</th><th>Matumizi (-)</th></tr>
+        ${recs.map(r => `<tr><td>${r.tx_date || r.created_at}</td><td>Risiti ${r.receipt_number} (${r.student_name})</td><td>${r.source_fund || 'Kutwa'}</td><td style="color:#059669;">${Number(r.amount_paid).toLocaleString()}</td><td>-</td></tr>`).join('')}
+        ${vchs.map(v => `<tr><td>${v.tx_date || v.created_at}</td><td>Vocha ${v.voucher_no} (${v.description})</td><td>${v.source_fund || 'Kutwa'}</td><td>-</td><td style="color:#dc2626;">${Number(v.amount).toLocaleString()}</td></tr>`).join('')}
+        ${procs.map(p => `<tr><td>${p.meeting_date || p.created_at}</td><td>Manunuzi: ${p.meeting_title}</td><td>${p.source_fund || 'Kutwa'}</td><td>-</td><td style="color:#dc2626;">${Number(p.estimated_budget).toLocaleString()}</td></tr>`).join('')}
+        </table>`;
+    } else if (type === 'PAYROLL_REP') {
+      bodyHtml = `<h4>RIPOTI YA MISHAHARA ILIYOLIPWA</h4>
+        <table><tr><th>Mtumishi</th><th>Kazi</th><th>Chanzo</th><th>Gross</th><th>Net Pay (TZS)</th><th>Tarehe</th></tr>
+        ${pays.map(p => `<tr><td><b>${p.name}</b></td><td>${p.job_title || '-'}</td><td>${p.source_fund || 'Kutwa'}</td><td>${Number(p.gross).toLocaleString()}</td><td><b>${Number(p.net_pay).toLocaleString()}</b></td><td>${p.paid_date || p.created_at}</td></tr>`).join('')}
+        </table>`;
+    }
+
+    document.getElementById('finReportArea').innerHTML = `
+      <div id="repPrintBox" style="border:1px solid #064e3b; padding:18px; background:#fff;">
+        <div style="display:flex; justify-content:space-between;"><div><h3>SANGABUYE SECONDARY SCHOOL</h3><p>S.L.P 11898, Ilemela - Mwanza | Mhasibu: 0615 000 305</p></div><img src="${qr}"></div>
+        ${bodyHtml}
+      </div><br><button class="btn btn-blue" onclick="printDiv('repPrintBox')">🖨️ Pakua / Chapisha Ripoti (A4 PDF)</button>`;
+  }
+  function lockPeriodRange(e) {
+    e.preventDefault();
+    const label = document.getElementById('lkLabel').value.trim();
+    const start_date = document.getElementById('lkStart').value;
+    const end_date = document.getElementById('lkEnd').value;
+    if (!confirm(`⚠️ Je, una uhakika unataka kufunga hesabu za "${label}" (${start_date} hadi ${end_date})? Ukifunga hutaweza kufungua tena mpaka uombe idhini kwa Mkuu/Admin!`)) return;
+    SGB.insert('account_locks', { label, start_date, end_date, status: 'Locked', unlock_requested: false });
+    alert('🔒 Hesabu zimefungwa rasmi!');
+    openTab('lock_accounts');
+  }
+
+  function requestUnlock(id, label) {
+    SGB.update('account_locks', id, { unlock_requested: true });
+    SGB.insert('direct_messages', {
+      sender: 'Mhasibu (0615 000 305)',
+      recipient: 'Mkuu wa Shule',
+      subject: `OMBI LA KUFUNGUA HESABU: ${label}`,
+      body: `Naomba ruhusa ya kufungua hesabu zilizofungwa za kipindi: ${label} ili kufanya marekebisho.`
+    });
+    alert('📩 Ombi la kufungua hesabu limetumwa kwa Mkuu wa Shule na IT Super Admin!');
   }
 
   function addCampStudent(e) {
     e.preventDefault();
-    SGB.insert('camp_students', {
-      student_name: document.getElementById('cpName').value.trim(),
-      class_name: document.getElementById('cpClass').value.trim(),
-      camp_name: document.getElementById('cpTitle').value.trim(),
-      fee_required: Number(document.getElementById('cpFee').value)
-    });
-    alert('✅ Mwanafunzi amesajiliwa kwenye Kambi ya Masomo!');
-    openTab('study_camp');
-  }
-
-  function quickCampPay(studentName, balance) {
-    const amt = Number(prompt(`Ingiza kiasi anacholipa ${studentName} kwa ajili ya Kambi (Deni ni TZS ${balance.toLocaleString()}):`, balance));
-    if (!amt || amt <= 0) return;
-    const method = confirm('Je, amelipa kupitia CRDB Bank? (Bofya OK kwa CRDB, au Cancel kwa Cash)') ? 'CRDB_Bank' : 'Cash';
-    const rec = SGB.insert('accounting_receipts', {
-      receipt_number: 'SGB-' + Math.floor(100000 + Math.random() * 900000),
-      student_name: studentName,
-      student_reg_no: 'CAMP-2026',
-      payment_category: 'Kambi ya Masomo (Academic Camp)',
-      payment_method: method,
-      bank_ref_no: method === 'CRDB_Bank' ? 'CRDB-CAMP' : 'CASH',
-      amount_paid: amt,
-      waiver: 0
-    });
-    alert(`✅ Malipo ya Kambi (TZS ${amt.toLocaleString()}) yamepokewa! Risiti Na: ${rec.receipt_number}`);
+    SGB.insert('camp_students', { student_name: document.getElementById('cpName').value.trim(), class_name: document.getElementById('cpClass').value.trim(), camp_name: document.getElementById('cpTitle').value.trim(), fee_required: Number(document.getElementById('cpFee').value) });
     openTab('study_camp');
   }
 
   function addBusStudent(e) {
     e.preventDefault();
-    SGB.insert('school_bus_routes', {
-      student_name: document.getElementById('bsName').value.trim(),
-      route: document.getElementById('bsRoute').value.trim(),
-      paid: Number(document.getElementById('bsPaid').value),
-      phone: document.getElementById('bsPhone').value.trim()
-    });
-    openTab('school_bus');
+    SGB.insert('school_bus_routes', { student_name: document.getElementById('bsName').value.trim(), route: document.getElementById('bsRoute').value.trim(), paid: Number(document.getElementById('bsPaid').value), phone: document.getElementById('bsPhone').value.trim() });
+    openTab('study_camp');
   }
 
   function addFeeStruct(e) {
     e.preventDefault();
-    SGB.insert('fee_structures', { category: document.getElementById('fsCat').value.trim(), amount: Number(document.getElementById('fsAmt').value) });
+    SGB.insert('fee_structures', { category: document.getElementById('fsCat').value.trim(), source_fund: document.getElementById('fsSource').value, amount: Number(document.getElementById('fsAmt').value) });
     openTab('fee_struct');
   }
 
   function delFeeStruct(id) {
-    const list = SGB.select('fee_structures').filter(x => x.id !== id);
-    localStorage.setItem('sgb_fee_structures', JSON.stringify(list));
+    localStorage.setItem('sgb_fee_structures', JSON.stringify(SGB.select('fee_structures').filter(x => x.id !== id)));
     openTab('fee_struct');
   }
 
   function addStore(e) {
     e.preventDefault();
-    const item = SGB.insert('store_inventory', {
-      item_name: document.getElementById('sItem').value.trim(),
-      quantity: Number(document.getElementById('sQty').value),
-      unit: document.getElementById('sUnit').value.trim(),
-      supplier: document.getElementById('sFrom').value.trim(),
-      value_tzs: Number(document.getElementById('sVal').value)
-    });
-    alert(`✅ Bidhaa ${item.item_name} (${item.quantity} ${item.unit}) imehifadhiwa stoo!`);
+    SGB.insert('store_inventory', { item_name: document.getElementById('sItem').value.trim(), quantity: Number(document.getElementById('sQty').value), unit: document.getElementById('sUnit').value.trim(), donor_type: document.getElementById('sDonorType').value, supplier: document.getElementById('sFrom').value.trim(), value_tzs: Number(document.getElementById('sVal').value) });
     openTab('store');
   }
 
@@ -450,100 +837,22 @@
     const used = Number(prompt('Ingiza kiasi kilichotumika:'));
     if (used > 0) { SGB.update('store_inventory', id, { quantity: Math.max(0, cur - used) }); openTab('store'); }
   }
-  function buildStatement() {
-    const name = document.getElementById('stmtName').value.trim();
-    const cls = document.getElementById('stmtClass').value.trim() || '-';
-    const req = Number(document.getElementById('stmtReq').value || 0);
-    const recs = SGB.select('accounting_receipts').filter(r => r.student_name.toLowerCase() === name.toLowerCase());
-    const paid = recs.reduce((s, r) => s + Number(r.amount_paid), 0);
-    const bal = Math.max(0, req - paid);
-    const qr = SGB.qrImg(`SANGABUYE-STMT:${name}|PAID:${paid}|BAL:${bal}`);
-
-    document.getElementById('stmtOutput').innerHTML = `
-      <div id="stmtPrint" style="border:1px solid #0f294a; padding:20px; background:white;">
-        <center><h3>SANGABUYE SECONDARY SCHOOL</h3><p>S.L.P 11898, Ilemela - Mwanza | CRDB: SHULE YA SEKONDARI SANGABUYE E.K (0150838972100)</p><h4>TAARIFA RASMI YA MICHANGO YA MWANAFUNZI</h4></center>
-        <p><b>Jina la Mwanafunzi:</b> ${name} | <b>Kidato/Mkondo:</b> ${cls}</p>
-        <table><tr><th>Aina ya Mchango</th><th>Kinachotakiwa (TZS)</th><th>Alichotoa (TZS)</th><th>Deni Lililobaki (TZS)</th></tr>
-        ${recs.map(r => `<tr><td>${r.payment_category} (${r.receipt_number})</td><td>-</td><td>${Number(r.amount_paid).toLocaleString()}</td><td>-</td></tr>`).join('')}
-        <tr style="background:#f1f5f9;"><td><b>MUHTASARI (SUMMARY TOTAL)</b></td><td><b>${req.toLocaleString()}</b></td><td><b>${paid.toLocaleString()}</b></td><td><b style="color:#dc2626;">${bal.toLocaleString()}</b></td></tr></table>
-        <div style="display:flex; justify-content:space-between; margin-top:25px; align-items:center;">
-          <div><b>Aliyeandaa:</b> Mhasibu (Simu: 0615 000 305)<br><br><b>Aliyethibitisha:</b> Mkuu wa Shule (Simu: 0784 755 173)</div>
-          <img src="${qr}" alt="QR">
-        </div>
-      </div><br>
-      <div style="display:flex; gap:8px; flex-wrap:wrap;">
-        <button class="btn btn-blue" onclick="printDiv('stmtPrint')">🖨️ Pakua / Chapisha Taarifa (A4 PDF)</button>
-        <button class="btn btn-green" onclick="sendStmtToHM('${name}', ${req}, ${paid}, ${bal})">📤 Tuma Kwa Mkuu wa Shule</button>
-        <button class="btn btn-green" onclick="SGB.sendWhatsApp('', 'SANGABUYE SEC: Taarifa ya Michango ya ${name}. Kinachotakiwa: TZS ${req.toLocaleString()}, Amelipa: TZS ${paid.toLocaleString()}, Deni Lililobaki: TZS ${bal.toLocaleString()}. CRDB: 0150838972100')">💬 Tuma Deni Kwa WhatsApp</button>
-        <button class="btn btn-amber" onclick="SGB.sendSMS('', 'SANGABUYE SEC: Taarifa ya Michango ya ${name}. Amelipa: TZS ${paid.toLocaleString()}, Deni: TZS ${bal.toLocaleString()}. Lipa CRDB: 0150838972100')">📲 Tuma Deni Kwa SMS</button>
-      </div>`;
-  }
-
-  function sendStmtToHM(name, req, paid, bal) {
-    SGB.insert('contribution_statements', { student_name: name, required: req, paid, balance: bal, status: 'Pending HM Approval' });
-    alert('✅ Taarifa ya michango imetumwa kwa Mkuu wa Shule (0784 755 173)!');
-  }
-
-  function sendProc(e) {
-    e.preventDefault();
-    SGB.insert('procurement_committee', { meeting_title: document.getElementById('pTitle').value, estimated_budget: document.getElementById('pBudget').value, minutes_summary: document.getElementById('pNotes').value, status: 'Pending (Inasubiri Mkuu wa Shule)' });
-    alert('✅ Muhtasari wa Kamati ya Manunuzi umetumwa kwa Mkuu wa Shule!');
-    openTab('procurement');
-  }
-
-  function resendProc(id) {
-    const newNotes = prompt('Andika marekebisho ya kikao baada ya maoni ya Mkuu wa Shule:');
-    if (newNotes) { SGB.update('procurement_committee', id, { minutes_summary: newNotes, status: 'Resent (Imetumwa Upya Kwa Mkuu)' }); openTab('procurement'); }
-  }
-
-  function addVoucher(e) {
-    e.preventDefault();
-    if (isPeriodLocked()) { alert('🔒 Mahesabu yamefungwa!'); return; }
-    SGB.insert('expense_vouchers', { voucher_no: 'VCH-' + Math.floor(1000 + Math.random() * 9000), description: document.getElementById('vDesc').value, source_account: document.getElementById('vAcc').value, amount: Number(document.getElementById('vAmt').value) });
-    openTab('bank_book');
-  }
-
-  function addPayroll(e) {
-    e.preventDefault();
-    const name = document.getElementById('pyName').value;
-    const gross = Number(document.getElementById('pyGross').value);
-    const nssf = Math.round(gross * 0.10);
-    const paye = Number(document.getElementById('pyPaye').value || 0);
-    SGB.insert('staff_payroll', { name, gross, nssf, paye, net_pay: gross - nssf - paye });
-    openTab('payroll_assets');
-  }
-
-  function addAsset(e) {
-    e.preventDefault();
-    SGB.insert('fixed_assets', { name: document.getElementById('asName').value, dept: document.getElementById('asDept').value, val: document.getElementById('asVal').value });
-    openTab('payroll_assets');
-  }
 
   function checkClearance() {
     const name = document.getElementById('clrName').value.trim();
     const recs = SGB.select('accounting_receipts').filter(r => r.student_name.toLowerCase() === name.toLowerCase());
     const unreturned = SGB.select('library_loans').filter(l => l.student_name.toLowerCase() === name.toLowerCase() && l.status.includes('Ameazima'));
     const paid = recs.reduce((s, r) => s + Number(r.amount_paid), 0);
-
     document.getElementById('clrResult').innerHTML = `<div class="panel" style="border-left:4px solid ${unreturned.length ? '#dc2626' : '#059669'};">
-      <b>Mwanafunzi:</b> ${name}<br>
-      <b>Jumla ya Michango Aliyolipa:</b> TZS ${paid.toLocaleString()}<br>
-      <b>Hali ya Maktaba:</b> ${unreturned.length ? `<span style="color:#dc2626;font-weight:bold;">❌ Anadaiwa Kitabu: ${unreturned.book}</span>` : '<span style="color:#059669;">✅ Hajaazima kitabu / Amerudisha</span>'}<br>
-      ${unreturned.length ? '' : `<button class="btn btn-green" style="margin-top:10px;" onclick="alert('✅ Uhasibu na Maktaba zimemthibitishia ${name} Clearance Kamili!')">✅ Thibitisha Clearance Kamili</button>`}
+      <b>Mwanafunzi:</b> ${name} | <b>Jumla Aliyolipa:</b> TZS ${paid.toLocaleString()}<br>
+      <b>Maktaba:</b> ${unreturned.length ? `<span style="color:#dc2626;font-weight:bold;">❌ Anadaiwa Kitabu: ${unreturned.map(x => x.book).join(', ')}</span>` : '<span style="color:#059669;">✅ Hana deni la kitabu</span>'}
     </div>`;
-  }
-
-  function togglePeriodLock() {
-    const next = !isPeriodLocked();
-    localStorage.setItem('sgb_finance_locked', String(next));
-    SGB.logAction(next ? 'Amefunga mahesabu (Period Locked)' : 'Amefungua mahesabu (Period Unlocked)');
-    openTab('clearance');
   }
 
   function printDiv(id) {
     const html = document.getElementById(id).innerHTML;
-    const w = window.open('', '', 'width=750,height=650');
-    w.document.write('<html><head><title>Sangabuye Finance Print</title><style>body{font-family:sans-serif;padding:15px;}table{width:100%;border-collapse:collapse;}th,td{border:1px solid #ccc;padding:8px;font-size:12px;}</style></head><body>' + html + '</body></html>');
+    const w = window.open('', '', 'width=800,height=650');
+    w.document.write('<html><head><title>Sangabuye Print</title><style>body{font-family:sans-serif;padding:15px;}table{width:100%;border-collapse:collapse;}th,td{border:1px solid #000;padding:7px;font-size:12px;}</style></head><body>' + html + '</body></html>');
     w.document.close(); w.focus();
     setTimeout(() => { w.print(); w.close(); }, 300);
   }
