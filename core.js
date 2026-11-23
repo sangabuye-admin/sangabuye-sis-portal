@@ -1,4 +1,4 @@
-// INJINI KUU YA SANGABUYE SIS PORTAL (v5.2 - FIXED & STABLE)
+// INJINI KUU YA SANGABUYE SIS PORTAL (v5.3 - PWA APP, OFFLINE SYNC & DIRECT MESSAGING)
 const SGB = {
   lang: localStorage.getItem('sgb_lang') || 'sw',
 
@@ -30,8 +30,6 @@ const SGB = {
   liveRefresh(silent = false) {
     const activeMenu = document.querySelector('.menu-btn.active');
     if (activeMenu) activeMenu.click();
-    else if (typeof renderStudentPortal === 'function') renderStudentPortal();
-    else if (typeof loadChild === 'function' && document.getElementById('childInput') && document.getElementById('childInput').value) loadChild();
     const syncEl = document.getElementById('syncTime');
     if (syncEl) syncEl.innerText = ' • Live synced: ' + new Date().toLocaleTimeString();
     this.applyLanguage();
@@ -92,6 +90,56 @@ const SGB = {
     };
     inp.click();
   },
+  openInboxModal() {
+    const u = this.getUser();
+    if (!u) return;
+    const msgs = this.select('direct_messages');
+    let modal = document.getElementById('sgbInboxModal');
+    if (!modal) {
+      modal = document.createElement('div');
+      modal.id = 'sgbInboxModal';
+      modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:10000;display:flex;justify-content:center;align-items:center;padding:15px;';
+      document.body.appendChild(modal);
+    }
+    modal.style.display = 'flex';
+    modal.innerHTML = `
+      <div style="background:#fff;width:100%;max-width:520px;border-radius:12px;padding:20px;max-height:85vh;overflow-y:auto;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+          <h3 style="margin:0;color:#0f294a;">💬 Ujumbe wa Ndani (Direct Inbox)</h3>
+          <button onclick="document.getElementById('sgbInboxModal').style.display='none'" style="background:#dc2626;color:#fff;border:none;padding:5px 10px;border-radius:6px;cursor:pointer;">✕ Funga</button>
+        </div>
+        <form onsubmit="SGB.sendDirectMsg(event)" style="display:grid;gap:8px;margin-bottom:14px;">
+          <select id="dmTo" style="padding:8px;border:1px solid #cbd5e1;border-radius:6px;">
+            <option value="Mkuu wa Shule">Kwenda: Mkuu wa Shule (0784 755 173)</option>
+            <option value="Mhasibu">Kwenda: Mhasibu (0615 000 305)</option>
+            <option value="Mtaaluma">Kwenda: Mtaaluma (Academic)</option>
+            <option value="Walimu">Kwenda: Walimu</option>
+            <option value="Wazazi">Kwenda: Wazazi</option>
+          </select>
+          <input type="text" id="dmSubj" required placeholder="Kichwa / Jina la Mwanafunzi" style="padding:8px;border:1px solid #cbd5e1;border-radius:6px;">
+          <textarea id="dmBody" rows="2" required placeholder="Andika ujumbe wako hapa..." style="padding:8px;border:1px solid #cbd5e1;border-radius:6px;"></textarea>
+          <button type="submit" style="background:#1d4ed8;color:#fff;border:none;padding:9px;border-radius:6px;font-weight:bold;cursor:pointer;">📤 Tuma Ujumbe</button>
+        </form>
+        <div style="font-size:12.5px;">
+          ${msgs.slice(0, 15).map(m => `<div style="border-bottom:1px solid #e2e8f0;padding:8px 0;">
+            <b>${m.sender} ➔ ${m.recipient}</b> <small style="color:#64748b;">(${m.created_at})</small><br>
+            <u>${m.subject}:</u> ${m.body}
+          </div>`).join('') || '<p style="color:#64748b;">Hakuna ujumbe wowote bado.</p>'}
+        </div>
+      </div>`;
+  },
+
+  sendDirectMsg(e) {
+    e.preventDefault();
+    const u = this.getUser();
+    this.insert('direct_messages', {
+      sender: u ? u.full_name : 'Mtumiaji',
+      recipient: document.getElementById('dmTo').value,
+      subject: document.getElementById('dmSubj').value,
+      body: document.getElementById('dmBody').value
+    });
+    this.openInboxModal();
+  },
 
   dict: [
     ['OFISI YA MHASIBU', 'ACCOUNTANT OFFICE'],
@@ -144,7 +192,6 @@ const SGB = {
       node.nodeValue = txt;
     }
   },
-
   logAction(action) {
     const user = this.getUser();
     const logs = JSON.parse(localStorage.getItem('sgb_audit_logs') || '[]');
@@ -179,13 +226,29 @@ const SGB = {
   }
 };
 
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js').catch(() => {});
+}
+
 window.addEventListener('DOMContentLoaded', () => {
+  if (!document.querySelector('link[rel="manifest"]')) {
+    const link = document.createElement('link');
+    link.rel = 'manifest';
+    link.href = 'manifest.json';
+    document.head.appendChild(link);
+  }
+
   const topbar = document.querySelector('.topbar');
   if (topbar) {
+    const netStatus = navigator.onLine
+      ? '<span style="color:#059669;font-size:11px;font-weight:bold;">🟢 Online</span>'
+      : '<span style="color:#d97706;font-size:11px;font-weight:bold;">🟠 Offline Mode</span>';
     const tools = document.createElement('div');
-    tools.style.cssText = 'display:flex; gap:6px; flex-wrap:wrap;';
+    tools.style.cssText = 'display:flex; gap:6px; flex-wrap:wrap; align-items:center;';
     tools.innerHTML = `
-      <button class="btn" style="background:#0284c7;color:#fff;" onclick="SGB.liveRefresh()">🔄 Live Refresh</button>
+      ${netStatus}
+      <button class="btn" style="background:#7c3aed;color:#fff;" onclick="SGB.openInboxModal()">💬 Ujumbe</button>
+      <button class="btn" style="background:#0284c7;color:#fff;" onclick="SGB.liveRefresh()">🔄 Refresh</button>
       <button class="btn" style="background:#d97706;color:#fff;" onclick="SGB.toggleLang()">🌐 SW | EN</button>
       <button class="btn" style="background:#059669;color:#fff;" onclick="SGB.exportBackup()">💾 Backup</button>
       <button class="btn" style="background:#475569;color:#fff;" onclick="SGB.importBackup()">📂 Restore</button>
