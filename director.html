@@ -8,7 +8,7 @@
   <style>
     * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
     body { margin: 0; background: #f1f5f9; display: flex; min-height: 100vh; color: #1e293b; }
-    .sidebar { width: 265px; background: #1e293b; color: white; display: flex; flex-direction: column; padding: 18px 12px; }
+    .sidebar { width: 270px; background: #1e293b; color: white; display: flex; flex-direction: column; padding: 18px 12px; }
     .sidebar h2 { font-size: 15px; margin: 0 0 4px; color: #fbbf24; text-align: center; }
     .sidebar p { font-size: 11px; text-align: center; color: #cbd5e1; margin: 0 0 18px; }
     .menu-btn { background: transparent; border: none; color: #e2e8f0; text-align: left; padding: 10px 12px; border-radius: 8px; cursor: pointer; font-size: 13px; margin-bottom: 4px; }
@@ -16,14 +16,15 @@
     .main { flex: 1; display: flex; flex-direction: column; }
     .topbar { background: white; padding: 14px 22px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
     .content { padding: 22px; }
-    .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-bottom: 18px; }
+    .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px; margin-bottom: 18px; }
     .card { background: white; padding: 16px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border-left: 4px solid #0284c7; }
     .card h4 { margin: 0 0 5px; font-size: 11px; color: #64748b; text-transform: uppercase; }
-    .card .val { font-size: 19px; font-weight: bold; color: #0f172a; }
+    .card .val { font-size: 18px; font-weight: bold; color: #0f172a; }
     .panel { background: white; padding: 18px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 18px; }
     input, textarea { padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; width: 100%; }
-    table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 13px; }
-    th, td { padding: 9px; border-bottom: 1px solid #e2e8f0; text-align: left; }
+    table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 12.5px; }
+    th, td { padding: 8px; border: 1px solid #e2e8f0; text-align: left; }
+    th { background: #f8fafc; color: #0f172a; }
     .btn { padding: 8px 14px; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold; background: #0284c7; color: white; }
     .logout-btn { background: #dc2626; color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: bold; margin-top: auto; }
   </style>
@@ -32,14 +33,15 @@
 <div class="sidebar">
   <h2>MKURUGENZI (DIRECTOR)</h2>
   <p>Executive Overview | Sangabuye</p>
-  <button class="menu-btn active" onclick="openTab('exec', this)">📊 Takwimu Kuu za Fedha & Shule</button>
-  <button class="menu-btn" onclick="openTab('board', this)">📁 Kumbukumbu za Bodi ya Shule</button>
+  <button class="menu-btn active" onclick="openTab('exec', this)">📊 1. Afya ya Fedha & Mali (Assets)</button>
+  <button class="menu-btn" onclick="openTab('acad_hr', this)">🎓 2. Takwimu za Taaluma & Watumishi</button>
+  <button class="menu-btn" onclick="openTab('board', this)">📁 3. Kumbukumbu za Bodi ya Shule</button>
   <button class="logout-btn" onclick="SGB.logout()">🚪 Toka (Logout)</button>
 </div>
 <div class="main">
   <div class="topbar">
-    <div><strong id="tabTitle">📊 Takwimu Kuu za Fedha & Shule</strong></div>
-    <button class="btn" onclick="document.querySelector('.menu-btn.active').click()">🔄 Live Refresh</button>
+    <div><strong id="tabTitle">📊 1. Afya ya Fedha & Mali (Assets)</strong> <span id="syncTime" style="font-size:11px; color:#0284c7;"></span></div>
+    <div></div>
   </div>
   <div class="content" id="viewArea"></div>
 </div>
@@ -50,27 +52,54 @@
   function openTab(tab, btn) {
     document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('active'));
     if (btn) btn.classList.add('active');
+    if (btn) document.getElementById('tabTitle').innerText = btn.innerText;
     const area = document.getElementById('viewArea');
 
     if (tab === 'exec') {
       const recs = SGB.select('accounting_receipts');
       const vchs = SGB.select('expense_vouchers');
-      const users = SGB.select('users_profile');
+      const pays = SGB.select('staff_payroll');
+      const assets = SGB.select('fixed_assets');
       const procs = SGB.select('procurement_committee');
-      const income = recs.reduce((s, r) => s + Number(r.amount_paid), 0);
-      const expense = vchs.reduce((s, v) => s + Number(v.amount), 0);
+
+      const crdb = recs.filter(r => r.payment_method === 'CRDB_Bank').reduce((s, r) => s + Number(r.amount_paid), 0);
+      const cash = recs.filter(r => r.payment_method === 'Cash').reduce((s, r) => s + Number(r.amount_paid), 0);
+      const expense = vchs.reduce((s, v) => s + Number(v.amount), 0) + pays.reduce((s, p) => s + Number(p.net_pay), 0);
+      const assetVal = assets.reduce((s, a) => s + Number(a.val), 0);
 
       area.innerHTML = `
         <div class="cards">
-          <div class="card" style="border-color:#059669;"><h4>Jumla ya Mapato (CRDB & Cash)</h4><div class="val">TZS ${income.toLocaleString()}</div></div>
-          <div class="card" style="border-color:#dc2626;"><h4>Jumla ya Matumizi</h4><div class="val">TZS ${expense.toLocaleString()}</div></div>
-          <div class="card"><h4>Wanafunzi Waliosajiliwa</h4><div class="val">${users.filter(u => u.role === 'student').length}</div></div>
-          <div class="card"><h4>Watumishi & Walimu</h4><div class="val">${users.filter(u => u.role !== 'student' && u.role !== 'parent').length}</div></div>
+          <div class="card" style="border-color:#059669;"><h4>Mapato CRDB (0150838972100)</h4><div class="val">TZS ${crdb.toLocaleString()}</div></div>
+          <div class="card" style="border-color:#059669;"><h4>Mapato Cash</h4><div class="val">TZS ${cash.toLocaleString()}</div></div>
+          <div class="card" style="border-color:#dc2626;"><h4>Matumizi & Mishahara</h4><div class="val">TZS ${expense.toLocaleString()}</div></div>
+          <div class="card" style="border-color:#d97706;"><h4>Thamani ya Mali (Fixed Assets)</h4><div class="val">TZS ${assetVal.toLocaleString()}</div></div>
         </div>
         <div class="panel">
-          <h3>Nakala za Maamuzi ya Kamati ya Manunuzi</h3>
-          <table><tr><th>Kikao</th><th>Bajeti (TZS)</th><th>Hali ya Idhini</th><th>Maoni ya Mkuu wa Shule</th></tr>
+          <h3>Nakala za Maamuzi ya Kamati ya Manunuzi & Idhini Kubwa</h3>
+          <table><tr><th>Kikao / Manunuzi</th><th>Bajeti (TZS)</th><th>Hali ya Idhini</th><th>Maoni ya Mkuu wa Shule</th></tr>
           ${procs.map(p => `<tr><td><b>${p.meeting_title}</b></td><td>${Number(p.estimated_budget).toLocaleString()}</td><td><b>${p.status}</b></td><td>${p.hm_comments || '-'}</td></tr>`).join('') || '<tr><td colspan="4">Hakuna kumbukumbu za manunuzi bado.</td></tr>'}
+          </table>
+        </div>`;
+    }
+
+    if (tab === 'acad_hr') {
+      const users = SGB.select('users_profile');
+      const maps = SGB.select('student_subjects');
+      const marks = SGB.select('exam_results');
+      const boys = maps.filter(m => m.sex === 'M').length;
+      const girls = maps.filter(m => m.sex === 'F').length;
+
+      area.innerHTML = `
+        <div class="cards">
+          <div class="card"><h4>Wanafunzi Waliosajiliwa</h4><div class="val">${users.filter(u => u.role === 'student').length}</div></div>
+          <div class="card"><h4>Uwiano wa Kijinsia (M / F)</h4><div class="val">Wavulana: ${boys} | Wasichana: ${girls}</div></div>
+          <div class="card" style="border-color:#059669;"><h4>Watumishi & Walimu</h4><div class="val">${users.filter(u => u.role !== 'student' && u.role !== 'parent').length}</div></div>
+          <div class="card"><h4>Rekodi za Mitihani</h4><div class="val">${marks.length}</div></div>
+        </div>
+        <div class="panel">
+          <h3>Rejista ya Mali za Kudumu za Shule (Fixed Assets Summary)</h3>
+          <table><tr><th>Mali</th><th>Idara</th><th>Thamani (TZS)</th></tr>
+          ${SGB.select('fixed_assets').map(a => `<tr><td><b>${a.name}</b></td><td>${a.dept}</td><td>${Number(a.val).toLocaleString()}</td></tr>`).join('') || '<tr><td colspan="3">Hakuna mali zilizosajiliwa bado.</td></tr>'}
           </table>
         </div>`;
     }
