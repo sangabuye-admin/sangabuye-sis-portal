@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Moduli ya Maktaba (Library) | Sangabuye SIS Portal</title>
+  <script src="core.js"></script>
+  <style>
+    * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
+    body { margin: 0; background: #f1f5f9; display: flex; min-height: 100vh; color: #1e293b; }
+    .sidebar { width: 265px; background: #312e81; color: white; display: flex; flex-direction: column; padding: 18px 12px; }
+    .sidebar h2 { font-size: 15px; margin: 0 0 4px; color: #fde68a; text-align: center; }
+    .sidebar p { font-size: 11px; text-align: center; color: #c7d2fe; margin: 0 0 18px; }
+    .menu-btn { background: transparent; border: none; color: #e0e7ff; text-align: left; padding: 10px 12px; border-radius: 8px; cursor: pointer; font-size: 13px; margin-bottom: 4px; }
+    .menu-btn:hover, .menu-btn.active { background: #4f46e5; color: white; font-weight: bold; }
+    .main { flex: 1; display: flex; flex-direction: column; }
+    .topbar { background: white; padding: 14px 22px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
+    .content { padding: 22px; }
+    .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-bottom: 18px; }
+    .card { background: white; padding: 15px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border-left: 4px solid #4f46e5; }
+    .card h4 { margin: 0 0 5px; font-size: 11px; color: #64748b; text-transform: uppercase; }
+    .card .val { font-size: 18px; font-weight: bold; color: #312e81; }
+    .panel { background: white; padding: 18px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 18px; }
+    input, select { padding: 9px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; width: 100%; }
+    table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 12.5px; }
+    th, td { padding: 8px; border: 1px solid #e2e8f0; text-align: left; }
+    th { background: #f8fafc; color: #312e81; }
+    .btn { padding: 7px 12px; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold; }
+    .btn-indigo { background: #4f46e5; color: white; }
+    .btn-green { background: #059669; color: white; }
+    .btn-amber { background: #d97706; color: white; }
+    .logout-btn { background: #dc2626; color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: bold; margin-top: auto; }
+  </style>
+</head>
+<body>
+
+<div class="sidebar">
+  <h2>MAKTABA YA SHULE</h2>
+  <p>Sangabuye Sec | Library System</p>
+  <button class="menu-btn active" onclick="openTab('issue_return', this)">📖 1. Azimisha & Rudisha Vitabu</button>
+  <button class="menu-btn" onclick="openTab('catalog', this)">📚 2. Katalogi & Stoo ya Vitabu</button>
+  <button class="menu-btn" onclick="openTab('lib_clearance', this)">✅ 3. Clearance ya Maktaba</button>
+  <button class="logout-btn" onclick="SGB.logout()">🚪 Toka (Logout)</button>
+</div>
+
+<div class="main">
+  <div class="topbar">
+    <div><strong id="tabTitle">📖 1. Azimisha & Rudisha Vitabu</strong> <span id="syncTime" style="font-size:11px; color:#4f46e5;"></span></div>
+    <div></div>
+  </div>
+  <div class="content" id="viewArea"></div>
+  <datalist id="stList"></datalist>
+</div>
+
+<script>
+  const user = SGB.requireRole(['librarian', 'super_admin']);
+  SGB.startSessionTimer();
+
+  function updateNames() {
+    const names = new Set();
+    SGB.select('users_profile').filter(u => u.role === 'student').forEach(u => names.add(u.full_name));
+    document.getElementById('stList').innerHTML = Array.from(names).map(n => `<option value="${n}">`).join('');
+  }
+
+  function openTab(tab, btn) {
+    document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+    if (btn) document.getElementById('tabTitle').innerText = btn.innerText;
+    updateNames();
+    const area = document.getElementById('viewArea');
+
+    if (tab === 'issue_return') {
+      const loans = SGB.select('library_loans');
+      const books = SGB.select('library_catalog');
+      const activeLoans = loans.filter(l => l.status.includes('Ameazima')).length;
+
+      area.innerHTML = `
+        <div class="cards">
+          <div class="card"><h4>Vitabu Vilivyoazimwa</h4><div class="val">${activeLoans}</div></div>
+          <div class="card" style="border-color:#059669;"><h4>Kumbukumbu Zote</h4><div class="val">${loans.length}</div></div>
+          <div class="card" style="border-color:#d97706;"><h4>Aina za Vitabu Katalogi</h4><div class="val">${books.length}</div></div>
+        </div>
+        <div class="panel">
+          <h3>1. Azimisha Kitabu Kwa Mwanafunzi / Mwalimu</h3>
+          <form onsubmit="issueBook(event)" style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:10px; margin-bottom:15px;">
+            <input type="text" id="lnSt" list="stList" required placeholder="Jina la Mwanafunzi / Mwalimu">
+            <input type="text" id="lnBook" list="bkList" required placeholder="Jina la Kitabu & Namba (ISBN)">
+            <datalist id="bkList">${books.map(b => `<option value="${b.title} (${b.isbn})">`).join('')}</datalist>
+            <input type="date" id="lnDue" required title="Tarehe ya Kurudisha">
+            <button type="submit" class="btn btn-indigo">📖 Azimisha Kitabu Sasa</button>
+          </form>
+
+          <h3>2. Orodha ya Vitabu Vilivyoazimwa (Issue & Return Log)</h3>
+          <table><tr><th>Mwanafunzi</th><th>Kitabu</th><th>Tarehe ya Kurudisha</th><th>Hali</th><th>Hatua</th></tr>
+          ${loans.map(l => {
+            const remindMsg = `SANGABUYE LIBRARY: Mzazi wa ${l.student_name}, mwanao anadaiwa kurudisha kitabu cha maktaba (${l.book}) kilichopaswa kurudi ${l.due_date || '-'}.`;
+            return `<tr><td><b>${l.student_name}</b></td><td>${l.book}</td><td>${l.due_date || '-'}</td><td><b>${l.status}</b></td>
+            <td>
+              ${l.status.includes('Ameazima') ? `
+                <button class="btn btn-green" onclick="SGB.update('library_loans', ${l.id}, {status:'Amerudisha (Returned)'}); openTab('issue_return')">✅ Amerudisha</button>
+                <button class="btn btn-amber" onclick="SGB.sendWhatsApp('', '${remindMsg}')">💬 Kumbusha WA</button>
+              ` : '✓ Imekamilika'}
+            </td></tr>`;
+          }).join('') || '<tr><td colspan="5">Hakuna kitabu kilichoazimwa bado.</td></tr>'}
+          </table>
+        </div>`;
+    }
+
+    if (tab === 'catalog') {
+      const books = SGB.select('library_catalog');
+      area.innerHTML = `
+        <div class="panel">
+          <h3>Sajili Vitabu Vipya Kwenye Maktaba (Book Inventory & Catalog)</h3>
+          <form onsubmit="addCatalogBook(event)" style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:10px; margin-bottom:15px;">
+            <input type="text" id="bkTitle" required placeholder="Jina la Kitabu (Mfano: Physics Form 3 TIE)">
+            <input type="text" id="bkSubj" required placeholder="Somo / Kundi (Mfano: Physics)">
+            <input type="text" id="bkIsbn" required placeholder="Namba ya Kitabu / ISBN">
+            <input type="number" id="bkCopies" required placeholder="Idadi ya Nakala (Copies)">
+            <button type="submit" class="btn btn-green" style="grid-column: span 4;">📚 Hifadhi Kwenye Katalogi ya Maktaba</button>
+          </form>
+          <table><tr><th>Jina la Kitabu</th><th>Somo</th><th>ISBN / Msimbo</th><th>Jumla ya Nakala</th></tr>
+          ${books.map(b => `<tr><td><b>${b.title}</b></td><td>${b.subject}</td><td>${b.isbn}</td><td><b>${b.copies}</b></td></tr>`).join('') || '<tr><td colspan="4">Hakuna vitabu vilivyosajiliwa kwenye katalogi bado.</td></tr>'}
+          </table>
+        </div>`;
+    }
+
+    if (tab === 'lib_clearance') {
+      area.innerHTML = `
+        <div class="panel">
+          <h3>Uhakiki wa Madeni ya Vitabu (Library Clearance Check)</h3>
+          <div style="display:flex; gap:10px; max-width:450px;">
+            <input type="text" id="libClrName" list="stList" placeholder="Andika jina la mwanafunzi...">
+            <button class="btn btn-indigo" onclick="checkLibClearance()">🔍 Hakiki Maktaba</button>
+          </div>
+          <div id="libClrOut" style="margin-top:15px;"></div>
+        </div>`;
+    }
+  }
+
+  function issueBook(e) {
+    e.preventDefault();
+    SGB.insert('library_loans', {
+      student_name: document.getElementById('lnSt').value.trim(),
+      book: document.getElementById('lnBook').value.trim(),
+      due_date: document.getElementById('lnDue').value,
+      status: 'Ameazima (Borrowed)'
+    });
+    openTab('issue_return');
+  }
+
+  function addCatalogBook(e) {
+    e.preventDefault();
+    SGB.insert('library_catalog', {
+      title: document.getElementById('bkTitle').value.trim(),
+      subject: document.getElementById('bkSubj').value.trim(),
+      isbn: document.getElementById('bkIsbn').value.trim(),
+      copies: Number(document.getElementById('bkCopies').value)
+    });
+    openTab('catalog');
+  }
+
+  function checkLibClearance() {
+    const name = document.getElementById('libClrName').value.trim();
+    const unreturned = SGB.select('library_loans').filter(l => l.student_name.toLowerCase() === name.toLowerCase() && l.status.includes('Ameazima'));
+    document.getElementById('libClrOut').innerHTML = unreturned.length
+      ? `<div style="padding:12px;background:#fee2e2;color:#991b1b;border-radius:8px;">❌ <b>HAJAKAMILISHA CLEARANCE:</b> ${name} bado anadaiwa kitabu: <b>${unreturned.map(x=>x.book).join(', ')}</b></div>`
+      : `<div style="padding:12px;background:#dcfce7;color:#166534;border-radius:8px;">✅ <b>AMEKAMILISHA CLEARANCE YA MAKTABA:</b> ${name} hana deni lolote la kitabu.</div>`;
+  }
+
+  openTab('issue_return', document.querySelector('.menu-btn'));
+</script>
+</body>
+</html>
