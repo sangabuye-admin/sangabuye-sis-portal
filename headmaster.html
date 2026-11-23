@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ofisi ya Mkuu wa Shule | Sangabuye SIS Portal</title>
-  <script src="core.js"></script>
+  <script src="core.js?v=6.6"></script>
   <style>
     * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
     body { margin: 0; background: #f1f5f9; display: flex; min-height: 100vh; color: #1e293b; }
@@ -45,7 +45,6 @@
   <button class="menu-btn" onclick="openTab('letters_news', this)">📜 6. Barua Rasmi PDF, Marks & Matangazo</button>
   <button class="logout-btn" onclick="SGB.logout()">🚪 Toka (Logout)</button>
 </div>
-
 <div class="main">
   <div class="topbar">
     <div><strong id="tabTitle">✅ 1. Manunuzi, Vocha & Kufungua Hesabu</strong> <span id="syncTime" style="font-size:11px; color:#059669;"></span></div>
@@ -67,13 +66,6 @@
       const procs = SGB.select('procurement_committee');
       const vchs = SGB.select('expense_vouchers');
       const locks = SGB.select('account_locks').filter(l => l.status === 'Locked');
-                       <b>${p.status}</b><br><br>
-                ${!isAllApproved ? `
-                  <button class="btn btn-green" onclick="approveAllProc(${p.id})">✅ Approve Yote</button>
-                  <button class="btn btn-red" onclick="rejectAllProc(${p.id})">❌ Reject Yote</button>
-                ` : (user.role === 'super_admin'
-                  ? `<span style="color:#059669;font-weight:bold;">✅ Imeidhinishwa</span><br><button class="btn btn-red" style="margin-top:4px;" onclick="rejectAllProc(${p.id})">↩️ Admin Override (Rejesha)</button>`
-                  : `<span style="color:#059669;font-weight:bold;">🔒 Imeidhinishwa (Imefungwa)</span>`)}
 
       area.innerHTML = `
         <div class="cards">
@@ -83,13 +75,20 @@
         </div>
 
         <div class="panel">
-          <h3>1. Kamati ya Manunuzi (Idhinisha Yote, Rejesha Hitaji Moja, au Rejesha Yote)</h3>
+          <h3>1. Kamati ya Manunuzi (Approve Hitaji Moja Moja au Yote)</h3>
           <table><tr><th>Kikao & Wajumbe</th><th>Chanzo</th><th>Mahitaji (Kipimo, Idadi & Gharama)</th><th>Bajeti (TZS)</th><th>Hatua ya Mkuu wa Shule</th></tr>
           ${procs.map(p => {
+            const isAllApproved = p.status === 'Approved' || p.status === 'Paid';
             const itemsHtml = (p.items || []).map((it, idx) => `
               <div style="border-bottom:1px dashed #cbd5e1; padding:4px 0; font-size:11.5px;">
                 • <b>${it.name}</b>: ${it.qty} ${it.unit} @ ${Number(it.price).toLocaleString()} = <b>${Number(it.total).toLocaleString()}</b>
-                ${it.rejected ? `<span style="color:#dc2626;"> [❌ Imerejeshwa: ${it.hm_note}]</span>` : `<button class="btn btn-amber" style="padding:2px 6px; font-size:10px; margin-left:6px;" onclick="rejectSingleProcItem(${p.id}, ${idx})">↩️ Rejesha Hitaji Hili</button>`}
+                ${it.approved || isAllApproved
+                  ? `<span style="color:#059669; font-weight:bold; margin-left:6px;">[✅ APPROVED]</span>`
+                  : it.rejected
+                    ? `<span style="color:#dc2626; font-weight:bold; margin-left:6px;">[❌ Imerejeshwa: ${it.hm_note}]</span>`
+                    : `<button class="btn btn-green" style="padding:2px 6px; font-size:10px; margin-left:6px;" onclick="approveSingleProcItem(${p.id}, ${idx})">✅ Approve</button>
+                       <button class="btn btn-amber" style="padding:2px 6px; font-size:10px; margin-left:4px;" onclick="rejectSingleProcItem(${p.id}, ${idx})">↩️ Rejesha Hitaji Hili</button>`
+                }
               </div>`).join('');
 
             return `<tr>
@@ -99,8 +98,12 @@
               <td><b>${Number(p.estimated_budget).toLocaleString()}</b></td>
               <td>
                 <b>${p.status}</b><br><br>
-                <button class="btn btn-green" onclick="approveAllProc(${p.id})">✅ Approve Yote</button>
-                <button class="btn btn-red" onclick="rejectAllProc(${p.id})">❌ Reject Yote</button>
+                ${!isAllApproved ? `
+                  <button class="btn btn-green" onclick="approveAllProc(${p.id})">✅ Approve Yote</button>
+                  <button class="btn btn-red" onclick="rejectAllProc(${p.id})">❌ Reject Yote</button>
+                ` : (user && user.role === 'super_admin'
+                  ? `<span style="color:#059669;font-weight:bold;">✅ Imeidhinishwa</span><br><button class="btn btn-red" style="margin-top:4px;" onclick="rejectAllProc(${p.id})">↩️ Admin Override</button>`
+                  : `<span style="color:#059669;font-weight:bold;">🔒 Imeidhinishwa (Imefungwa)</span>`)}
               </td>
             </tr>`;
           }).join('') || '<tr><td colspan="5">Hakuna maombi ya manunuzi bado.</td></tr>'}
@@ -108,18 +111,22 @@
         </div>
 
         <div class="panel">
-          <h3>2. Idhinisha Vocha za Matumizi ya Kawaida</h3>
-          <table><tr><th>Vocha</th><th>Maelezo</th><th>Chanzo</th><th>Kiasi (TZS)</th><th>Hali</th><th>Hatua</th></tr>
-          ${vchs.map(v => `<tr><td><b>${v.voucher_no}</b></td><td>${v.description}</td><td>${v.source_fund || 'Kutwa'}</td><td><b>${Number(v.amount).toLocaleString()}</b></td><td><b>${v.status || 'Paid'}</b></td>
-          <td>${v.status === 'Pending HM Approval' ? `<button class="btn btn-green" onclick="SGB.update('expense_vouchers', ${v.id}, {status:'Approved'}); openTab('approvals')">✅ Idhinisha</button> <button class="btn btn-red" onclick="SGB.update('expense_vouchers', ${v.id}, {status:'Rejected'}); openTab('approvals')">❌ Kataa</button>` : '✓ Imeshughulikiwa'}</td></tr>`).join('') || '<tr><td colspan="6">Hakuna vocha bado.</td></tr>'}
+          <h3>2. Idhinisha Vocha za Matumizi (FFARS)</h3>
+          <table><tr><th>PV #</th><th>Mlipwaji</th><th>Maelezo</th><th>Chanzo</th><th>Kiasi (TZS)</th><th>Hali</th><th>Hatua</th></tr>
+          ${vchs.map(v => `<tr><td><b>${v.voucher_no}</b></td><td>${v.payee_name || '-'}</td><td>${v.description}</td><td>${v.source_fund || 'Kutwa'}</td><td><b>${Number(v.amount).toLocaleString()}</b></td><td><b>${v.status || 'Paid'}</b></td>
+          <td>${v.status === 'Pending HM Approval' ? `<button class="btn btn-green" onclick="SGB.update('expense_vouchers', '${v.id}', {status:'Approved'}); openTab('approvals')">✅ Idhinisha</button> <button class="btn btn-red" onclick="SGB.update('expense_vouchers', '${v.id}', {status:'Rejected'}); openTab('approvals')">❌ Kataa</button>` : '✓ Imeshughulikiwa'}</td></tr>`).join('') || '<tr><td colspan="7">Hakuna vocha bado.</td></tr>'}
           </table>
         </div>
 
         <div class="panel" style="border-left:4px solid #dc2626;">
-          <h3>3. Kufungua Hesabu Zilizofungwa na Mhasibu (Unlock Accounting Periods)</h3>
-          <table><tr><th>Kipindi</th><th>Kuanzia</th><th>Hadi</th><th>Ombi la Mhasibu</th><th>Hatua</th></tr>
-          ${locks.map(l => `<tr><td><b>${l.label}</b></td><td>${l.start_date}</td><td>${l.end_date}</td><td>${l.unlock_requested ? '📩 Ameomba Kufunguliwa' : 'Imefungwa'}</td>
-          <td><button class="btn btn-green" onclick="SGB.update('account_locks', ${l.id}, {status:'Unlocked'}); alert('🔓 Hesabu zimefunguliwa!'); openTab('approvals')">🔓 Fungua Hesabu</button></td></tr>`).join('') || '<tr><td colspan="5">Hakuna kipindi kilichofungwa kwa sasa.</td></tr>'}
+          <h3>3. Kufungua Hesabu Zilizofungwa na Mhasibu</h3>
+          <table><tr><th>Kipindi</th><th>Mapato / Matumizi / Salio</th><th>Ombi la Mhasibu</th><th>Hatua</th></tr>
+          ${locks.map(l => `<tr>
+            <td><b>${l.label}</b><br><small>${l.start_date} hadi ${l.end_date}</small></td>
+            <td>Mapato: <b>${Number(l.period_in||0).toLocaleString()}</b> | Matumizi: <b>${Number(l.period_out||0).toLocaleString()}</b> | Salio: <b>${Number(l.period_bal||0).toLocaleString()}</b></td>
+            <td>${l.unlock_requested ? '<span style="color:#d97706;font-weight:bold;">📩 Ameomba Kufunguliwa</span>' : 'Imefungwa'}</td>
+            <td><button class="btn btn-green" onclick="SGB.update('account_locks', ${l.id}, {status:'Unlocked', unlock_requested:false}); alert('🔓 Hesabu zimefunguliwa!'); openTab('approvals')">🔓 Fungua Hesabu</button></td>
+          </tr>`).join('') || '<tr><td colspan="4">Hakuna kipindi kilichofungwa kwa sasa.</td></tr>'}
           </table>
         </div>`;
     }
@@ -128,7 +135,7 @@
       const staff = SGB.select('staff_payroll');
       area.innerHTML = `
         <div class="panel">
-          <h3>1. Weka Kiwango cha Malipo ya Mtumishi (Bila Makato — Fixed Gross Rate)</h3>
+          <h3>1. Weka Kiwango cha Malipo ya Mtumishi (Bila Makato)</h3>
           <form onsubmit="hmSetStaffRate(event)" style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:10px; margin-bottom:15px;">
             <input type="text" id="hmPyName" required placeholder="Jina la Mtumishi">
             <input type="text" id="hmPyJob" required placeholder="Kazi Anayoifanya">
@@ -138,27 +145,23 @@
               <option value="Kambi ya Masomo">Chanzo: Kambi ya Masomo</option>
             </select>
             <input type="number" id="hmPyAmt" required placeholder="Kiwango cha Malipo (TZS)">
-            <button type="submit" class="btn btn-blue" style="grid-column: span 4;">💾 Weka Kiwango & Tuma Kwa Mhasibu (Pre-Audited)</button>
+            <button type="submit" class="btn btn-blue" style="grid-column: span 4;">💾 Weka Kiwango & Tuma Kwa Mhasibu</button>
           </form>
 
           <h3>2. Fanya Pre-Audit ya Mishahara (Mtumishi Mmoja Mmoja au Wote)</h3>
           <button class="btn btn-green" style="margin-bottom:10px;" onclick="preAuditAllStaff()">✅ Pre-Audit & Approve Watumishi Wote</button>
           <table><tr><th>Mtumishi</th><th>Kazi</th><th>Chanzo</th><th>Gross</th><th>Makato</th><th>Net Pay</th><th>Hali</th><th>Pre-Audit ya Mkuu</th></tr>
           ${staff.map(s => `<tr>
-            <td><b>${s.name}</b></td>
-            <td>${s.job_title || '-'}</td>
-            <td>${s.source_fund || 'Kutwa'}</td>
-            <td>${Number(s.gross).toLocaleString()}</td>
-            <td>${(Number(s.nssf || 0) + Number(s.paye || 0)).toLocaleString()}</td>
-            <td><b>${Number(s.net_pay).toLocaleString()}</b></td>
-            <td><b>${s.status}</b></td>
+            <td><b>${s.name}</b></td><td>${s.job_title || '-'}</td><td>${s.source_fund || 'Kutwa'}</td>
+            <td>${Number(s.gross).toLocaleString()}</td><td>${(Number(s.nssf || 0) + Number(s.paye || 0)).toLocaleString()}</td>
+            <td><b>${Number(s.net_pay).toLocaleString()}</b></td><td><b>${s.status}</b></td>
             <td>
               ${s.status !== 'Paid' ? `
                 <button class="btn btn-green" onclick="SGB.update('staff_payroll', ${s.id}, {status:'Pre-Audited & Approved', hm_note:''}); openTab('payroll_audit')">✅ Approve</button>
                 <button class="btn btn-amber" onclick="returnStaffPay(${s.id})">↩️ Rudisha</button>
               ` : '💵 Amelipwa'}
             </td>
-          </tr>`).join('') || '<tr><td colspan="8">Hakuna orodha ya mishahara kutoka kwa Mhasibu bado.</td></tr>'}
+          </tr>`).join('') || '<tr><td colspan="8">Hakuna orodha ya mishahara bado.</td></tr>'}
           </table>
         </div>`;
     }
@@ -169,8 +172,8 @@
           <h3>Toa Kibali Kipya cha Mwanafunzi Kutoka Nje ya Shule (Gate Pass + QR)</h3>
           <form onsubmit="issueGatePass(event)" style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:15px;">
             <input type="text" id="gpName" required placeholder="Jina Kamili la Mwanafunzi">
-            <input type="text" id="gpClass" required placeholder="Kidato/Mkondo (Mfano: Form 3B)">
-            <input type="text" id="gpReason" required placeholder="Sababu (Matibabu / Ruhusa ya Mzazi)">
+            <input type="text" id="gpClass" required placeholder="Kidato/Mkondo">
+            <input type="text" id="gpReason" required placeholder="Sababu">
             <button type="submit" class="btn btn-green" style="grid-column: span 3;">🛂 Idhinisha Kibali & Zalisha QR Code</button>
           </form>
           <div id="gpSlipArea" style="margin-bottom:15px;"></div>
@@ -185,11 +188,11 @@
       const cases = SGB.select('discipline_health');
       area.innerHTML = `
         <div class="panel">
-          <h3>Rekodi ya Kesi za Nidhamu & Matibabu ya Zahanati (Sickbay)</h3>
+          <h3>Rekodi ya Kesi za Nidhamu & Matibabu ya Zahanati</h3>
           <form onsubmit="addDiscHealth(event)" style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:15px;">
             <input type="text" id="dhName" required placeholder="Jina la Mwanafunzi">
-            <select id="dhType"><option value="Nidhamu (Discipline)">Nidhamu (Discipline)</option><option value="Afya / Zahanati (Sickbay)">Afya / Zahanati (Sickbay)</option></select>
-            <input type="text" id="dhNote" required placeholder="Maelezo ya Tukio / Matibabu / Adhabu">
+            <select id="dhType"><option value="Nidhamu (Discipline)">Nidhamu</option><option value="Afya / Zahanati (Sickbay)">Afya / Zahanati</option></select>
+            <input type="text" id="dhNote" required placeholder="Maelezo">
             <button type="submit" class="btn btn-blue" style="grid-column: span 3;">💾 Hifadhi Kumbukumbu</button>
           </form>
           <table><tr><th>Mwanafunzi</th><th>Aina</th><th>Maelezo</th><th>Tarehe</th></tr>
@@ -205,82 +208,88 @@
       results.forEach(r => {
         const t = r.teacher || 'Mwalimu';
         if (!kpiMap[t]) kpiMap[t] = { count: 0, sum: 0 };
-        kpiMap[t].count++;
-        kpiMap[t].sum += Number(r.total_score);
+        kpiMap[t].count++; kpiMap[t].sum += Number(r.total_score);
       });
-
       area.innerHTML = `
         <div class="panel">
-          <h3>1. Mahudhurio ya Watumishi (Staff Attendance & Leave)</h3>
+          <h3>1. Mahudhurio ya Watumishi</h3>
           <form onsubmit="addStaffAtt(event)" style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:15px;">
             <input type="text" id="saName" required placeholder="Jina la Mwalimu / Mtumishi">
-            <select id="saStat"><option value="Yupo Kazini (Present)">Yupo Kazini (Present)</option><option value="Ruhusa (On Leave)">Ruhusa (On Leave)</option><option value="Amechelewa (Late)">Amechelewa (Late)</option></select>
-            <button type="submit" class="btn btn-green">✅ Rekodi Mahudhurio</button>
+            <select id="saStat"><option value="Yupo Kazini (Present)">Yupo Kazini</option><option value="Ruhusa (On Leave)">Ruhusa</option><option value="Amechelewa (Late)">Amechelewa</option></select>
+            <button type="submit" class="btn btn-green">✅ Rekodi</button>
           </form>
           <table><tr><th>Mtumishi</th><th>Hali</th><th>Tarehe</th></tr>
           ${att.map(a => `<tr><td><b>${a.name}</b></td><td>${a.status}</td><td>${a.created_at}</td></tr>`).join('')}
           </table>
         </div>
         <div class="panel">
-          <h3>2. Tathmini ya Ufaulu wa Masomo ya Walimu (Teacher Performance KPIs)</h3>
-          <table><tr><th>Mwalimu</th><th>Idadi ya Alama Zilizotumwa</th><th>Wastani wa Ufaulu (%)</th></tr>
-          ${Object.entries(kpiMap).map(([t, d]) => `<tr><td><b>${t}</b></td><td>${d.count}</td><td><b>${Math.round(d.sum / d.count)}%</b></td></tr>`).join('') || '<tr><td colspan="3">Hakuna alama zilizotumwa bado.</td></tr>'}
+          <h3>2. Ufaulu wa Masomo ya Walimu (KPIs)</h3>
+          <table><tr><th>Mwalimu</th><th>Alama Zilizotumwa</th><th>Wastani (%)</th></tr>
+          ${Object.entries(kpiMap).map(([t, d]) => `<tr><td><b>${t}</b></td><td>${d.count}</td><td><b>${Math.round(d.sum / d.count)}%</b></td></tr>`).join('') || '<tr><td colspan="3">Hakuna alama bado.</td></tr>'}
           </table>
         </div>`;
     }
 
     if (tab === 'letters_news') {
       const exams = SGB.select('exams_list');
-      const news = SGB.select('announcements');
       area.innerHTML = `
         <div class="panel">
-          <h3>1. Jenereta ya Barua Rasmi za Shule (Official Letters PDF + QR)</h3>
+          <h3>1. Barua Rasmi za Shule (A4 PDF + QR)</h3>
           <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px;">
-            <input type="text" id="ltTo" placeholder="Kwa (Mfano: Mzazi wa Amina Hassan / Afisa Elimu)">
-            <input type="text" id="ltSubj" placeholder="Kichwa cha Barua (YAH: WITO WA MZAZI)">
-            <textarea id="ltBody" rows="3" style="grid-column: span 2;" placeholder="Andika maudhui kamili ya barua rasmi hapa..."></textarea>
-            <button class="btn btn-blue" style="grid-column: span 2;" onclick="genOfficialLetter()">📜 Tengeneza Barua Rasmi (A4 PDF)</button>
+            <input type="text" id="ltTo" placeholder="Kwa">
+            <input type="text" id="ltSubj" placeholder="Kichwa cha Barua">
+            <textarea id="ltBody" rows="3" style="grid-column: span 2;" placeholder="Maudhui ya barua..."></textarea>
+            <button class="btn btn-blue" style="grid-column: span 2;" onclick="genOfficialLetter()">📜 Tengeneza Barua (A4 PDF)</button>
           </div>
           <div id="ltOutput"></div>
         </div>
         <div class="panel">
-          <h3>2. Fungua Alama Zilizofungwa (Marks Unlock Override)</h3>
+          <h3>2. Fungua Alama Zilizofungwa</h3>
           <table><tr><th>Mtihani</th><th>Hali</th><th>Hatua</th></tr>
-          ${exams.map(e => `<tr><td><b>${e.title}</b></td><td>${e.status}</td><td><button class="btn btn-amber" onclick="SGB.update('exams_list', ${e.id}, {status:'Open (Imefunguliwa na Mkuu wa Shule)'}); openTab('letters_news')">🔓 Unlock Marks</button></td></tr>`).join('') || '<tr><td colspan="3">Hakuna mitihani bado.</td></tr>'}
+          ${exams.map(e => `<tr><td><b>${e.title}</b></td><td>${e.status}</td><td><button class="btn btn-amber" onclick="SGB.update('exams_list', ${e.id}, {status:'Open'}); openTab('letters_news')">🔓 Unlock</button></td></tr>`).join('') || '<tr><td colspan="3">Hakuna mitihani bado.</td></tr>'}
           </table>
         </div>
         <div class="panel">
-          <h3>3. Tangazo la Shule (Broadcast Kwa Wazazi, Walimu & Wanafunzi)</h3>
+          <h3>3. Tangazo la Shule</h3>
           <form onsubmit="postNews(event)" style="display:grid; gap:10px;">
-            <textarea id="newsTxt" rows="2" required placeholder="Andika tangazo jipya la shule hapa..."></textarea>
-            <button type="submit" class="btn btn-green">📢 Chapisha Tangazo Sasa</button>
+            <textarea id="newsTxt" rows="2" required placeholder="Andika tangazo jipya..."></textarea>
+            <button type="submit" class="btn btn-green">📢 Chapisha Tangazo</button>
           </form>
         </div>`;
     }
   }
+  function approveSingleProcItem(procId, itemIdx) {
+    const proc = SGB.select('procurement_committee').find(p => p.id === procId);
+    if (!proc) return;
+    const updated = proc.items.map((it, i) => i === itemIdx ? { ...it, approved: true, rejected: false, hm_note: '' } : it);
+    const allApproved = updated.every(it => it.approved);
+    SGB.update('procurement_committee', procId, { items: updated, status: allApproved ? 'Approved' : proc.status, hm_comments: allApproved ? '✅ Mahitaji yote yameidhinishwa' : proc.hm_comments });
+    openTab('approvals');
+  }
+
   function rejectSingleProcItem(procId, itemIdx) {
     const proc = SGB.select('procurement_committee').find(p => p.id === procId);
     if (!proc) return;
-    const reason = prompt(`Andika sababu ya kurejesha hitaji "${proc.items[itemIdx].name}" kwa Mhasibu:`);
+    const reason = prompt(`Sababu ya kurejesha "${proc.items[itemIdx].name}":`);
     if (!reason) return;
-    const updated = proc.items.map((it, i) => i === itemIdx ? { ...it, rejected: true, hm_note: reason } : it);
-    SGB.update('procurement_committee', procId, { items: updated, status: 'Rejected (Hitaji Moja Limerejeshwa)', hm_comments: `Hitaji "${proc.items[itemIdx].name}" limerejeshwa: ${reason}` });
+    const updated = proc.items.map((it, i) => i === itemIdx ? { ...it, approved: false, rejected: true, hm_note: reason } : it);
+    SGB.update('procurement_committee', procId, { items: updated, status: 'Rejected (Hitaji Moja Limerejeshwa)', hm_comments: reason });
     openTab('approvals');
   }
 
   function approveAllProc(procId) {
     const proc = SGB.select('procurement_committee').find(p => p.id === procId);
     if (!proc) return;
-    const cleaned = (proc.items || []).map(it => ({ ...it, rejected: false, hm_note: '' }));
-    SGB.update('procurement_committee', procId, { items: cleaned, status: 'Approved', hm_comments: '✅ Imeidhinishwa na Mkuu wa Shule (0784 755 173)' });
+    const cleaned = (proc.items || []).map(it => ({ ...it, approved: true, rejected: false, hm_note: '' }));
+    SGB.update('procurement_committee', procId, { items: cleaned, status: 'Approved', hm_comments: '✅ Imeidhinishwa na Mkuu wa Shule' });
     openTab('approvals');
   }
 
   function rejectAllProc(procId) {
-    const reason = prompt('Andika sababu ya kurejesha manunuzi yote kwa Mhasibu:');
+    const reason = prompt('Sababu ya kurejesha manunuzi yote:');
     if (!reason) return;
     const proc = SGB.select('procurement_committee').find(p => p.id === procId);
-    const marked = (proc.items || []).map(it => ({ ...it, rejected: true, hm_note: reason }));
+    const marked = (proc.items || []).map(it => ({ ...it, approved: false, rejected: true, hm_note: reason }));
     SGB.update('procurement_committee', procId, { items: marked, status: 'Rejected (Yote Yamerejeshwa)', hm_comments: reason });
     openTab('approvals');
   }
@@ -288,61 +297,34 @@
   function hmSetStaffRate(e) {
     e.preventDefault();
     const gross = Number(document.getElementById('hmPyAmt').value);
-    SGB.insert('staff_payroll', {
-      name: document.getElementById('hmPyName').value.trim(),
-      job_title: document.getElementById('hmPyJob').value.trim(),
-      source_fund: document.getElementById('hmPySrc').value,
-      gross,
-      nssf: 0,
-      paye: 0,
-      net_pay: gross,
-      status: 'Pre-Audited & Approved'
-    });
-    alert('✅ Kiwango cha malipo (bila makato) kimewekwa na kutumwa kwa Mhasibu!');
-    openTab('payroll_audit');
+    SGB.insert('staff_payroll', { name: document.getElementById('hmPyName').value.trim(), job_title: document.getElementById('hmPyJob').value.trim(), source_fund: document.getElementById('hmPySrc').value, gross, nssf: 0, paye: 0, net_pay: gross, status: 'Pre-Audited & Approved' });
+    alert('✅ Kiwango kimewekwa na kutumwa kwa Mhasibu!'); openTab('payroll_audit');
   }
 
   function preAuditAllStaff() {
-    SGB.select('staff_payroll').forEach(s => {
-      if (s.status !== 'Paid') SGB.update('staff_payroll', s.id, { status: 'Pre-Audited & Approved', hm_note: '' });
-    });
-    alert('✅ Watumishi wote wamefanyiwa Pre-Audit na kuidhinishwa kwa ajili ya malipo!');
-    openTab('payroll_audit');
+    SGB.select('staff_payroll').forEach(s => { if (s.status !== 'Paid') SGB.update('staff_payroll', s.id, { status: 'Pre-Audited & Approved', hm_note: '' }); });
+    alert('✅ Watumishi wote wameidhinishwa!'); openTab('payroll_audit');
   }
 
   function returnStaffPay(id) {
-    const note = prompt('Andika maelekezo ya marekebisho kwa Mhasibu:');
-    if (note) {
-      SGB.update('staff_payroll', id, { status: 'Returned (Rekebisha)', hm_note: note });
-      openTab('payroll_audit');
-    }
+    const note = prompt('Maelekezo ya marekebisho:');
+    if (note) { SGB.update('staff_payroll', id, { status: 'Returned (Rekebisha)', hm_note: note }); openTab('payroll_audit'); }
   }
+
   function issueGatePass(e) {
     e.preventDefault();
     const gp = SGB.insert('gate_passes', { student_name: document.getElementById('gpName').value, class_name: document.getElementById('gpClass').value, reason: document.getElementById('gpReason').value, status: 'Approved (Mkuu wa Shule)' });
     const qr = SGB.qrImg(`GATEPASS:${gp.student_name}|${gp.created_at}`);
-    document.getElementById('gpSlipArea').innerHTML = `
-      <div id="gpPrint" style="border:2px solid #0f294a; padding:14px; max-width:320px; background:#fff;">
-        <center><b>SANGABUYE SECONDARY SCHOOL</b><br><small>KIBALI CHA KUTOKA NJE YA SHULE (GATE PASS)</small></center><hr>
-        <b>Mwanafunzi:</b> ${gp.student_name} (${gp.class_name})<br><b>Sababu:</b> ${gp.reason}<br><b>Muda:</b> ${gp.created_at}<br><b>Idhini:</b> Mkuu wa Shule (0784 755 173)<hr>
-        <center><img src="${qr}"></center>
-      </div><br><button class="btn btn-blue" onclick="printBox('gpPrint')">🖨️ Chapisha Gate Pass</button>`;
+    document.getElementById('gpSlipArea').innerHTML = `<div id="gpPrint" style="border:2px solid #0f294a; padding:14px; max-width:320px; background:#fff;"><center><b>SANGABUYE SECONDARY SCHOOL</b><br><small>GATE PASS</small></center><hr><b>Mwanafunzi:</b> ${gp.student_name} (${gp.class_name})<br><b>Sababu:</b> ${gp.reason}<br><b>Muda:</b> ${gp.created_at}<hr><center><img src="${qr}"></center></div><br><button class="btn btn-blue" onclick="printBox('gpPrint')">🖨️ Print</button>`;
   }
 
   function addDiscHealth(e) { e.preventDefault(); SGB.insert('discipline_health', { student_name: document.getElementById('dhName').value, type: document.getElementById('dhType').value, note: document.getElementById('dhNote').value }); openTab('discipline_health'); }
   function addStaffAtt(e) { e.preventDefault(); SGB.insert('staff_attendance', { name: document.getElementById('saName').value, status: document.getElementById('saStat').value }); openTab('staff_kpi'); }
 
   function genOfficialLetter() {
-    const to = document.getElementById('ltTo').value;
-    const subj = document.getElementById('ltSubj').value;
-    const body = document.getElementById('ltBody').value;
+    const to = document.getElementById('ltTo').value, subj = document.getElementById('ltSubj').value, body = document.getElementById('ltBody').value;
     const qr = SGB.qrImg(`SANGABUYE-LETTER:${subj}`);
-    document.getElementById('ltOutput').innerHTML = `
-      <div id="ltPrint" style="border:1px solid #000; padding:25px; background:white; line-height:1.6;">
-        <div style="display:flex; justify-content:space-between;"><div><h3>SANGABUYE SECONDARY SCHOOL</h3><p>S.L.P 11898, ILEMELA - MWANZA<br>Simu: 0784 755 173</p></div><img src="${qr}"></div><hr>
-        <p><b>Tarehe:</b> ${new Date().toLocaleDateString('sw-TZ')}</p><p><b>Kwa:</b> ${to}</p><p><b><u>YAH: ${subj.toUpperCase()}</u></b></p>
-        <p>${body.replace(/\n/g, '<br>')}</p><br><p>Wako katika ujenzi wa Taifa,<br><br>_______________________<br><b>MKUU WA SHULE (0784 755 173)</b></p>
-      </div><br><button class="btn btn-blue" onclick="printBox('ltPrint')">🖨️ Pakua Barua (A4 PDF)</button>`;
+    document.getElementById('ltOutput').innerHTML = `<div id="ltPrint" style="border:1px solid #000; padding:25px; background:white; line-height:1.6;"><div style="display:flex; justify-content:space-between;"><div><h3>SANGABUYE SECONDARY SCHOOL</h3><p>S.L.P 11898, ILEMELA - MWANZA | Simu: 0784 755 173</p></div><img src="${qr}"></div><hr><p><b>Tarehe:</b> ${new Date().toLocaleDateString('sw-TZ')}</p><p><b>Kwa:</b> ${to}</p><p><b><u>YAH: ${subj.toUpperCase()}</u></b></p><p>${body.replace(/\n/g, '<br>')}</p><br><p>_______________________<br><b>MKUU WA SHULE (0784 755 173)</b></p></div><br><button class="btn btn-blue" onclick="printBox('ltPrint')">🖨️ Print A4 PDF</button>`;
   }
 
   function postNews(e) { e.preventDefault(); SGB.insert('announcements', { message: document.getElementById('newsTxt').value }); alert('📢 Tangazo limechapishwa!'); e.target.reset(); openTab('letters_news'); }
@@ -350,9 +332,8 @@
   function printBox(id) {
     const html = document.getElementById(id).innerHTML;
     const w = window.open('', '', 'width=750,height=600');
-    w.document.write('<html><head><title>Sangabuye Official Print</title></head><body style="font-family:sans-serif;padding:20px;">' + html + '</body></html>');
-    w.document.close(); w.focus();
-    setTimeout(() => { w.print(); w.close(); }, 300);
+    w.document.write('<html><head><title>Sangabuye Print</title></head><body style="font-family:sans-serif;padding:20px;">' + html + '</body></html>');
+    w.document.close(); w.focus(); setTimeout(() => { w.print(); w.close(); }, 300);
   }
 
   openTab('approvals', document.querySelector('.menu-btn'));
