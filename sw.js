@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sangabuye-sis-v5.6';
+const CACHE_NAME = 'sangabuye-sis-v6.1';
 const ASSETS = [
   './',
   './index.html',
