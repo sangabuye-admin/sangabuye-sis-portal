@@ -1,4 +1,4 @@
-// INJINI KUU YA SANGABUYE SIS PORTAL (v5.4 - SMS, WHATSAPP, PHOTO ENGINE & PWA)
+// INJINI KUU YA SANGABUYE SIS PORTAL (v5.5 - AUTO PHONE LOOKUP, HELP GUIDE & PWA)
 const SGB = {
   lang: localStorage.getItem('sgb_lang') || 'sw',
 
@@ -27,31 +27,55 @@ const SGB = {
     return JSON.parse(localStorage.getItem('sgb_school_config') || '{"year":"2026","term":"Term I","crdb":"0150838972100"}');
   },
 
-  // 1. INJINI YA KUTUMA UJUMBE KWA SMS NA WHATSAPP (1-CLICK SHARE)
-  formatPhone(rawPhone) {
-    let p = (rawPhone || '').replace(/\D/g, '');
-    if (!p) p = (prompt('Ingiza namba ya simu ya Mzazi (Mfano: 0755123456):') || '').replace(/\D/g, '');
+  // 1. TAFUTA NAMBA YA SIMU YA MZAZI KIOTOMATIKI KUTOKA KWENYE UJUMBE
+  findParentPhone(message) {
+    const msgLower = (message || '').toLowerCase();
+    const users = this.select('users_profile');
+    const bus = this.select('school_bus_routes');
+
+    for (const u of users) {
+      if (u.full_name && msgLower.includes(u.full_name.toLowerCase()) && u.phone_number && /\d{9,}/.test(u.phone_number)) {
+        return u.phone_number;
+      }
+    }
+    for (const b of bus) {
+      if (b.student_name && msgLower.includes(b.student_name.toLowerCase()) && b.phone && /\d{9,}/.test(b.phone)) {
+        return b.phone;
+      }
+    }
+    return '';
+  },
+
+  formatPhone(rawPhone, message = '') {
+    let detected = rawPhone || this.findParentPhone(message);
+    let p = (detected || '').replace(/\D/g, '');
+    if (!p) {
+      p = (prompt('Ingiza namba ya simu ya Mzazi (Mfano: 0755123456):') || '').replace(/\D/g, '');
+    } else {
+      const confirmed = prompt('Thibitisha au badilisha namba ya simu ya Mzazi:', detected);
+      if (confirmed === null) return null;
+      p = confirmed.replace(/\D/g, '');
+    }
     if (!p) return null;
     if (p.startsWith('0')) p = '255' + p.slice(1);
     return p;
   },
 
   sendWhatsApp(rawPhone, message) {
-    const phone = this.formatPhone(rawPhone);
+    const phone = this.formatPhone(rawPhone, message);
     if (!phone) return;
     this.insert('comms_logs', { channel: 'WhatsApp', phone, message });
     window.open(`https://wa.me{phone}?text=${encodeURIComponent(message)}`, '_blank');
   },
 
   sendSMS(rawPhone, message) {
-    const phone = this.formatPhone(rawPhone);
+    const phone = this.formatPhone(rawPhone, message);
     if (!phone) return;
     const localNum = phone.startsWith('255') ? '0' + phone.slice(3) : phone;
     this.insert('comms_logs', { channel: 'SMS', phone: localNum, message });
     window.location.href = `sms:${localNum}?body=${encodeURIComponent(message)}`;
   },
 
-  // 2. INJINI YA KUPUNGUZA UKUBWA WA PICHA YA MWANAFUNZI (PHOTO COMPRESSOR)
   compressPhoto(file, callback) {
     if (!file) return;
     const reader = new FileReader();
@@ -131,6 +155,31 @@ const SGB = {
       reader.readAsText(file);
     };
     inp.click();
+  },
+
+  openHelpModal() {
+    let modal = document.getElementById('sgbHelpModal');
+    if (!modal) {
+      modal = document.createElement('div');
+      modal.id = 'sgbHelpModal';
+      modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.55);z-index:10001;display:flex;justify-content:center;align-items:center;padding:15px;';
+      document.body.appendChild(modal);
+    }
+    modal.style.display = 'flex';
+    modal.innerHTML = `
+      <div style="background:#fff;width:100%;max-width:520px;border-radius:12px;padding:20px;max-height:85vh;overflow-y:auto;line-height:1.6;font-size:13px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+          <h3 style="margin:0;color:#0f294a;">❓ Mwongozo wa Haraka — Sangabuye SIS</h3>
+          <button onclick="document.getElementById('sgbHelpModal').style.display='none'" style="background:#dc2626;color:#fff;border:none;padding:5px 10px;border-radius:6px;cursor:pointer;">✕ Funga</button>
+        </div>
+        <p><b>🏫 Shule:</b> Sangabuye Secondary School (S.L.P 11898, Ilemela - Mwanza)</p>
+        <p><b>📞 Mkuu wa Shule:</b> 0784 755 173 | <b>Mhasibu:</b> 0615 000 305</p>
+        <p><b>🏦 Akaunti ya Benki:</b> CRDB <code>0150838972100</code> (SHULE YA SEKONDARI SANGABUYE E.K)</p>
+        <hr>
+        <p><b>1. Kuweka Kwenye Simu Kama App:</b> Kwenye Chrome (Android) bofya vidoti vitatu (⋮) kisha <i>Add to Home screen / Install app</i>. Kwenye iPhone (Safari) bofya <i>Share ➔ Add to Home Screen</i>.</p>
+        <p><b>2. Kazi Bila Mtandao (Offline Mode):</b> Mfumo unaendelea kufanya kazi hata intaneti ikikatika. Tumia kitufe cha <b>💾 Backup</b> kuhifadhi nakala ya kumbukumbu mara kwa mara.</p>
+        <p><b>3. Mawasiliano ya Papo Hapo:</b> Tumia vitufe vya <b>💬 WhatsApp</b> na <b>📲 SMS</b> kutuma risiti, madeni, au matokeo moja kwa moja kwa mzazi.</p>
+      </div>`;
   },
 
   openInboxModal() {
@@ -290,6 +339,7 @@ window.addEventListener('DOMContentLoaded', () => {
     tools.style.cssText = 'display:flex; gap:6px; flex-wrap:wrap; align-items:center;';
     tools.innerHTML = `
       ${netStatus}
+      <button class="btn" style="background:#0f294a;color:#fff;" onclick="SGB.openHelpModal()">❓ Msaada</button>
       <button class="btn" style="background:#7c3aed;color:#fff;" onclick="SGB.openInboxModal()">💬 Ujumbe</button>
       <button class="btn" style="background:#0284c7;color:#fff;" onclick="SGB.liveRefresh()">🔄 Refresh</button>
       <button class="btn" style="background:#d97706;color:#fff;" onclick="SGB.toggleLang()">🌐 SW | EN</button>
