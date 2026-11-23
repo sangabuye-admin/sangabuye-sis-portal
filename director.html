@@ -35,7 +35,7 @@
   <h2>MKURUGENZI (DIRECTOR)</h2>
   <p>Executive Overview | Sangabuye</p>
   <button class="menu-btn active" onclick="openTab('exec', this)">📊 1. Afya ya Fedha, Collection % & Idhini</button>
-  <button class="menu-btn" onclick="openTab('acad_hr', this)">🎓 2. NECTA Division, Uwiano & Mali</button>
+  <button class="menu-btn" onclick="openTab('acad_hr', this)">🎓 2. NECTA Division, Kambi & Top 5</button>
   <button class="menu-btn" onclick="openTab('board', this)">📁 3. Kumbukumbu za Bodi ya Shule</button>
   <button class="logout-btn" onclick="SGB.logout()">🚪 Toka (Logout)</button>
 </div>
@@ -60,12 +60,12 @@
       const recs = SGB.select('accounting_receipts');
       const vchs = SGB.select('expense_vouchers');
       const pays = SGB.select('staff_payroll');
-      const assets = SGB.select('fixed_assets');
       const procs = SGB.select('procurement_committee');
       const stmts = SGB.select('contribution_statements');
 
       const crdb = recs.filter(r => r.payment_method === 'CRDB_Bank').reduce((s, r) => s + Number(r.amount_paid), 0);
       const cash = recs.filter(r => r.payment_method === 'Cash').reduce((s, r) => s + Number(r.amount_paid), 0);
+      const campTotal = recs.filter(r => r.payment_category.toLowerCase().includes('kambi')).reduce((s, r) => s + Number(r.amount_paid), 0);
       const totalIn = crdb + cash;
       const expense = vchs.reduce((s, v) => s + Number(v.amount), 0) + pays.reduce((s, p) => s + Number(p.net_pay), 0);
       const pendingFees = stmts.reduce((s, x) => s + Number(x.balance || 0), 0);
@@ -76,8 +76,8 @@
       area.innerHTML = `
         <div class="cards">
           <div class="card" style="border-color:#059669;"><h4>Mapato CRDB & Cash</h4><div class="val">TZS ${totalIn.toLocaleString()}</div></div>
+          <div class="card" style="border-color:#d97706;"><h4>Makusanyo ya Kambi</h4><div class="val">TZS ${campTotal.toLocaleString()}</div></div>
           <div class="card" style="border-color:#dc2626;"><h4>Matumizi & Mishahara</h4><div class="val">TZS ${expense.toLocaleString()}</div></div>
-          <div class="card" style="border-color:#d97706;"><h4>Madeni (Pending Fees)</h4><div class="val">TZS ${pendingFees.toLocaleString()}</div></div>
           <div class="card"><h4>Ufanisi wa Makusanyo</h4><div class="val">${collRate}% Collected</div></div>
         </div>
         <div class="panel">
@@ -95,7 +95,6 @@
           </table>
         </div>`;
     }
-
     if (tab === 'acad_hr') {
       const users = SGB.select('users_profile');
       const maps = SGB.select('student_subjects');
@@ -116,16 +115,31 @@
         if (agg <= 17) divs.I++; else if (agg <= 21) divs.II++; else if (agg <= 25) divs.III++; else if (agg <= 33) divs.IV++; else divs.O++;
       });
 
+      const top5 = Object.entries(marks.reduce((acc, m) => {
+        if (m.grade === 'X') return acc;
+        if (!acc[m.student_name]) acc[m.student_name] = [];
+        acc[m.student_name].push(Number(m.total_score));
+        return acc;
+      }, {})).map(([name, arr]) => ({ name, avg: (arr.reduce((a,b)=>a+b,0)/arr.length).toFixed(1) }))
+        .sort((a,b) => b.avg - a.avg).slice(0, 5);
+
       area.innerHTML = `
         <div class="cards">
           <div class="card"><h4>Wanafunzi (O & A-Level)</h4><div class="val">${stCount} (M:${boys} | F:${girls})</div></div>
           <div class="card"><h4>Uwiano Walimu:Wanafunzi</h4><div class="val">${ratio}</div></div>
+          <div class="card" style="border-color:#d97706;"><h4>Wanafunzi Kwenye Kambi</h4><div class="val">${SGB.select('camp_students').length}</div></div>
           <div class="card" style="border-color:#059669;"><h4>Thamani ya Mali (Assets)</h4><div class="val">TZS ${assets.reduce((s,a)=>s+Number(a.val),0).toLocaleString()}</div></div>
         </div>
         <div class="panel">
           <h3>Mwenendo wa Ufaulu wa Shule (NECTA Division I–IV Summary)</h3>
           <table><tr><th>Division I</th><th>Division II</th><th>Division III</th><th>Division IV</th><th>Division 0</th></tr>
           <tr><td><b style="color:#059669;">${divs.I}</b></td><td><b>${divs.II}</b></td><td><b>${divs.III}</b></td><td>${divs.IV}</td><td style="color:#dc2626;">${divs.O}</td></tr>
+          </table>
+        </div>
+        <div class="panel">
+          <h3>🏆 Wanafunzi 5 Bora wa Shule (Top 5 Overall Students)</h3>
+          <table><tr><th>Nafasi</th><th>Mwanafunzi</th><th>Wastani (%)</th></tr>
+          ${top5.map((s, i) => `<tr><td><b>#${i+1}</b></td><td><b>${s.name}</b></td><td><b style="color:#059669;">${s.avg}%</b></td></tr>`).join('') || '<tr><td colspan="3">Hakuna matokeo bado.</td></tr>'}
           </table>
         </div>`;
     }
