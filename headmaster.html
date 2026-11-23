@@ -8,23 +8,23 @@
   <style>
     * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
     body { margin: 0; background: #f1f5f9; display: flex; min-height: 100vh; color: #1e293b; }
-    .sidebar { width: 270px; background: #7c2d12; color: white; display: flex; flex-direction: column; padding: 18px 12px; }
-    .sidebar h2 { font-size: 15px; margin: 0 0 4px; color: #fde68a; text-align: center; }
-    .sidebar p { font-size: 11px; text-align: center; color: #fed7aa; margin: 0 0 18px; }
-    .menu-btn { background: transparent; border: none; color: #ffedd5; text-align: left; padding: 9px 12px; border-radius: 8px; cursor: pointer; font-size: 12.5px; margin-bottom: 4px; }
-    .menu-btn:hover, .menu-btn.active { background: #c2410c; color: white; font-weight: bold; }
+    .sidebar { width: 270px; background: #0f294a; color: white; display: flex; flex-direction: column; padding: 18px 12px; }
+    .sidebar h2 { font-size: 15px; margin: 0 0 4px; color: #fbbf24; text-align: center; }
+    .sidebar p { font-size: 11px; text-align: center; color: #cbd5e1; margin: 0 0 18px; }
+    .menu-btn { background: transparent; border: none; color: #e2e8f0; text-align: left; padding: 9px 12px; border-radius: 8px; cursor: pointer; font-size: 12.5px; margin-bottom: 4px; }
+    .menu-btn:hover, .menu-btn.active { background: #1d4ed8; color: white; font-weight: bold; }
     .main { flex: 1; display: flex; flex-direction: column; }
     .topbar { background: white; padding: 14px 22px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
     .content { padding: 22px; }
     .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-bottom: 18px; }
-    .card { background: white; padding: 15px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border-left: 4px solid #c2410c; }
+    .card { background: white; padding: 15px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border-left: 4px solid #1d4ed8; }
     .card h4 { margin: 0 0 5px; font-size: 11px; color: #64748b; text-transform: uppercase; }
-    .card .val { font-size: 18px; font-weight: bold; color: #7c2d12; }
+    .card .val { font-size: 18px; font-weight: bold; color: #0f294a; }
     .panel { background: white; padding: 18px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 18px; }
     input, select, textarea { padding: 9px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; width: 100%; }
     table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 12.5px; }
     th, td { padding: 8px; border: 1px solid #e2e8f0; text-align: left; }
-    th { background: #f8fafc; color: #7c2d12; }
+    th { background: #f8fafc; color: #0f294a; }
     .btn { padding: 7px 12px; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold; }
     .btn-green { background: #059669; color: white; }
     .btn-red { background: #dc2626; color: white; }
@@ -37,17 +37,18 @@
 <div class="sidebar">
   <h2>MKUU WA SHULE</h2>
   <p>Sangabuye Sec | Simu: 0784 755 173</p>
-  <button class="menu-btn active" onclick="openTab('approvals', this)">✅ 1. Idhini: Manunuzi, Vocha & Mishahara</button>
-  <button class="menu-btn" onclick="openTab('statements', this)">📄 2. Thibitisha Michango (PDF)</button>
-  <button class="menu-btn" onclick="openTab('gate_disc', this)">🎫 3. Gate Pass, Nidhamu & Zahanati</button>
-  <button class="menu-btn" onclick="openTab('staff_kpis', this)">👩‍🏫 4. Mahudhurio Watumishi & KPIs</button>
-  <button class="menu-btn" onclick="openTab('letters_unlock', this)">📜 5. Barua Rasmi (PDF) & Marks Unlock</button>
-  <button class="menu-btn" onclick="openTab('broadcast', this)">📢 6. Matangazo ya Dharura</button>
+  <button class="menu-btn active" onclick="openTab('approvals', this)">✅ 1. Manunuzi, Vocha & Kufungua Hesabu</button>
+  <button class="menu-btn" onclick="openTab('payroll_audit', this)">💼 2. Pre-Audit ya Mishahara & Viwango</button>
+  <button class="menu-btn" onclick="openTab('gatepass', this)">🛂 3. Vibali vya Toka (Gate Pass + QR)</button>
+  <button class="menu-btn" onclick="openTab('discipline_health', this)">⚖️ 4. Nidhamu & Afya (Zahanati)</button>
+  <button class="menu-btn" onclick="openTab('staff_kpi', this)">👩‍🏫 5. Mahudhurio Watumishi & KPIs</button>
+  <button class="menu-btn" onclick="openTab('letters_news', this)">📜 6. Barua Rasmi PDF, Marks & Matangazo</button>
   <button class="logout-btn" onclick="SGB.logout()">🚪 Toka (Logout)</button>
 </div>
+
 <div class="main">
   <div class="topbar">
-    <div><strong id="tabTitle">✅ 1. Idhini: Manunuzi, Vocha & Mishahara</strong> <span id="syncTime" style="font-size:11px; color:#059669;">● Simu: 0784 755 173</span></div>
+    <div><strong id="tabTitle">✅ 1. Manunuzi, Vocha & Kufungua Hesabu</strong> <span id="syncTime" style="font-size:11px; color:#059669;"></span></div>
     <div></div>
   </div>
   <div class="content" id="viewArea"></div>
@@ -65,229 +66,286 @@
     if (tab === 'approvals') {
       const procs = SGB.select('procurement_committee');
       const vchs = SGB.select('expense_vouchers');
-      const pays = SGB.select('staff_payroll');
+      const locks = SGB.select('account_locks').filter(l => l.status === 'Locked');
+
       area.innerHTML = `
         <div class="cards">
-          <div class="card"><h4>Kamati ya Manunuzi</h4><div class="val">${procs.length}</div></div>
-          <div class="card"><h4>Vocha za Matumizi</h4><div class="val">${vchs.length}</div></div>
-          <div class="card" style="border-color:#059669;"><h4>Mishahara (Payroll)</h4><div class="val">${pays.length}</div></div>
+          <div class="card"><h4>Manunuzi Yanayosubiri</h4><div class="val">${procs.filter(p => p.status.includes('Pending') || p.status.includes('Resent')).length}</div></div>
+          <div class="card" style="border-color:#d97706;"><h4>Vocha Zinasubiri Idhini</h4><div class="val">${vchs.filter(v => v.status === 'Pending HM Approval').length}</div></div>
+          <div class="card" style="border-color:#dc2626;"><h4>Vipindi Vilivyofungwa</h4><div class="val">${locks.length}</div></div>
         </div>
+
         <div class="panel">
-          <h3>1. Muhtasari wa Kamati ya Manunuzi (Kutoka Kwa Mhasibu 0615 000 305)</h3>
-          <table><tr><th>Kikao</th><th>Bajeti (TZS)</th><th>Hali</th><th>Maamuzi ya Mkuu wa Shule</th></tr>
-          ${procs.map(p => `<tr><td><b>${p.meeting_title}</b><br><small>${p.minutes_summary}</small></td><td>${Number(p.estimated_budget).toLocaleString()}</td><td><b>${p.status}</b></td>
-          <td><button class="btn btn-green" onclick="decideProc(${p.id}, 'Accepted (Imeidhinishwa na Mkuu)')">Accept</button> <button class="btn btn-red" onclick="rejectProc(${p.id})">Reject + Maoni</button></td></tr>`).join('') || '<tr><td colspan="4">Hakuna muhtasari wa manunuzi bado.</td></tr>'}
+          <h3>1. Kamati ya Manunuzi (Idhinisha Yote, Rejesha Hitaji Moja, au Rejesha Yote)</h3>
+          <table><tr><th>Kikao & Wajumbe</th><th>Chanzo</th><th>Mahitaji (Kipimo, Idadi & Gharama)</th><th>Bajeti (TZS)</th><th>Hatua ya Mkuu wa Shule</th></tr>
+          ${procs.map(p => {
+            const itemsHtml = (p.items || []).map((it, idx) => `
+              <div style="border-bottom:1px dashed #cbd5e1; padding:4px 0; font-size:11.5px;">
+                • <b>${it.name}</b>: ${it.qty} ${it.unit} @ ${Number(it.price).toLocaleString()} = <b>${Number(it.total).toLocaleString()}</b>
+                ${it.rejected ? `<span style="color:#dc2626;"> [❌ Imerejeshwa: ${it.hm_note}]</span>` : `<button class="btn btn-amber" style="padding:2px 6px; font-size:10px; margin-left:6px;" onclick="rejectSingleProcItem(${p.id}, ${idx})">↩️ Rejesha Hitaji Hili</button>`}
+              </div>`).join('');
+
+            return `<tr>
+              <td><b>${p.meeting_title}</b><br><small><b>Wajumbe:</b> ${p.members || '-'}</small></td>
+              <td><b>${p.source_fund || 'Kutwa'}</b></td>
+              <td>${itemsHtml || p.minutes_summary}</td>
+              <td><b>${Number(p.estimated_budget).toLocaleString()}</b></td>
+              <td>
+                <b>${p.status}</b><br><br>
+                <button class="btn btn-green" onclick="approveAllProc(${p.id})">✅ Approve Yote</button>
+                <button class="btn btn-red" onclick="rejectAllProc(${p.id})">❌ Reject Yote</button>
+              </td>
+            </tr>`;
+          }).join('') || '<tr><td colspan="5">Hakuna maombi ya manunuzi bado.</td></tr>'}
           </table>
         </div>
+
         <div class="panel">
-          <h3>2. Vocha za Matumizi ya Shule (Expense Vouchers)</h3>
-          <table><tr><th>Vocha Na.</th><th>Maelezo</th><th>Akaunti</th><th>Kiasi (TZS)</th><th>Hali</th><th>Hatua</th></tr>
-          ${vchs.map(v => `<tr><td><b>${v.voucher_no}</b></td><td>${v.description}</td><td>${v.source_account}</td><td><b>${Number(v.amount).toLocaleString()}</b></td><td><b>${v.status || 'Pending'}</b></td>
-          <td><button class="btn btn-green" onclick="SGB.update('expense_vouchers', ${v.id}, {status:'Approved (Mkuu wa Shule)'}); openTab('approvals')">Approve</button> <button class="btn btn-red" onclick="SGB.update('expense_vouchers', ${v.id}, {status:'Rejected'}); openTab('approvals')">Reject</button></td></tr>`).join('') || '<tr><td colspan="6">Hakuna vocha bado.</td></tr>'}
+          <h3>2. Idhinisha Vocha za Matumizi ya Kawaida</h3>
+          <table><tr><th>Vocha</th><th>Maelezo</th><th>Chanzo</th><th>Kiasi (TZS)</th><th>Hali</th><th>Hatua</th></tr>
+          ${vchs.map(v => `<tr><td><b>${v.voucher_no}</b></td><td>${v.description}</td><td>${v.source_fund || 'Kutwa'}</td><td><b>${Number(v.amount).toLocaleString()}</b></td><td><b>${v.status || 'Paid'}</b></td>
+          <td>${v.status === 'Pending HM Approval' ? `<button class="btn btn-green" onclick="SGB.update('expense_vouchers', ${v.id}, {status:'Approved'}); openTab('approvals')">✅ Idhinisha</button> <button class="btn btn-red" onclick="SGB.update('expense_vouchers', ${v.id}, {status:'Rejected'}); openTab('approvals')">❌ Kataa</button>` : '✓ Imeshughulikiwa'}</td></tr>`).join('') || '<tr><td colspan="6">Hakuna vocha bado.</td></tr>'}
           </table>
         </div>
-        <div class="panel">
-          <h3>3. Idhini ya Mishahara ya Wafanyakazi (Staff Payroll)</h3>
-          <table><tr><th>Mtumishi</th><th>Gross (TZS)</th><th>NSSF</th><th>PAYE</th><th>Net Pay</th><th>Hali</th><th>Hatua</th></tr>
-          ${pays.map(p => `<tr><td><b>${p.name}</b></td><td>${Number(p.gross).toLocaleString()}</td><td>${Number(p.nssf).toLocaleString()}</td><td>${Number(p.paye).toLocaleString()}</td><td><b>${Number(p.net_pay).toLocaleString()}</b></td><td>${p.status || 'Pending'}</td>
-          <td><button class="btn btn-green" onclick="SGB.update('staff_payroll', ${p.id}, {status:'Approved for Payment'}); openTab('approvals')">✅ Idhinisha Malipo</button></td></tr>`).join('') || '<tr><td colspan="7">Hakuna orodha ya mishahara bado.</td></tr>'}
+
+        <div class="panel" style="border-left:4px solid #dc2626;">
+          <h3>3. Kufungua Hesabu Zilizofungwa na Mhasibu (Unlock Accounting Periods)</h3>
+          <table><tr><th>Kipindi</th><th>Kuanzia</th><th>Hadi</th><th>Ombi la Mhasibu</th><th>Hatua</th></tr>
+          ${locks.map(l => `<tr><td><b>${l.label}</b></td><td>${l.start_date}</td><td>${l.end_date}</td><td>${l.unlock_requested ? '📩 Ameomba Kufunguliwa' : 'Imefungwa'}</td>
+          <td><button class="btn btn-green" onclick="SGB.update('account_locks', ${l.id}, {status:'Unlocked'}); alert('🔓 Hesabu zimefunguliwa!'); openTab('approvals')">🔓 Fungua Hesabu</button></td></tr>`).join('') || '<tr><td colspan="5">Hakuna kipindi kilichofungwa kwa sasa.</td></tr>'}
           </table>
         </div>`;
     }
 
-    if (tab === 'statements') {
-      const stmts = SGB.select('contribution_statements');
+    if (tab === 'payroll_audit') {
+      const staff = SGB.select('staff_payroll');
       area.innerHTML = `
         <div class="panel">
-          <h3>Thibitisha & Tuma Taarifa za Michango Kwa Wazazi (0784 755 173)</h3>
-          <table><tr><th>Mwanafunzi</th><th>Kinachotakiwa</th><th>Amelipa</th><th>Deni</th><th>Hali</th><th>Hatua</th></tr>
-          ${stmts.map(s => `<tr><td><b>${s.student_name}</b></td><td>${Number(s.required).toLocaleString()}</td><td>${Number(s.paid).toLocaleString()}</td><td style="color:#dc2626;">${Number(s.balance).toLocaleString()}</td><td><b>${s.status}</b></td>
-          <td><button class="btn btn-green" onclick="SGB.update('contribution_statements', ${s.id}, {status:'Verified & Sent to Parent (0784 755 173)'}); alert('✅ Imethibitishwa na kutumwa kwa Mzazi!'); openTab('statements')">✅ Thibitisha & Tuma</button></td></tr>`).join('') || '<tr><td colspan="6">Hakuna taarifa zilizotumwa na Mhasibu bado.</td></tr>'}
+          <h3>1. Weka Kiwango cha Malipo ya Mtumishi (Bila Makato — Fixed Gross Rate)</h3>
+          <form onsubmit="hmSetStaffRate(event)" style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:10px; margin-bottom:15px;">
+            <input type="text" id="hmPyName" required placeholder="Jina la Mtumishi">
+            <input type="text" id="hmPyJob" required placeholder="Kazi Anayoifanya">
+            <select id="hmPySrc">
+              <option value="Kutwa">Chanzo: Kutwa</option>
+              <option value="Hostel">Chanzo: Hostel</option>
+              <option value="Kambi ya Masomo">Chanzo: Kambi ya Masomo</option>
+            </select>
+            <input type="number" id="hmPyAmt" required placeholder="Kiwango cha Malipo (TZS)">
+            <button type="submit" class="btn btn-blue" style="grid-column: span 4;">💾 Weka Kiwango & Tuma Kwa Mhasibu (Pre-Audited)</button>
+          </form>
+
+          <h3>2. Fanya Pre-Audit ya Mishahara (Mtumishi Mmoja Mmoja au Wote)</h3>
+          <button class="btn btn-green" style="margin-bottom:10px;" onclick="preAuditAllStaff()">✅ Pre-Audit & Approve Watumishi Wote</button>
+          <table><tr><th>Mtumishi</th><th>Kazi</th><th>Chanzo</th><th>Gross</th><th>Makato</th><th>Net Pay</th><th>Hali</th><th>Pre-Audit ya Mkuu</th></tr>
+          ${staff.map(s => `<tr>
+            <td><b>${s.name}</b></td>
+            <td>${s.job_title || '-'}</td>
+            <td>${s.source_fund || 'Kutwa'}</td>
+            <td>${Number(s.gross).toLocaleString()}</td>
+            <td>${(Number(s.nssf || 0) + Number(s.paye || 0)).toLocaleString()}</td>
+            <td><b>${Number(s.net_pay).toLocaleString()}</b></td>
+            <td><b>${s.status}</b></td>
+            <td>
+              ${s.status !== 'Paid' ? `
+                <button class="btn btn-green" onclick="SGB.update('staff_payroll', ${s.id}, {status:'Pre-Audited & Approved', hm_note:''}); openTab('payroll_audit')">✅ Approve</button>
+                <button class="btn btn-amber" onclick="returnStaffPay(${s.id})">↩️ Rudisha</button>
+              ` : '💵 Amelipwa'}
+            </td>
+          </tr>`).join('') || '<tr><td colspan="8">Hakuna orodha ya mishahara kutoka kwa Mhasibu bado.</td></tr>'}
           </table>
         </div>`;
     }
-    if (tab === 'gate_disc') {
+    if (tab === 'gatepass') {
       const gps = SGB.select('gate_passes');
-      const disc = SGB.select('discipline_cases');
-      const sick = SGB.select('sickbay_records');
       area.innerHTML = `
         <div class="panel">
-          <h3>1. Ruhusa za Wanafunzi (Gate Pass — Ikiwemo Maombi ya Wazazi)</h3>
-          <form onsubmit="addGP(event)" style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:12px;">
-            <input type="text" id="gName" required placeholder="Jina la Mwanafunzi">
-            <input type="text" id="gReason" required placeholder="Sababu ya Ruhusa">
-            <input type="date" id="gDate" required>
-            <button type="submit" class="btn btn-green" style="grid-column: span 3;">🎫 Toa Gate Pass Rasmi</button>
+          <h3>Toa Kibali Kipya cha Mwanafunzi Kutoka Nje ya Shule (Gate Pass + QR)</h3>
+          <form onsubmit="issueGatePass(event)" style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:15px;">
+            <input type="text" id="gpName" required placeholder="Jina Kamili la Mwanafunzi">
+            <input type="text" id="gpClass" required placeholder="Kidato/Mkondo (Mfano: Form 3B)">
+            <input type="text" id="gpReason" required placeholder="Sababu (Matibabu / Ruhusa ya Mzazi)">
+            <button type="submit" class="btn btn-green" style="grid-column: span 3;">🛂 Idhinisha Kibali & Zalisha QR Code</button>
           </form>
-          <table><tr><th>Mwanafunzi</th><th>Sababu</th><th>Tarehe ya Kurudi</th><th>Hali</th><th>Hatua</th></tr>
-          ${gps.map(g => `<tr><td><b>${g.student_name}</b></td><td>${g.reason}</td><td>${g.return_date}</td><td><b>${g.status}</b></td>
-          <td>${g.status.includes('Pending') ? `<button class="btn btn-green" onclick="SGB.update('gate_passes', ${g.id}, {status:'Approved by Headmaster'}); openTab('gate_disc')">✅ Idhinisha</button>` : `<button class="btn btn-blue" onclick="printGatePass('${g.student_name}', '${g.reason}', '${g.return_date}', ${g.id})">🖨️ Kibali + QR</button>`}</td></tr>`).join('')}
-          </table>
-        </div>
-        <div class="panel">
-          <h3>2. Kumbukumbu za Nidhamu (Discipline Cases)</h3>
-          <form onsubmit="addDisc(event)" style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:12px;">
-            <input type="text" id="dcName" required placeholder="Jina la Mwanafunzi">
-            <input type="text" id="dcOffense" required placeholder="Kosa la Nidhamu">
-            <input type="text" id="dcAction" required placeholder="Adhabu / Ushauri Uliotolewa">
-            <button type="submit" class="btn btn-amber" style="grid-column: span 3;">⚖️ Hifadhi Kesi ya Nidhamu</button>
-          </form>
-          <table><tr><th>Mwanafunzi</th><th>Kosa</th><th>Hatua Iliyochukuliwa</th><th>Tarehe</th></tr>
-          ${disc.map(d => `<tr><td><b>${d.student_name}</b></td><td>${d.offense}</td><td>${d.action}</td><td>${d.created_at}</td></tr>`).join('')}
-          </table>
-        </div>
-        <div class="panel">
-          <h3>3. Zahanati ya Shule (Sickbay & Medical Log)</h3>
-          <form onsubmit="addSick(event)" style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px;">
-            <input type="text" id="skName" required placeholder="Jina la Mwanafunzi">
-            <input type="text" id="skDiag" required placeholder="Tatizo / Matibabu Aliyopewa">
-            <button type="submit" class="btn btn-blue" style="grid-column: span 2;">🏥 Hifadhi Rekodi ya Zahanati</button>
-          </form>
-          <table><tr><th>Mwanafunzi</th><th>Matibabu</th><th>Muda</th></tr>
-          ${sick.map(s => `<tr><td><b>${s.student_name}</b></td><td>${s.diagnosis}</td><td>${s.created_at}</td></tr>`).join('')}
+          <div id="gpSlipArea" style="margin-bottom:15px;"></div>
+          <table><tr><th>Mwanafunzi</th><th>Kidato</th><th>Sababu</th><th>Hali</th><th>Hatua</th></tr>
+          ${gps.map(g => `<tr><td><b>${g.student_name}</b></td><td>${g.class_name}</td><td>${g.reason}</td><td><b>${g.status}</b></td>
+          <td>${g.status.includes('Pending') ? `<button class="btn btn-green" onclick="SGB.update('gate_passes', ${g.id}, {status:'Approved (Mkuu wa Shule)'}); openTab('gatepass')">✅ Idhinisha</button>` : '✓ Tayari'}</td></tr>`).join('')}
           </table>
         </div>`;
     }
 
-    if (tab === 'staff_kpis') {
-      const marks = SGB.select('exam_results');
-      const rolls = SGB.select('rollcall_logs');
-      const allocs = SGB.select('teacher_allocations');
+    if (tab === 'discipline_health') {
+      const cases = SGB.select('discipline_health');
+      area.innerHTML = `
+        <div class="panel">
+          <h3>Rekodi ya Kesi za Nidhamu & Matibabu ya Zahanati (Sickbay)</h3>
+          <form onsubmit="addDiscHealth(event)" style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:15px;">
+            <input type="text" id="dhName" required placeholder="Jina la Mwanafunzi">
+            <select id="dhType"><option value="Nidhamu (Discipline)">Nidhamu (Discipline)</option><option value="Afya / Zahanati (Sickbay)">Afya / Zahanati (Sickbay)</option></select>
+            <input type="text" id="dhNote" required placeholder="Maelezo ya Tukio / Matibabu / Adhabu">
+            <button type="submit" class="btn btn-blue" style="grid-column: span 3;">💾 Hifadhi Kumbukumbu</button>
+          </form>
+          <table><tr><th>Mwanafunzi</th><th>Aina</th><th>Maelezo</th><th>Tarehe</th></tr>
+          ${cases.map(c => `<tr><td><b>${c.student_name}</b></td><td>${c.type}</td><td>${c.note}</td><td>${c.created_at}</td></tr>`).join('')}
+          </table>
+        </div>`;
+    }
+
+    if (tab === 'staff_kpi') {
       const att = SGB.select('staff_attendance');
-      const byTeacher = {};
-      allocs.forEach(a => { byTeacher[a.teacher_name] = { subjects: new Set(), scores: [], rollCount: 0 }; });
-      allocs.forEach(a => { if (byTeacher[a.teacher_name]) byTeacher[a.teacher_name].subjects.add(a.subject_name); });
-      marks.forEach(m => { if (m.teacher && byTeacher[m.teacher] && m.grade !== 'X') byTeacher[m.teacher].scores.push(Number(m.total_score)); });
-      rolls.forEach(r => { if (r.teacher && byTeacher[r.teacher]) byTeacher[r.teacher].rollCount++; });
+      const results = SGB.select('exam_results');
+      const kpiMap = {};
+      results.forEach(r => {
+        const t = r.teacher || 'Mwalimu';
+        if (!kpiMap[t]) kpiMap[t] = { count: 0, sum: 0 };
+        kpiMap[t].count++;
+        kpiMap[t].sum += Number(r.total_score);
+      });
 
       area.innerHTML = `
         <div class="panel">
-          <h3>1. Daftari la Mahudhurio ya Watumishi & Likizo (Staff Attendance & Leave)</h3>
-          <form onsubmit="addStaffAtt(event)" style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:12px;">
+          <h3>1. Mahudhurio ya Watumishi (Staff Attendance & Leave)</h3>
+          <form onsubmit="addStaffAtt(event)" style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:15px;">
             <input type="text" id="saName" required placeholder="Jina la Mwalimu / Mtumishi">
-            <select id="saStat"><option value="Amefika Kazini (Present)">Amefika Kazini (Present)</option><option value="Ruhusa / Likizo (Approved Leave)">Ruhusa / Likizo (Leave)</option><option value="Hayupo Bila Taarifa (Absent)">Hayupo Bila Taarifa (Absent)</option></select>
+            <select id="saStat"><option value="Yupo Kazini (Present)">Yupo Kazini (Present)</option><option value="Ruhusa (On Leave)">Ruhusa (On Leave)</option><option value="Amechelewa (Late)">Amechelewa (Late)</option></select>
             <button type="submit" class="btn btn-green">✅ Rekodi Mahudhurio</button>
           </form>
-          <table><tr><th>Mtumishi</th><th>Hali</th><th>Tarehe & Muda</th></tr>
+          <table><tr><th>Mtumishi</th><th>Hali</th><th>Tarehe</th></tr>
           ${att.map(a => `<tr><td><b>${a.name}</b></td><td>${a.status}</td><td>${a.created_at}</td></tr>`).join('')}
           </table>
         </div>
         <div class="panel">
-          <h3>2. Tathmini ya Utendaji wa Walimu (Teacher KPIs & Subject Pass Average)</h3>
-          <table><tr><th>Jina la Mwalimu</th><th>Masomo</th><th>Wastani wa Ufaulu (%)</th><th>Mahudhurio Vipindini</th></tr>
-          ${Object.entries(byTeacher).map(([t, d]) => {
-            const avg = d.scores.length ? (d.scores.reduce((a,b)=>a+b,0)/d.scores.length).toFixed(1) + '%' : 'Hakuna alama';
-            return `<tr><td><b>${t}</b></td><td>${Array.from(d.subjects).join(', ')}</td><td><b>${avg}</b></td><td>${d.rollCount}</td></tr>`;
-          }).join('') || '<tr><td colspan="4">Hakuna walimu waliopangiwa masomo bado.</td></tr>'}
-          </table>
-        </div>`;
-    }
-    if (tab === 'letters_unlock') {
-      const exams = SGB.select('exams_list');
-      area.innerHTML = `
-        <div class="panel">
-          <h3>1. Jenereta ya Barua Rasmi za Utawala (Official Letters + QR Code)</h3>
-          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px;">
-            <select id="ltType">
-              <option value="BARUA YA UTAMBULISHO WA MWANAFUNZI">Barua ya Utambulisho (Introduction Letter)</option>
-              <option value="BARUA YA WITO WA MZAZI / MLEZI">Barua ya Wito wa Mzazi (Parent Summons)</option>
-              <option value="CHETI CHA KUMALIZA SHULE (LEAVING CERTIFICATE)">Cheti cha Kumaliza Shule (Leaving Certificate)</option>
-            </select>
-            <input type="text" id="ltStudent" placeholder="Majina Kamili ya Mwanafunzi">
-            <textarea id="ltBody" rows="3" style="grid-column: span 2;" placeholder="Andika maelezo mahususi ya barua..."></textarea>
-            <button class="btn btn-blue" style="grid-column: span 2;" onclick="buildOfficialLetter()">📜 Zalisha Barua Rasmi (Print / A4 PDF)</button>
-          </div>
-          <div id="letterOutput"></div>
-        </div>
-        <div class="panel">
-          <h3>2. Idhini ya Kufungua Alama Zilizofungwa (Authorize Marks Unlock)</h3>
-          <table><tr><th>Mtihani</th><th>Hali ya Sasa</th><th>Hatua ya Mkuu wa Shule</th></tr>
-          ${exams.map(e => `<tr><td><b>${e.title}</b></td><td>${e.status}</td><td><button class="btn btn-amber" onclick="SGB.update('exams_list', ${e.id}, {status:'Open (Unlocked by Headmaster)'}); alert('🔓 Mtihani umefunguliwa kwa marekebisho!'); openTab('letters_unlock')">🔓 Idhinisha Kufungua (Unlock)</button></td></tr>`).join('') || '<tr><td colspan="3">Hakuna mitihani iliyosajiliwa bado.</td></tr>'}
+          <h3>2. Tathmini ya Ufaulu wa Masomo ya Walimu (Teacher Performance KPIs)</h3>
+          <table><tr><th>Mwalimu</th><th>Idadi ya Alama Zilizotumwa</th><th>Wastani wa Ufaulu (%)</th></tr>
+          ${Object.entries(kpiMap).map(([t, d]) => `<tr><td><b>${t}</b></td><td>${d.count}</td><td><b>${Math.round(d.sum / d.count)}%</b></td></tr>`).join('') || '<tr><td colspan="3">Hakuna alama zilizotumwa bado.</td></tr>'}
           </table>
         </div>`;
     }
 
-    if (tab === 'broadcast') {
+    if (tab === 'letters_news') {
+      const exams = SGB.select('exams_list');
       const news = SGB.select('announcements');
       area.innerHTML = `
         <div class="panel">
-          <h3>Matangazo ya Dharura Kwa Wazazi, Walimu & Wanafunzi</h3>
-          <form onsubmit="sendNews(event)">
-            <textarea id="newsMsg" rows="3" required placeholder="Andika tangazo rasmi kutoka Ofisi ya Mkuu wa Shule (0784 755 173)..."></textarea><br><br>
-            <button type="submit" class="btn btn-green">📢 Chapisha Tangazo Kwa Wote</button>
-          </form>
-          <table><tr><th>Tangazo</th><th>Muda</th></tr>
-          ${news.map(n => `<tr><td>${n.message}</td><td>${n.created_at}</td></tr>`).join('')}
+          <h3>1. Jenereta ya Barua Rasmi za Shule (Official Letters PDF + QR)</h3>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px;">
+            <input type="text" id="ltTo" placeholder="Kwa (Mfano: Mzazi wa Amina Hassan / Afisa Elimu)">
+            <input type="text" id="ltSubj" placeholder="Kichwa cha Barua (YAH: WITO WA MZAZI)">
+            <textarea id="ltBody" rows="3" style="grid-column: span 2;" placeholder="Andika maudhui kamili ya barua rasmi hapa..."></textarea>
+            <button class="btn btn-blue" style="grid-column: span 2;" onclick="genOfficialLetter()">📜 Tengeneza Barua Rasmi (A4 PDF)</button>
+          </div>
+          <div id="ltOutput"></div>
+        </div>
+        <div class="panel">
+          <h3>2. Fungua Alama Zilizofungwa (Marks Unlock Override)</h3>
+          <table><tr><th>Mtihani</th><th>Hali</th><th>Hatua</th></tr>
+          ${exams.map(e => `<tr><td><b>${e.title}</b></td><td>${e.status}</td><td><button class="btn btn-amber" onclick="SGB.update('exams_list', ${e.id}, {status:'Open (Imefunguliwa na Mkuu wa Shule)'}); openTab('letters_news')">🔓 Unlock Marks</button></td></tr>`).join('') || '<tr><td colspan="3">Hakuna mitihani bado.</td></tr>'}
           </table>
+        </div>
+        <div class="panel">
+          <h3>3. Tangazo la Shule (Broadcast Kwa Wazazi, Walimu & Wanafunzi)</h3>
+          <form onsubmit="postNews(event)" style="display:grid; gap:10px;">
+            <textarea id="newsTxt" rows="2" required placeholder="Andika tangazo jipya la shule hapa..."></textarea>
+            <button type="submit" class="btn btn-green">📢 Chapisha Tangazo Sasa</button>
+          </form>
         </div>`;
     }
   }
-
-  function decideProc(id, status) {
-    SGB.update('procurement_committee', id, { status, hm_comments: 'Imeidhinishwa na Mkuu wa Shule (0784 755 173).' });
+  function rejectSingleProcItem(procId, itemIdx) {
+    const proc = SGB.select('procurement_committee').find(p => p.id === procId);
+    if (!proc) return;
+    const reason = prompt(`Andika sababu ya kurejesha hitaji "${proc.items[itemIdx].name}" kwa Mhasibu:`);
+    if (!reason) return;
+    const updated = proc.items.map((it, i) => i === itemIdx ? { ...it, rejected: true, hm_note: reason } : it);
+    SGB.update('procurement_committee', procId, { items: updated, status: 'Rejected (Hitaji Moja Limerejeshwa)', hm_comments: `Hitaji "${proc.items[itemIdx].name}" limerejeshwa: ${reason}` });
     openTab('approvals');
   }
-  function rejectProc(id) {
-    const c = prompt('Andika maoni ya marekebisho kwa Mhasibu:');
-    if (c) { SGB.update('procurement_committee', id, { status: 'Rejected (Fanya Marekebisho)', hm_comments: c }); openTab('approvals'); }
+
+  function approveAllProc(procId) {
+    const proc = SGB.select('procurement_committee').find(p => p.id === procId);
+    if (!proc) return;
+    const cleaned = (proc.items || []).map(it => ({ ...it, rejected: false, hm_note: '' }));
+    SGB.update('procurement_committee', procId, { items: cleaned, status: 'Approved', hm_comments: '✅ Imeidhinishwa na Mkuu wa Shule (0784 755 173)' });
+    openTab('approvals');
   }
-  function addGP(e) {
+
+  function rejectAllProc(procId) {
+    const reason = prompt('Andika sababu ya kurejesha manunuzi yote kwa Mhasibu:');
+    if (!reason) return;
+    const proc = SGB.select('procurement_committee').find(p => p.id === procId);
+    const marked = (proc.items || []).map(it => ({ ...it, rejected: true, hm_note: reason }));
+    SGB.update('procurement_committee', procId, { items: marked, status: 'Rejected (Yote Yamerejeshwa)', hm_comments: reason });
+    openTab('approvals');
+  }
+
+  function hmSetStaffRate(e) {
     e.preventDefault();
-    SGB.insert('gate_passes', { student_name: document.getElementById('gName').value, reason: document.getElementById('gReason').value, return_date: document.getElementById('gDate').value, status: 'Approved (Active)' });
-    openTab('gate_disc');
+    const gross = Number(document.getElementById('hmPyAmt').value);
+    SGB.insert('staff_payroll', {
+      name: document.getElementById('hmPyName').value.trim(),
+      job_title: document.getElementById('hmPyJob').value.trim(),
+      source_fund: document.getElementById('hmPySrc').value,
+      gross,
+      nssf: 0,
+      paye: 0,
+      net_pay: gross,
+      status: 'Pre-Audited & Approved'
+    });
+    alert('✅ Kiwango cha malipo (bila makato) kimewekwa na kutumwa kwa Mhasibu!');
+    openTab('payroll_audit');
   }
-  function printGatePass(name, reason, retDate, id) {
-    const qr = SGB.qrImg(`GATE-PASS:${id}|${name}`);
-    const w = window.open('', '', 'width=400,height=450');
-    w.document.write(`<html><body style="font-family:monospace;padding:20px;border:2px dashed #000;width:300px;margin:auto;">
-      <center><b>SANGABUYE SECONDARY SCHOOL</b><br>S.L.P 11898, ILEMELA - MWANZA<br>Simu: 0784 755 173<br>------------------------<br><b>KIBALI CHA RUHUSA (GATE PASS)</b></center><br>
-      <b>Mwanafunzi:</b> ${name}<br><b>Sababu:</b> ${reason}<br><b>Tarehe ya Kurudi:</b> ${retDate}<br><b>Imeidhinishwa na:</b> Mkuu wa Shule<br>------------------------<br>
-      <center><img src="${qr}"><br><small>Onyesha kwa Mlinzi wa Getini</small></center>
-    </body></html>`);
-    w.document.close(); w.focus();
-    setTimeout(() => { w.print(); w.close(); }, 300);
+
+  function preAuditAllStaff() {
+    SGB.select('staff_payroll').forEach(s => {
+      if (s.status !== 'Paid') SGB.update('staff_payroll', s.id, { status: 'Pre-Audited & Approved', hm_note: '' });
+    });
+    alert('✅ Watumishi wote wamefanyiwa Pre-Audit na kuidhinishwa kwa ajili ya malipo!');
+    openTab('payroll_audit');
   }
-  function addDisc(e) {
+
+  function returnStaffPay(id) {
+    const note = prompt('Andika maelekezo ya marekebisho kwa Mhasibu:');
+    if (note) {
+      SGB.update('staff_payroll', id, { status: 'Returned (Rekebisha)', hm_note: note });
+      openTab('payroll_audit');
+    }
+  }
+  function issueGatePass(e) {
     e.preventDefault();
-    SGB.insert('discipline_cases', { student_name: document.getElementById('dcName').value, offense: document.getElementById('dcOffense').value, action: document.getElementById('dcAction').value });
-    openTab('gate_disc');
+    const gp = SGB.insert('gate_passes', { student_name: document.getElementById('gpName').value, class_name: document.getElementById('gpClass').value, reason: document.getElementById('gpReason').value, status: 'Approved (Mkuu wa Shule)' });
+    const qr = SGB.qrImg(`GATEPASS:${gp.student_name}|${gp.created_at}`);
+    document.getElementById('gpSlipArea').innerHTML = `
+      <div id="gpPrint" style="border:2px solid #0f294a; padding:14px; max-width:320px; background:#fff;">
+        <center><b>SANGABUYE SECONDARY SCHOOL</b><br><small>KIBALI CHA KUTOKA NJE YA SHULE (GATE PASS)</small></center><hr>
+        <b>Mwanafunzi:</b> ${gp.student_name} (${gp.class_name})<br><b>Sababu:</b> ${gp.reason}<br><b>Muda:</b> ${gp.created_at}<br><b>Idhini:</b> Mkuu wa Shule (0784 755 173)<hr>
+        <center><img src="${qr}"></center>
+      </div><br><button class="btn btn-blue" onclick="printBox('gpPrint')">🖨️ Chapisha Gate Pass</button>`;
   }
-  function addSick(e) {
-    e.preventDefault();
-    SGB.insert('sickbay_records', { student_name: document.getElementById('skName').value, diagnosis: document.getElementById('skDiag').value });
-    openTab('gate_disc');
-  }
-  function addStaffAtt(e) {
-    e.preventDefault();
-    SGB.insert('staff_attendance', { name: document.getElementById('saName').value, status: document.getElementById('saStat').value });
-    openTab('staff_kpis');
-  }
-  function buildOfficialLetter() {
-    const type = document.getElementById('ltType').value;
-    const st = document.getElementById('ltStudent').value;
+
+  function addDiscHealth(e) { e.preventDefault(); SGB.insert('discipline_health', { student_name: document.getElementById('dhName').value, type: document.getElementById('dhType').value, note: document.getElementById('dhNote').value }); openTab('discipline_health'); }
+  function addStaffAtt(e) { e.preventDefault(); SGB.insert('staff_attendance', { name: document.getElementById('saName').value, status: document.getElementById('saStat').value }); openTab('staff_kpi'); }
+
+  function genOfficialLetter() {
+    const to = document.getElementById('ltTo').value;
+    const subj = document.getElementById('ltSubj').value;
     const body = document.getElementById('ltBody').value;
-    const qr = SGB.qrImg(`SANGABUYE-LETTER:${type}|${st}`);
-    document.getElementById('letterOutput').innerHTML = `
-      <div id="ltPrint" style="border:2px solid #7c2d12; padding:25px; background:white;">
-        <div style="display:flex; justify-content:space-between;"><div><h2>SANGABUYE SECONDARY SCHOOL</h2><p>S.L.P 11898, Ilemela - Mwanza | Simu: 0784 755 173</p></div><img src="${qr}"></div><hr>
-        <p><b>Tarehe:</b> ${new Date().toLocaleDateString('sw-TZ')}</p>
-        <h4>YAH: ${type} — ${st.toUpperCase()}</h4>
-        <p style="line-height:1.7;">${body}</p><br><br>
-        <p>Wako katika ujenzi wa Taifa,<br><br>___________________________<br><b>Mkuu wa Shule (Headmaster)</b><br>Sangabuye Secondary School (0784 755 173)</p>
-      </div><br><button class="btn btn-green" onclick="printLetter()">🖨️ Chapisha Barua (A4 PDF)</button>`;
+    const qr = SGB.qrImg(`SANGABUYE-LETTER:${subj}`);
+    document.getElementById('ltOutput').innerHTML = `
+      <div id="ltPrint" style="border:1px solid #000; padding:25px; background:white; line-height:1.6;">
+        <div style="display:flex; justify-content:space-between;"><div><h3>SANGABUYE SECONDARY SCHOOL</h3><p>S.L.P 11898, ILEMELA - MWANZA<br>Simu: 0784 755 173</p></div><img src="${qr}"></div><hr>
+        <p><b>Tarehe:</b> ${new Date().toLocaleDateString('sw-TZ')}</p><p><b>Kwa:</b> ${to}</p><p><b><u>YAH: ${subj.toUpperCase()}</u></b></p>
+        <p>${body.replace(/\n/g, '<br>')}</p><br><p>Wako katika ujenzi wa Taifa,<br><br>_______________________<br><b>MKUU WA SHULE (0784 755 173)</b></p>
+      </div><br><button class="btn btn-blue" onclick="printBox('ltPrint')">🖨️ Pakua Barua (A4 PDF)</button>`;
   }
-  function printLetter() {
-    const html = document.getElementById('ltPrint').innerHTML;
-    const w = window.open('', '', 'width=750,height=650');
-    w.document.write('<html><body style="font-family:serif;padding:25px;">' + html + '</body></html>');
+
+  function postNews(e) { e.preventDefault(); SGB.insert('announcements', { message: document.getElementById('newsTxt').value }); alert('📢 Tangazo limechapishwa!'); e.target.reset(); openTab('letters_news'); }
+
+  function printBox(id) {
+    const html = document.getElementById(id).innerHTML;
+    const w = window.open('', '', 'width=750,height=600');
+    w.document.write('<html><head><title>Sangabuye Official Print</title></head><body style="font-family:sans-serif;padding:20px;">' + html + '</body></html>');
     w.document.close(); w.focus();
     setTimeout(() => { w.print(); w.close(); }, 300);
-  }
-  function sendNews(e) {
-    e.preventDefault();
-    SGB.insert('announcements', { message: document.getElementById('newsMsg').value, sender: 'Mkuu wa Shule (0784 755 173)' });
-    alert('📢 Tangazo limetumwa kwa wote!');
-    openTab('broadcast');
   }
 
   openTab('approvals', document.querySelector('.menu-btn'));
