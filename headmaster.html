@@ -11,7 +11,7 @@
     .sidebar { width: 270px; background: #7c2d12; color: white; display: flex; flex-direction: column; padding: 18px 12px; }
     .sidebar h2 { font-size: 15px; margin: 0 0 4px; color: #fde68a; text-align: center; }
     .sidebar p { font-size: 11px; text-align: center; color: #fed7aa; margin: 0 0 18px; }
-    .menu-btn { background: transparent; border: none; color: #ffedd5; text-align: left; padding: 10px 12px; border-radius: 8px; cursor: pointer; font-size: 13px; margin-bottom: 4px; }
+    .menu-btn { background: transparent; border: none; color: #ffedd5; text-align: left; padding: 9px 12px; border-radius: 8px; cursor: pointer; font-size: 12.5px; margin-bottom: 4px; }
     .menu-btn:hover, .menu-btn.active { background: #c2410c; color: white; font-weight: bold; }
     .main { flex: 1; display: flex; flex-direction: column; }
     .topbar { background: white; padding: 14px 22px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
@@ -40,8 +40,9 @@
   <button class="menu-btn active" onclick="openTab('approvals', this)">✅ 1. Idhini: Manunuzi, Vocha & Mishahara</button>
   <button class="menu-btn" onclick="openTab('statements', this)">📄 2. Thibitisha Michango (PDF)</button>
   <button class="menu-btn" onclick="openTab('gate_disc', this)">🎫 3. Gate Pass, Nidhamu & Zahanati</button>
-  <button class="menu-btn" onclick="openTab('kpis', this)">👩‍🏫 4. Utendaji wa Walimu (Teacher KPIs)</button>
-  <button class="menu-btn" onclick="openTab('broadcast', this)">📢 5. Matangazo ya Dharura</button>
+  <button class="menu-btn" onclick="openTab('staff_kpis', this)">👩‍🏫 4. Mahudhurio Watumishi & KPIs</button>
+  <button class="menu-btn" onclick="openTab('letters_unlock', this)">📜 5. Barua Rasmi (PDF) & Marks Unlock</button>
+  <button class="menu-btn" onclick="openTab('broadcast', this)">📢 6. Matangazo ya Dharura</button>
   <button class="logout-btn" onclick="SGB.logout()">🚪 Toka (Logout)</button>
 </div>
 <div class="main">
@@ -147,10 +148,12 @@
           </table>
         </div>`;
     }
-    if (tab === 'kpis') {
+
+    if (tab === 'staff_kpis') {
       const marks = SGB.select('exam_results');
       const rolls = SGB.select('rollcall_logs');
       const allocs = SGB.select('teacher_allocations');
+      const att = SGB.select('staff_attendance');
       const byTeacher = {};
       allocs.forEach(a => { byTeacher[a.teacher_name] = { subjects: new Set(), scores: [], rollCount: 0 }; });
       allocs.forEach(a => { if (byTeacher[a.teacher_name]) byTeacher[a.teacher_name].subjects.add(a.subject_name); });
@@ -159,12 +162,47 @@
 
       area.innerHTML = `
         <div class="panel">
-          <h3>Tathmini ya Utendaji wa Walimu (Teacher KPIs & Subject Pass Average)</h3>
-          <table><tr><th>Jina la Mwalimu</th><th>Masomo</th><th>Wastani wa Ufaulu (%)</th><th>Mahudhurio Aliyochukua</th></tr>
+          <h3>1. Daftari la Mahudhurio ya Watumishi & Likizo (Staff Attendance & Leave)</h3>
+          <form onsubmit="addStaffAtt(event)" style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:12px;">
+            <input type="text" id="saName" required placeholder="Jina la Mwalimu / Mtumishi">
+            <select id="saStat"><option value="Amefika Kazini (Present)">Amefika Kazini (Present)</option><option value="Ruhusa / Likizo (Approved Leave)">Ruhusa / Likizo (Leave)</option><option value="Hayupo Bila Taarifa (Absent)">Hayupo Bila Taarifa (Absent)</option></select>
+            <button type="submit" class="btn btn-green">✅ Rekodi Mahudhurio</button>
+          </form>
+          <table><tr><th>Mtumishi</th><th>Hali</th><th>Tarehe & Muda</th></tr>
+          ${att.map(a => `<tr><td><b>${a.name}</b></td><td>${a.status}</td><td>${a.created_at}</td></tr>`).join('')}
+          </table>
+        </div>
+        <div class="panel">
+          <h3>2. Tathmini ya Utendaji wa Walimu (Teacher KPIs & Subject Pass Average)</h3>
+          <table><tr><th>Jina la Mwalimu</th><th>Masomo</th><th>Wastani wa Ufaulu (%)</th><th>Mahudhurio Vipindini</th></tr>
           ${Object.entries(byTeacher).map(([t, d]) => {
             const avg = d.scores.length ? (d.scores.reduce((a,b)=>a+b,0)/d.scores.length).toFixed(1) + '%' : 'Hakuna alama';
             return `<tr><td><b>${t}</b></td><td>${Array.from(d.subjects).join(', ')}</td><td><b>${avg}</b></td><td>${d.rollCount}</td></tr>`;
           }).join('') || '<tr><td colspan="4">Hakuna walimu waliopangiwa masomo bado.</td></tr>'}
+          </table>
+        </div>`;
+    }
+    if (tab === 'letters_unlock') {
+      const exams = SGB.select('exams_list');
+      area.innerHTML = `
+        <div class="panel">
+          <h3>1. Jenereta ya Barua Rasmi za Utawala (Official Letters + QR Code)</h3>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px;">
+            <select id="ltType">
+              <option value="BARUA YA UTAMBULISHO WA MWANAFUNZI">Barua ya Utambulisho (Introduction Letter)</option>
+              <option value="BARUA YA WITO WA MZAZI / MLEZI">Barua ya Wito wa Mzazi (Parent Summons)</option>
+              <option value="CHETI CHA KUMALIZA SHULE (LEAVING CERTIFICATE)">Cheti cha Kumaliza Shule (Leaving Certificate)</option>
+            </select>
+            <input type="text" id="ltStudent" placeholder="Majina Kamili ya Mwanafunzi">
+            <textarea id="ltBody" rows="3" style="grid-column: span 2;" placeholder="Andika maelezo mahususi ya barua..."></textarea>
+            <button class="btn btn-blue" style="grid-column: span 2;" onclick="buildOfficialLetter()">📜 Zalisha Barua Rasmi (Print / A4 PDF)</button>
+          </div>
+          <div id="letterOutput"></div>
+        </div>
+        <div class="panel">
+          <h3>2. Idhini ya Kufungua Alama Zilizofungwa (Authorize Marks Unlock)</h3>
+          <table><tr><th>Mtihani</th><th>Hali ya Sasa</th><th>Hatua ya Mkuu wa Shule</th></tr>
+          ${exams.map(e => `<tr><td><b>${e.title}</b></td><td>${e.status}</td><td><button class="btn btn-amber" onclick="SGB.update('exams_list', ${e.id}, {status:'Open (Unlocked by Headmaster)'}); alert('🔓 Mtihani umefunguliwa kwa marekebisho!'); openTab('letters_unlock')">🔓 Idhinisha Kufungua (Unlock)</button></td></tr>`).join('') || '<tr><td colspan="3">Hakuna mitihani iliyosajiliwa bado.</td></tr>'}
           </table>
         </div>`;
     }
@@ -218,6 +256,32 @@
     e.preventDefault();
     SGB.insert('sickbay_records', { student_name: document.getElementById('skName').value, diagnosis: document.getElementById('skDiag').value });
     openTab('gate_disc');
+  }
+  function addStaffAtt(e) {
+    e.preventDefault();
+    SGB.insert('staff_attendance', { name: document.getElementById('saName').value, status: document.getElementById('saStat').value });
+    openTab('staff_kpis');
+  }
+  function buildOfficialLetter() {
+    const type = document.getElementById('ltType').value;
+    const st = document.getElementById('ltStudent').value;
+    const body = document.getElementById('ltBody').value;
+    const qr = SGB.qrImg(`SANGABUYE-LETTER:${type}|${st}`);
+    document.getElementById('letterOutput').innerHTML = `
+      <div id="ltPrint" style="border:2px solid #7c2d12; padding:25px; background:white;">
+        <div style="display:flex; justify-content:space-between;"><div><h2>SANGABUYE SECONDARY SCHOOL</h2><p>S.L.P 11898, Ilemela - Mwanza | Simu: 0784 755 173</p></div><img src="${qr}"></div><hr>
+        <p><b>Tarehe:</b> ${new Date().toLocaleDateString('sw-TZ')}</p>
+        <h4>YAH: ${type} — ${st.toUpperCase()}</h4>
+        <p style="line-height:1.7;">${body}</p><br><br>
+        <p>Wako katika ujenzi wa Taifa,<br><br>___________________________<br><b>Mkuu wa Shule (Headmaster)</b><br>Sangabuye Secondary School (0784 755 173)</p>
+      </div><br><button class="btn btn-green" onclick="printLetter()">🖨️ Chapisha Barua (A4 PDF)</button>`;
+  }
+  function printLetter() {
+    const html = document.getElementById('ltPrint').innerHTML;
+    const w = window.open('', '', 'width=750,height=650');
+    w.document.write('<html><body style="font-family:serif;padding:25px;">' + html + '</body></html>');
+    w.document.close(); w.focus();
+    setTimeout(() => { w.print(); w.close(); }, 300);
   }
   function sendNews(e) {
     e.preventDefault();
