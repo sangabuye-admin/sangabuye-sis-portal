@@ -36,8 +36,8 @@
   <button class="menu-btn active" onclick="openTab('exams_ctrl', this)">📝 1. Usimamizi wa Mitihani & Publish</button>
   <button class="menu-btn" onclick="openTab('necta_master', this)">📊 2. Master Sheet (O & A-Level NECTA)</button>
   <button class="menu-btn" onclick="openTab('seating_isal', this)">🪑 3. Viti 40 (Real Mix), ISAL & CAL</button>
-  <button class="menu-btn" onclick="openTab('analytics_gpa', this)">📈 4. Kijinsia (M/F), GPA & Remedial</button>
-  <button class="menu-btn" onclick="openTab('report_card', this)">📄 5. Ripoti Binafsi (A4 PDF)</button>
+  <button class="menu-btn" onclick="openTab('analytics_gpa', this)">📈 4. Kijinsia, Chati ya Masomo & GPA</button>
+  <button class="menu-btn" onclick="openTab('report_card', this)">📄 5. Ripoti Binafsi (Picha + SMS/WA)</button>
   <button class="menu-btn" onclick="openTab('subjects_map', this)">📚 6. Pangia Walimu & Tahasusi</button>
   <button class="menu-btn" onclick="openTab('timetable', this)">🗓️ 7. Smart Timetable (Clash-Free)</button>
   <button class="menu-btn" onclick="openTab('transfer_bulk', this)">🎓 8. Transfer Cert & Bulk Marks</button>
@@ -107,6 +107,7 @@
           </table>
         </div>`;
     }
+
     if (tab === 'necta_master') {
       area.innerHTML = `
         <div class="panel">
@@ -142,7 +143,6 @@
           <div id="examFormsOutput"></div>
         </div>`;
     }
-
     if (tab === 'analytics_gpa') {
       const marks = SGB.select('exam_results');
       const maps = SGB.select('student_subjects');
@@ -190,10 +190,14 @@
           </table>
         </div>
         <div class="panel">
-          <h3>2. Wastani wa Ufaulu Kila Somo (Subject GPA & Pass Rate)</h3>
-          <table><tr><th>Somo</th><th>Watahiniwa</th><th>Waliofaulu (A–D)</th><th>Wastani wa GPA</th></tr>
-          ${Object.entries(bySubj).map(([sub, d]) => `<tr><td><b>${sub}</b></td><td>${d.count}</td><td>${d.pass} (${Math.round((d.pass/d.count)*100)}%)</td><td><b>${(d.pts/d.count).toFixed(2)}</b></td></tr>`).join('') || '<tr><td colspan="4">Hakuna alama bado.</td></tr>'}
-          </table>
+          <h3>📊 2. Mchoro wa Ulinganisho wa Ufaulu wa Masomo (Visual Subject Chart)</h3>
+          ${Object.entries(bySubj).map(([sub, d]) => {
+            const pct = Math.round((d.pass / d.count) * 100);
+            return `<div style="margin-bottom:8px;">
+              <div style="display:flex;justify-content:space-between;font-size:12px;"><b>${sub}</b><span>${pct}% Waliofaulu (GPA: ${(d.pts/d.count).toFixed(2)})</span></div>
+              <div style="background:#e2e8f0;height:14px;border-radius:6px;"><div style="background:${pct>=50?'#059669':'#dc2626'};height:14px;border-radius:6px;width:${pct}%;"></div></div>
+            </div>`;
+          }).join('') || '<p style="font-size:12px;">Hakuna alama bado.</p>'}
         </div>
         <div class="panel">
           <h3>3. Orodha ya Wanafunzi wa Msaada Maalum (Remedial List &lt; 35%)</h3>
@@ -202,10 +206,11 @@
           </table>
         </div>`;
     }
+
     if (tab === 'report_card') {
       area.innerHTML = `
         <div class="panel">
-          <h3>Ripoti Binafsi ya Maendeleo ya Mwanafunzi (A4 Portrait PDF)</h3>
+          <h3>Ripoti Binafsi ya Maendeleo ya Mwanafunzi (Picha + A4 PDF + SMS/WhatsApp)</h3>
           <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:15px;">
             <input type="text" id="rcName" list="stList" placeholder="Andika herufi chache za jina la mwanafunzi...">
             <input type="text" id="rcClass" placeholder="Kidato/Mkondo (Mfano: Form 4A)">
@@ -216,7 +221,6 @@
           <div id="rcOutput"></div>
         </div>`;
     }
-
     if (tab === 'subjects_map') {
       const maps = SGB.select('student_subjects');
       const allocs = SGB.select('teacher_allocations');
@@ -440,15 +444,29 @@
     const tc = document.getElementById('rcTeacherComment').value;
     const hmc = document.getElementById('rcHMComment').value;
     const marks = SGB.select('exam_results').filter(m => m.student_name.toLowerCase() === name.toLowerCase());
+    const photo = JSON.parse(localStorage.getItem('sgb_student_photos') || '{}')[name.toLowerCase()] || '';
     const qr = SGB.qrImg(`REPORT:${name}|${cls}`);
+    const summaryTxt = `SANGABUYE SEC: Matokeo ya ${name} (${cls}): ` + marks.map(m => `${m.subject_name}:${m.total_score}%('${m.grade}')`).join(', ');
+
     document.getElementById('rcOutput').innerHTML = `
       <div id="rcPrint" style="border:2px solid #1e1b4b; padding:20px; background:white;">
-        <div style="display:flex; justify-content:space-between;"><div><h2>SANGABUYE SECONDARY SCHOOL</h2><p>S.L.P 11898, Ilemela - Mwanza | Simu: 0784 755 173</p><h4>TAARIFA YA MAENDELEO YA TAALUMA (A4 REPORT CARD)</h4></div><img src="${qr}"></div>
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <div><h2>SANGABUYE SECONDARY SCHOOL</h2><p>S.L.P 11898, Ilemela - Mwanza | Simu: 0784 755 173</p><h4>TAARIFA YA MAENDELEO YA TAALUMA (A4 REPORT CARD)</h4></div>
+          <div style="display:flex; gap:8px;">
+            ${photo ? `<img src="${photo}" style="width:70px; height:75px; object-fit:cover; border:1px solid #1e1b4b; border-radius:6px;">` : ''}
+            <img src="${qr}">
+          </div>
+        </div>
         <p><b>Mwanafunzi:</b> ${name} | <b>Kidato:</b> ${cls}</p>
         <table><tr><th>Somo</th><th>CA (30%)</th><th>Final (70%)</th><th>Jumla</th><th>Daraja</th><th>Pointi</th></tr>
         ${marks.map(m => `<tr><td>${m.subject_name}</td><td>${m.ca_score}</td><td>${m.final_score}</td><td><b>${m.total_score}%</b></td><td><b>${m.grade}</b></td><td>${m.points}</td></tr>`).join('')}</table><br>
         <p><b>Maoni ya Mwalimu wa Darasa:</b> ${tc}</p><p><b>Maoni & Sahihi ya Mkuu wa Shule (0784 755 173):</b> ${hmc}</p>
-      </div><br><button class="btn btn-indigo" onclick="printSection('rcPrint')">🖨️ Pakua Ripoti (A4 PDF)</button>`;
+      </div><br>
+      <div style="display:flex; gap:8px; flex-wrap:wrap;">
+        <button class="btn btn-indigo" onclick="printSection('rcPrint')">🖨️ Pakua Ripoti (A4 PDF)</button>
+        <button class="btn btn-green" onclick="SGB.sendWhatsApp('', '${summaryTxt}')">💬 Tuma Matokeo WhatsApp</button>
+        <button class="btn btn-amber" onclick="SGB.sendSMS('', '${summaryTxt}')">📲 Tuma Matokeo SMS</button>
+      </div>`;
   }
 
   function buildTransferCert() {
