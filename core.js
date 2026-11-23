@@ -1,4 +1,4 @@
-// INJINI KUU YA SANGABUYE SIS PORTAL (v5.5 - AUTO PHONE LOOKUP, HELP GUIDE & PWA)
+// INJINI KUU YA SANGABUYE SIS PORTAL (v5.7 - MOBILE BACKUP MODAL, AUTO PHONE & PWA)
 const SGB = {
   lang: localStorage.getItem('sgb_lang') || 'sw',
 
@@ -27,7 +27,6 @@ const SGB = {
     return JSON.parse(localStorage.getItem('sgb_school_config') || '{"year":"2026","term":"Term I","crdb":"0150838972100"}');
   },
 
-  // 1. TAFUTA NAMBA YA SIMU YA MZAZI KIOTOMATIKI KUTOKA KWENYE UJUMBE
   findParentPhone(message) {
     const msgLower = (message || '').toLowerCase();
     const users = this.select('users_profile');
@@ -122,41 +121,94 @@ const SGB = {
       const k = localStorage.key(i);
       if (k && k.startsWith('sgb_')) backup.data[k] = JSON.parse(localStorage.getItem(k));
     }
-    const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'Sangabuye_SIS_Backup_' + new Date().toISOString().slice(0, 10) + '.json';
-    a.click();
+    const jsonStr = JSON.stringify(backup);
+
+    try {
+      const blob = new Blob([jsonStr], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'Sangabuye_Backup_' + new Date().toISOString().slice(0, 10) + '.json';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    } catch (e) {}
+
+    let modal = document.getElementById('sgbBackupModal');
+    if (!modal) {
+      modal = document.createElement('div');
+      modal.id = 'sgbBackupModal';
+      modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:10002;display:flex;justify-content:center;align-items:center;padding:15px;';
+      document.body.appendChild(modal);
+    }
+    modal.style.display = 'flex';
+    modal.innerHTML = `
+      <div style="background:#fff;width:100%;max-width:500px;border-radius:12px;padding:18px;">
+        <h3 style="margin:0 0 8px;color:#0f294a;">💾 Nakala ya Data Zako (Backup Code)</h3>
+        <p style="font-size:12px;color:#475569;">Bofya kitufe cha <b>Nakili (Copy)</b> hapa chini, kisha uende kwenye link/simu mpya ubofye <b>📂 Restore</b> na kubandika (Paste):</p>
+        <textarea id="bkOutText" rows="6" readonly style="width:100%;font-size:11px;padding:8px;border:1px solid #cbd5e1;border-radius:6px;">${jsonStr}</textarea><br><br>
+        <div style="display:flex;gap:8px;">
+          <button onclick="SGB.copyBackupText()" style="background:#059669;color:#fff;border:none;padding:9px 14px;border-radius:6px;font-weight:bold;cursor:pointer;">📋 Nakili (Copy Data)</button>
+          <button onclick="document.getElementById('sgbBackupModal').style.display='none'" style="background:#dc2626;color:#fff;border:none;padding:9px 14px;border-radius:6px;font-weight:bold;cursor:pointer;">✕ Funga</button>
+        </div>
+      </div>`;
     this.logAction('Amepakua nakala ya mfumo (System Backup)');
-    this.notifySync('💾 Nakala ya mfumo (Backup) imepakuliwa!');
+  },
+
+  copyBackupText() {
+    const el = document.getElementById('bkOutText');
+    el.select();
+    el.setSelectionRange(0, 999999);
+    if (navigator.clipboard) navigator.clipboard.writeText(el.value).catch(() => {});
+    document.execCommand('copy');
+    alert('✅ Data zimenakiliwa (Copied)! Nenda kwenye link/simu mpya ubofye Restore na ubandike (Paste).');
   },
 
   importBackup() {
-    const inp = document.createElement('input');
-    inp.type = 'file';
-    inp.accept = '.json';
-    inp.onchange = (e) => {
+    let modal = document.getElementById('sgbRestoreModal');
+    if (!modal) {
+      modal = document.createElement('div');
+      modal.id = 'sgbRestoreModal';
+      modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:10002;display:flex;justify-content:center;align-items:center;padding:15px;';
+      document.body.appendChild(modal);
+    }
+    modal.style.display = 'flex';
+    modal.innerHTML = `
+      <div style="background:#fff;width:100%;max-width:500px;border-radius:12px;padding:18px;">
+        <h3 style="margin:0 0 8px;color:#0f294a;">📂 Rudisha Data Zako (Restore)</h3>
+        <p style="font-size:12px;color:#475569;">Bandika (Paste) maandishi ya Backup hapa chini AU chagua faili la <code>.json</code>:</p>
+        <textarea id="bkInText" rows="5" placeholder="Bandika (Paste) kodi ya Backup hapa..." style="width:100%;font-size:11px;padding:8px;border:1px solid #cbd5e1;border-radius:6px;"></textarea><br><br>
+        <input type="file" id="bkFileInp" accept=".json" style="margin-bottom:12px;">
+        <div style="display:flex;gap:8px;">
+          <button onclick="SGB.processRestoreText()" style="background:#1d4ed8;color:#fff;border:none;padding:9px 14px;border-radius:6px;font-weight:bold;cursor:pointer;">✅ Rudisha Data Sasa</button>
+          <button onclick="document.getElementById('sgbRestoreModal').style.display='none'" style="background:#dc2626;color:#fff;border:none;padding:9px 14px;border-radius:6px;font-weight:bold;cursor:pointer;">✕ Funga</button>
+        </div>
+      </div>`;
+
+    document.getElementById('bkFileInp').onchange = (e) => {
       const file = e.target.files[0];
       if (!file) return;
       const reader = new FileReader();
-      reader.onload = (ev) => {
-        try {
-          const parsed = JSON.parse(ev.target.result);
-          const records = parsed.data || parsed;
-          Object.keys(records).forEach(k => {
-            if (k.startsWith('sgb_')) localStorage.setItem(k, JSON.stringify(records[k]));
-          });
-          alert('✅ Data zote za Backup zimerudishwa kikamilifu!');
-          this.liveRefresh(true);
-        } catch (err) {
-          alert('❌ Faili la Backup si sahihi: ' + err.message);
-        }
-      };
+      reader.onload = (ev) => { document.getElementById('bkInText').value = ev.target.result; };
       reader.readAsText(file);
     };
-    inp.click();
   },
 
+  processRestoreText() {
+    try {
+      const raw = document.getElementById('bkInText').value.trim();
+      if (!raw) { alert('⚠️ Bandika maandishi ya Backup au chagua faili kwanza.'); return; }
+      const parsed = JSON.parse(raw);
+      const records = parsed.data || parsed;
+      Object.keys(records).forEach(k => {
+        if (k.startsWith('sgb_')) localStorage.setItem(k, JSON.stringify(records[k]));
+      });
+      document.getElementById('sgbRestoreModal').style.display = 'none';
+      alert('✅ Data zote zimerudishwa kikamilifu!');
+      this.liveRefresh(true);
+    } catch (err) {
+      alert('❌ Maandishi au faili la Backup si sahihi: ' + err.message);
+    }
+  },
   openHelpModal() {
     let modal = document.getElementById('sgbHelpModal');
     if (!modal) {
@@ -177,7 +229,7 @@ const SGB = {
         <p><b>🏦 Akaunti ya Benki:</b> CRDB <code>0150838972100</code> (SHULE YA SEKONDARI SANGABUYE E.K)</p>
         <hr>
         <p><b>1. Kuweka Kwenye Simu Kama App:</b> Kwenye Chrome (Android) bofya vidoti vitatu (⋮) kisha <i>Add to Home screen / Install app</i>. Kwenye iPhone (Safari) bofya <i>Share ➔ Add to Home Screen</i>.</p>
-        <p><b>2. Kazi Bila Mtandao (Offline Mode):</b> Mfumo unaendelea kufanya kazi hata intaneti ikikatika. Tumia kitufe cha <b>💾 Backup</b> kuhifadhi nakala ya kumbukumbu mara kwa mara.</p>
+        <p><b>2. Kuhamisha Data (Backup & Restore):</b> Bofya <b>💾 Backup</b> kunakili data zako, kisha nenda kwenye kifaa/link mpya na ubofye <b>📂 Restore</b>.</p>
         <p><b>3. Mawasiliano ya Papo Hapo:</b> Tumia vitufe vya <b>💬 WhatsApp</b> na <b>📲 SMS</b> kutuma risiti, madeni, au matokeo moja kwa moja kwa mzazi.</p>
       </div>`;
   },
