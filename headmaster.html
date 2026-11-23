@@ -67,6 +67,13 @@
       const procs = SGB.select('procurement_committee');
       const vchs = SGB.select('expense_vouchers');
       const locks = SGB.select('account_locks').filter(l => l.status === 'Locked');
+                       <b>${p.status}</b><br><br>
+                ${!isAllApproved ? `
+                  <button class="btn btn-green" onclick="approveAllProc(${p.id})">✅ Approve Yote</button>
+                  <button class="btn btn-red" onclick="rejectAllProc(${p.id})">❌ Reject Yote</button>
+                ` : (user.role === 'super_admin'
+                  ? `<span style="color:#059669;font-weight:bold;">✅ Imeidhinishwa</span><br><button class="btn btn-red" style="margin-top:4px;" onclick="rejectAllProc(${p.id})">↩️ Admin Override (Rejesha)</button>`
+                  : `<span style="color:#059669;font-weight:bold;">🔒 Imeidhinishwa (Imefungwa)</span>`)}
 
       area.innerHTML = `
         <div class="cards">
