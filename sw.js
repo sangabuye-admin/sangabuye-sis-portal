@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sangabuye-sis-v5.3';
+const CACHE_NAME = 'sangabuye-sis-v5.6';
 const ASSETS = [
   './',
   './index.html',
@@ -11,7 +11,9 @@ const ASSETS = [
   './academic.html',
   './teacher.html',
   './parent.html',
-  './student.html'
+  './student.html',
+  './library.html',
+  './matron_patron.html'
 ];
 
 self.addEventListener('install', (e) => {
