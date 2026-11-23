@@ -1,4 +1,4 @@
-// INJINI KUU YA SANGABUYE SIS PORTAL (v5.3 - PWA APP, OFFLINE SYNC & DIRECT MESSAGING)
+// INJINI KUU YA SANGABUYE SIS PORTAL (v5.4 - SMS, WHATSAPP, PHOTO ENGINE & PWA)
 const SGB = {
   lang: localStorage.getItem('sgb_lang') || 'sw',
 
@@ -27,6 +27,49 @@ const SGB = {
     return JSON.parse(localStorage.getItem('sgb_school_config') || '{"year":"2026","term":"Term I","crdb":"0150838972100"}');
   },
 
+  // 1. INJINI YA KUTUMA UJUMBE KWA SMS NA WHATSAPP (1-CLICK SHARE)
+  formatPhone(rawPhone) {
+    let p = (rawPhone || '').replace(/\D/g, '');
+    if (!p) p = (prompt('Ingiza namba ya simu ya Mzazi (Mfano: 0755123456):') || '').replace(/\D/g, '');
+    if (!p) return null;
+    if (p.startsWith('0')) p = '255' + p.slice(1);
+    return p;
+  },
+
+  sendWhatsApp(rawPhone, message) {
+    const phone = this.formatPhone(rawPhone);
+    if (!phone) return;
+    this.insert('comms_logs', { channel: 'WhatsApp', phone, message });
+    window.open(`https://wa.me{phone}?text=${encodeURIComponent(message)}`, '_blank');
+  },
+
+  sendSMS(rawPhone, message) {
+    const phone = this.formatPhone(rawPhone);
+    if (!phone) return;
+    const localNum = phone.startsWith('255') ? '0' + phone.slice(3) : phone;
+    this.insert('comms_logs', { channel: 'SMS', phone: localNum, message });
+    window.location.href = `sms:${localNum}?body=${encodeURIComponent(message)}`;
+  },
+
+  // 2. INJINI YA KUPUNGUZA UKUBWA WA PICHA YA MWANAFUNZI (PHOTO COMPRESSOR)
+  compressPhoto(file, callback) {
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = 160;
+        canvas.height = 160;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, 160, 160);
+        callback(canvas.toDataURL('image/jpeg', 0.75));
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  },
+
   liveRefresh(silent = false) {
     const activeMenu = document.querySelector('.menu-btn.active');
     if (activeMenu) activeMenu.click();
@@ -49,7 +92,6 @@ const SGB = {
     clearTimeout(this._toastTimer);
     this._toastTimer = setTimeout(() => { toast.style.opacity = '0'; }, 2500);
   },
-
   exportBackup() {
     const backup = { portal: 'Sangabuye SIS Portal', exported_at: new Date().toISOString(), data: {} };
     for (let i = 0; i < localStorage.length; i++) {
@@ -90,6 +132,7 @@ const SGB = {
     };
     inp.click();
   },
+
   openInboxModal() {
     const u = this.getUser();
     if (!u) return;
