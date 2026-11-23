@@ -22,9 +22,13 @@
 </head>
 <body>
 <div class="topbar">
-  <div><strong>🎒 TOVUTI YA MWANAFUNZI — SANGABUYE SIS PORTAL</strong></div>
+  <div>
+    <strong>🎒 TOVUTI YA MWANAFUNZI — SANGABUYE SIS PORTAL</strong>
+    <button class="btn btn-red" style="margin-left:12px;" onclick="SGB.logout()">🚪 Toka (Logout)</button>
+  </div>
   <div></div>
 </div>
+
 <div class="container" id="stBody"></div>
 <script>
   const user = SGB.requireRole(['student', 'super_admin']);
