@@ -11,7 +11,7 @@
     .sidebar { width: 270px; background: #1e1b4b; color: white; display: flex; flex-direction: column; padding: 18px 12px; }
     .sidebar h2 { font-size: 15px; margin: 0 0 4px; color: #fde68a; text-align: center; }
     .sidebar p { font-size: 11px; text-align: center; color: #c7d2fe; margin: 0 0 18px; }
-    .menu-btn { background: transparent; border: none; color: #e0e7ff; text-align: left; padding: 9px 12px; border-radius: 8px; cursor: pointer; font-size: 12.5px; margin-bottom: 4px; }
+    .menu-btn { background: transparent; border: none; color: #e0e7ff; text-align: left; padding: 8px 12px; border-radius: 8px; cursor: pointer; font-size: 12.5px; margin-bottom: 3px; }
     .menu-btn:hover, .menu-btn.active { background: #4338ca; color: white; font-weight: bold; }
     .main { flex: 1; display: flex; flex-direction: column; }
     .topbar { background: white; padding: 14px 22px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
@@ -42,6 +42,7 @@
   <button class="menu-btn" onclick="openTab('timetable', this)">🗓️ 7. Smart Timetable (Clash-Free)</button>
   <button class="menu-btn" onclick="openTab('transfer_bulk', this)">🎓 8. Transfer Cert & Bulk Marks</button>
   <button class="menu-btn" onclick="openTab('top_awards', this)">🏆 9. Top 10 Wanafunzi & Walimu Bora</button>
+  <button class="menu-btn" onclick="openTab('inspect_plans', this)">📑 10. Kagua & Saini Lesson Plans</button>
   <button class="logout-btn" onclick="SGB.logout()">🚪 Toka (Logout)</button>
 </div>
 
@@ -341,6 +342,24 @@
           </table>
         </div>
         <button class="btn btn-indigo" onclick="printSection('awardsPrintArea')">🖨️ Chapisha Orodha ya Zawadi (A4 PDF)</button>`;
+    }
+
+    if (tab === 'inspect_plans') {
+      const plans = SGB.select('lesson_plans');
+      area.innerHTML = `
+        <div class="panel">
+          <h3>Ukaguzi wa Schemes of Work & Lesson Plans za Walimu</h3>
+          <table><tr><th>Mwalimu</th><th>Aina</th><th>Somo & Darasa</th><th>Mada & Malengo</th><th>Hali</th><th>Hatua ya Mtaaluma</th></tr>
+          ${plans.map(p => `<tr>
+            <td><b>${p.teacher}</b></td>
+            <td>${p.type}</td>
+            <td>${p.subject}</td>
+            <td><b>${p.topic}</b><br><small>${p.objectives}</small></td>
+            <td><b>${p.status}</b></td>
+            <td>${p.status.includes('Pending') ? `<button class="btn btn-green" onclick="SGB.update('lesson_plans', ${p.id}, {status:'✅ Imekaguliwa & Kusainiwa (Academic)'}); openTab('inspect_plans')">✍️ Saini & Idhinisha</button>` : '✓ Imesainiwa'}</td>
+          </tr>`).join('') || '<tr><td colspan="6">Hakuna Scheme of Work au Lesson Plan iliyotumwa na walimu bado.</td></tr>'}
+          </table>
+        </div>`;
     }
   }
   function createExam(e) {
