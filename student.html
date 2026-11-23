@@ -7,103 +7,154 @@
   <script src="core.js"></script>
   <style>
     * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
-    body { margin: 0; background: #f1f5f9; color: #1e293b; }
-    .topbar { background: #1e40af; color: white; padding: 14px 22px; display: flex; justify-content: space-between; align-items: center; }
-    .container { max-width: 950px; margin: 20px auto; padding: 0 15px; }
+    body { margin: 0; background: #f1f5f9; display: flex; min-height: 100vh; color: #1e293b; }
+    .sidebar { width: 265px; background: #1e3a8a; color: white; display: flex; flex-direction: column; padding: 18px 12px; }
+    .sidebar h2 { font-size: 15px; margin: 0 0 4px; color: #fde68a; text-align: center; }
+    .sidebar p { font-size: 11px; text-align: center; color: #bfdbfe; margin: 0 0 18px; }
+    .menu-btn { background: transparent; border: none; color: #dbeafe; text-align: left; padding: 10px 12px; border-radius: 8px; cursor: pointer; font-size: 13px; margin-bottom: 4px; }
+    .menu-btn:hover, .menu-btn.active { background: #2563eb; color: white; font-weight: bold; }
+    .main { flex: 1; display: flex; flex-direction: column; }
+    .topbar { background: white; padding: 14px 22px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
+    .content { padding: 22px; }
+    .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-bottom: 18px; }
+    .card { background: white; padding: 15px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border-left: 4px solid #2563eb; }
+    .card h4 { margin: 0 0 5px; font-size: 11px; color: #64748b; text-transform: uppercase; }
+    .card .val { font-size: 16px; font-weight: bold; color: #1e3a8a; }
     .panel { background: white; padding: 18px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-bottom: 18px; }
     input, textarea { padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; width: 100%; }
     table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
     th, td { padding: 8px; border: 1px solid #e2e8f0; text-align: left; }
-    th { background: #f8fafc; color: #1e40af; }
+    th { background: #f8fafc; color: #1e3a8a; }
     .btn { padding: 8px 14px; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold; background: #1d4ed8; color: white; }
     .btn-green { background: #059669; color: white; }
-    .btn-red { background: #dc2626; color: white; }
+    .logout-btn { background: #dc2626; color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: bold; margin-top: auto; }
   </style>
 </head>
 <body>
-<div class="topbar">
-  <div>
-    <strong>🎒 TOVUTI YA MWANAFUNZI — SANGABUYE SIS PORTAL</strong>
-    <button class="btn btn-red" style="margin-left:12px;" onclick="SGB.logout()">🚪 Toka (Logout)</button>
-  </div>
-  <div></div>
+<div class="sidebar">
+  <h2>TOVUTI YA MWANAFUNZI</h2>
+  <p id="stBadge">Sangabuye Secondary School</p>
+  <button class="menu-btn active" onclick="openTab('home', this)">🏠 1. Taarifa Zangu & Matangazo</button>
+  <button class="menu-btn" onclick="openTab('cbt_hw', this)">💻 2. Kazi za Nyumbani & Online CBT</button>
+  <button class="menu-btn" onclick="openTab('results', this)">📊 3. Matokeo Yangu (NECTA)</button>
+  <button class="menu-btn" onclick="openTab('timetable_lib', this)">🗓️ 4. Ratiba & Maktaba (Past Papers)</button>
+  <button class="menu-btn" onclick="openTab('secret_box', this)">🔒 5. Sanduku la Maoni la Siri</button>
+  <button class="logout-btn" onclick="SGB.logout()">🚪 Toka (Logout)</button>
 </div>
 
-<div class="container" id="stBody"></div>
+<div class="main">
+  <div class="topbar">
+    <div><strong id="tabTitle">🏠 1. Taarifa Zangu & Matangazo</strong> <span id="syncTime" style="font-size:11px; color:#059669;"></span></div>
+    <div></div>
+  </div>
+  <div class="content" id="viewArea"></div>
+</div>
 <script>
   const user = SGB.requireRole(['student', 'super_admin']);
   SGB.startSessionTimer();
   const cleanStudentName = user.full_name.replace(' [Via Admin]', '').trim();
+  document.getElementById('stBadge').innerText = cleanStudentName;
 
-  function renderStudentPortal() {
-    const cbts = SGB.select('assignments_cbt');
-    const mySubs = SGB.select('assignment_submissions').filter(s => s.student_name.toLowerCase() === cleanStudentName.toLowerCase());
-    const myMarks = SGB.select('exam_results').filter(m => m.student_name.toLowerCase().includes(cleanStudentName.toLowerCase()));
-    const tt = SGB.select('smart_timetable');
-    const news = SGB.select('announcements');
-    const myBooks = SGB.select('library_loans').filter(l => l.student_name.toLowerCase().includes(cleanStudentName.toLowerCase()));
-    const myHostel = SGB.select('hostel_beds').filter(h => h.student_name.toLowerCase().includes(cleanStudentName.toLowerCase()));
+  function openTab(tab, btn) {
+    document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+    if (btn) document.getElementById('tabTitle').innerText = btn.innerText;
+    const area = document.getElementById('viewArea');
 
-    document.getElementById('stBody').innerHTML = `
-      <div class="panel" style="border-left:4px solid #1d4ed8;">
-        <h3>Karibu, ${cleanStudentName}!</h3>
-        <p style="font-size:13px; color:#475569;">
-          <b>Bweni & Kitanda:</b> ${myHostel.length ? myHostel.room_bed : 'Mwanafunzi wa Kutwa (Day Scholar)'} |
-          <b>Vitabu vya Maktaba:</b> ${myBooks.length ? myBooks.map(b => `${b.book} (${b.status})`).join(', ') : 'Huna kitabu ulichoazima'}
-        </p>
-        ${news.length ? `<div style="background:#fef3c7; padding:8px 12px; border-radius:6px; font-size:12px;"><b>📢 Tangazo la Shule:</b> ${news.message}</div>` : ''}
-      </div>
+    if (tab === 'home') {
+      const news = SGB.select('announcements');
+      const myBooks = SGB.select('library_loans').filter(l => l.student_name.toLowerCase().includes(cleanStudentName.toLowerCase()));
+      const myHostel = SGB.select('hostel_beds').filter(h => h.student_name.toLowerCase().includes(cleanStudentName.toLowerCase()));
+      const myMarks = SGB.select('exam_results').filter(m => m.student_name.toLowerCase().includes(cleanStudentName.toLowerCase()));
 
-      <div class="panel">
-        <h3>1. Kazi za Nyumbani (Written Assignments) & Mitihani ya Mtandaoni (Online CBT)</h3>
-        ${cbts.map(c => `<div style="border:1px solid #cbd5e1; padding:14px; border-radius:8px; margin-bottom:12px; background:#f8fafc;">
-          <div style="display:flex; justify-content:space-between;">
-            <b>${c.title} (${c.sub || 'Somo'})</b>
-            <span style="font-size:11px; color:#1d4ed8; font-weight:bold;">Mwalimu: ${c.teacher || '-'}</span>
-          </div>
-          <p style="margin:8px 0;">${c.question}</p>
-          ${c.type === 'WRITTEN' ? `
-            <textarea id="ans_${c.id}" rows="3" placeholder="Andika majibu yako hapa..."></textarea><br><br>
-            <button class="btn btn-green" onclick="submitWritten(${c.id}, '${c.title}', '${c.teacher}')">📤 Wasilisha Kazi Kwa Mwalimu</button>
-          ` : `
-            <small style="color:#334155;"><b>Chaguo:</b> ${c.options}</small><br><br>
-            <div style="display:flex; gap:8px; max-width:340px;">
-              <input type="text" id="ans_${c.id}" placeholder="Weka herufi (A, B, C au D)">
-              <button class="btn" onclick="checkCBT(${c.id}, '${c.answer}')">✅ Wasilisha Jibu</button>
-            </div>
-          `}
-        </div>`).join('') || '<p>Hakuna kazi au jaribio lililowekwa na walimu kwa sasa.</p>'}
-
-        ${mySubs.length > 0 ? `
-          <h4>Kazi Zako Zilizowasilishwa & Alama za Mwalimu:</h4>
-          <table><tr><th>Kazi</th><th>Jibu Lako</th><th>Alama / Maoni ya Mwalimu</th></tr>
-          ${mySubs.map(s => `<tr><td><b>${s.title}</b></td><td>${s.answer_text}</td><td><b style="color:#059669;">${s.score}</b></td></tr>`).join('')}
+      area.innerHTML = `
+        <div class="cards">
+          <div class="card"><h4>Mwanafunzi</h4><div class="val">${cleanStudentName}</div></div>
+          <div class="card" style="border-color:#059669;"><h4>Bweni & Kitanda</h4><div class="val">${myHostel.length ? myHostel.room_bed : 'Day Scholar (Kutwa)'}</div></div>
+          <div class="card" style="border-color:#d97706;"><h4>Vitabu vya Maktaba</h4><div class="val">${myBooks.length}</div></div>
+          <div class="card"><h4>Masomo Yaliyosahihishwa</h4><div class="val">${myMarks.length}</div></div>
+        </div>
+        <div class="panel">
+          <h3>📢 Matangazo Rasmi ya Shule (Kutoka Kwa Mkuu wa Shule)</h3>
+          ${news.length ? news.map(n => `<p style="border-bottom:1px solid #e2e8f0; padding-bottom:8px;"><b>[${n.created_at}]</b> ${n.message}</p>`).join('') : '<p style="color:#64748b;">Hakuna matangazo mapya kwa sasa.</p>'}
+        </div>
+        <div class="panel">
+          <h3>📚 Hali ya Vitabu Nilivyoazima Maktaba</h3>
+          <table><tr><th>Kitabu</th><th>Hali</th><th>Tarehe</th></tr>
+          ${myBooks.map(b => `<tr><td><b>${b.book}</b></td><td>${b.status}</td><td>${b.created_at}</td></tr>`).join('') || '<tr><td colspan="3">Huna kitabu ulichoazima maktaba.</td></tr>'}
           </table>
-        ` : ''}
-      </div>
+        </div>`;
+    }
 
-      <div class="panel">
-        <h3>2. Matokeo Yangu ya Mitihani (NECTA Grading)</h3>
-        <table><tr><th>Somo</th><th>CA (30%)</th><th>Final (70%)</th><th>Jumla</th><th>Daraja</th></tr>
-        ${myMarks.map(m => `<tr><td><b>${m.subject_name}</b></td><td>${m.ca_score}</td><td>${m.final_score}</td><td><b>${m.total_score}%</b></td><td><b>${m.grade}</b></td></tr>`).join('') || '<tr><td colspan="5">Hakuna matokeo yaliyopatikana kwa jina lako bado.</td></tr>'}
-        </table>
-      </div>
+    if (tab === 'cbt_hw') {
+      const cbts = SGB.select('assignments_cbt');
+      const mySubs = SGB.select('assignment_submissions').filter(s => s.student_name.toLowerCase() === cleanStudentName.toLowerCase());
+      area.innerHTML = `
+        <div class="panel">
+          <h3>1. Kazi za Nyumbani (Written Assignments) & Online CBT</h3>
+          ${cbts.map(c => `<div style="border:1px solid #cbd5e1; padding:14px; border-radius:8px; margin-bottom:12px; background:#f8fafc;">
+            <div style="display:flex; justify-content:space-between;">
+              <b>${c.title} (${c.sub || 'Somo'})</b>
+              <span style="font-size:11px; color:#1d4ed8; font-weight:bold;">Mwalimu: ${c.teacher || '-'}</span>
+            </div>
+            <p style="margin:8px 0;">${c.question}</p>
+            ${c.type === 'WRITTEN' ? `
+              <textarea id="ans_${c.id}" rows="3" placeholder="Andika majibu yako hapa..."></textarea><br><br>
+              <button class="btn btn-green" onclick="submitWritten(${c.id}, '${c.title}', '${c.teacher}')">📤 Wasilisha Kazi Kwa Mwalimu</button>
+            ` : `
+              <small style="color:#334155;"><b>Chaguo:</b> ${c.options}</small><br><br>
+              <div style="display:flex; gap:8px; max-width:340px;">
+                <input type="text" id="ans_${c.id}" placeholder="Weka herufi (A, B, C au D)">
+                <button class="btn" onclick="checkCBT(${c.id}, '${c.answer}')">✅ Wasilisha Jibu</button>
+              </div>
+            `}
+          </div>`).join('') || '<p>Hakuna kazi au jaribio lililowekwa na walimu kwa sasa.</p>'}
+        </div>
+        <div class="panel">
+          <h3>2. Kazi Zangu Zilizowasilishwa & Alama za Mwalimu</h3>
+          <table><tr><th>Kazi</th><th>Jibu Lako</th><th>Alama / Maoni</th></tr>
+          ${mySubs.map(s => `<tr><td><b>${s.title}</b></td><td>${s.answer_text}</td><td><b style="color:#059669;">${s.score}</b></td></tr>`).join('') || '<tr><td colspan="3">Bado hujawasilisha kazi yoyote.</td></tr>'}
+          </table>
+        </div>`;
+    }
+    if (tab === 'results') {
+      const myMarks = SGB.select('exam_results').filter(m => m.student_name.toLowerCase().includes(cleanStudentName.toLowerCase()));
+      area.innerHTML = `
+        <div class="panel">
+          <h3>Matokeo Yangu ya Mitihani (NECTA Grading)</h3>
+          <table><tr><th>Somo</th><th>CA (30%)</th><th>Final (70%)</th><th>Jumla</th><th>Daraja</th><th>Pointi</th></tr>
+          ${myMarks.map(m => `<tr><td><b>${m.subject_name}</b></td><td>${m.ca_score}</td><td>${m.final_score}</td><td><b>${m.total_score}%</b></td><td><b>${m.grade}</b></td><td>${m.points}</td></tr>`).join('') || '<tr><td colspan="6">Hakuna matokeo yaliyopatikana kwa jina lako bado.</td></tr>'}
+          </table>
+        </div>`;
+    }
 
-      <div class="panel">
-        <h3>3. Ratiba ya Vipindi & Maktaba ya NECTA Past Papers</h3>
-        <table><tr><th>Siku</th><th>Muda</th><th>Darasa</th><th>Mwalimu & Somo</th></tr>
-        ${tt.map(t => `<tr><td><b>${t.day}</b></td><td>${t.time}</td><td>${t.cls}</td><td>${t.teacher}</td></tr>`).join('') || '<tr><td colspan="4">Ratiba haijapakiwa bado.</td></tr>'}
-        </table>
-        <p style="margin-top:12px; font-size:12px;">📚 <b>Maktaba ya Kidijitali (NECTA Past Papers):</b> <a href="https://tetea.org" target="_blank">Fungua Maktaba ya NECTA Past Papers (Form 2, 4 & 6) ↗</a></p>
-      </div>
+    if (tab === 'timetable_lib') {
+      const tt = SGB.select('smart_timetable');
+      area.innerHTML = `
+        <div class="panel">
+          <h3>1. Ratiba ya Vipindi (Smart Timetable)</h3>
+          <table><tr><th>Siku</th><th>Muda</th><th>Darasa</th><th>Mwalimu & Somo</th></tr>
+          ${tt.map(t => `<tr><td><b>${t.day}</b></td><td>${t.time}</td><td>${t.cls}</td><td>${t.teacher}</td></tr>`).join('') || '<tr><td colspan="4">Ratiba haijapakiwa bado.</td></tr>'}
+          </table>
+        </div>
+        <div class="panel">
+          <h3>2. Maktaba ya Kidijitali (NECTA Past Papers)</h3>
+          <p style="font-size:13px;">Pakua mitihani iliyopita ya NECTA (Form 2, Form 4 na Form 6) kwa masomo yote:</p>
+          <a href="https://tetea.org" target="_blank" class="btn" style="text-decoration:none; display:inline-block;">📚 Fungua Maktaba ya NECTA Past Papers ↗</a>
+        </div>`;
+    }
 
-      <div class="panel">
-        <h3>4. Sanduku la Maoni la Siri (Whistleblower Box)</h3>
-        <form onsubmit="sendSecret(event)" style="display:flex; gap:10px;">
-          <input type="text" id="secTxt" required placeholder="Andika taarifa nyeti kwa Mkuu wa Shule bila jina lako kuonekana...">
-          <button type="submit" class="btn">🔒 Tuma Kwa Siri</button>
-        </form>
-      </div>`;
+    if (tab === 'secret_box') {
+      area.innerHTML = `
+        <div class="panel">
+          <h3>Sanduku la Maoni la Siri (Whistleblower Box)</h3>
+          <p style="font-size:12px; color:#475569;">Taarifa unayotuma hapa inafika moja kwa moja kwa Mkuu wa Shule na Super Admin <b>bila jina lako kuonekana</b>.</p>
+          <form onsubmit="sendSecret(event)">
+            <textarea id="secTxt" rows="4" required placeholder="Andika taarifa nyeti au ushauri wako hapa..."></textarea><br><br>
+            <button type="submit" class="btn">🔒 Tuma Taarifa Kwa Siri</button>
+          </form>
+        </div>`;
+    }
   }
 
   function submitWritten(id, title, teacher) {
@@ -111,7 +162,7 @@
     if (!answer_text) return;
     SGB.insert('assignment_submissions', { student_name: cleanStudentName, title, teacher, answer_text, score: 'Inasubiri kusahihishwa' });
     alert('✅ Kazi yako imetumwa kwa mwalimu ' + teacher + '!');
-    renderStudentPortal();
+    openTab('cbt_hw');
   }
 
   function checkCBT(id, correct) {
@@ -124,11 +175,11 @@
   function sendSecret(e) {
     e.preventDefault();
     SGB.insert('secret_reports', { message: document.getElementById('secTxt').value });
-    alert('🔒 Ujumbe wako wa siri umetumwa kwa Super Admin & Mkuu wa Shule bila utambulisho wako!');
+    alert('🔒 Ujumbe wako wa siri umetumwa bila utambulisho wako!');
     e.target.reset();
   }
 
-  renderStudentPortal();
+  openTab('home', document.querySelector('.menu-btn'));
 </script>
 </body>
 </html>
