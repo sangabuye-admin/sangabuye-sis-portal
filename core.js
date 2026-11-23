@@ -1,5 +1,5 @@
-// INJINI KUU YA SANGABUYE SIS PORTAL (v6.0 - FIREBASE LIVE CLOUD SYNC + PWA)
-const FIREBASE_DB_URL = 'https://sangabuye-sis-default-rtdb.firebaseio.com';
+// INJINI KUU YA SANGABUYE SIS PORTAL (v6.5 - FFARS, FULL BILINGUAL, CLOUD SYNC & RELIABLE BACKUP)
+const FIREBASE_DB_URL = 'https://firebaseio.com';
 
 const SGB = {
   lang: localStorage.getItem('sgb_lang') || 'sw',
@@ -14,9 +14,10 @@ const SGB = {
       body: raw
     }).then(() => {
       const syncEl = document.getElementById('syncTime');
-      if (syncEl) syncEl.innerText = ' • ☁️ Cloud Saved: ' + new Date().toLocaleTimeString();
+      if (syncEl) syncEl.innerText = ' • ☁️ Cloud Live: ' + new Date().toLocaleTimeString();
     }).catch(() => {});
   },
+
   async pullFromCloud(silent = true) {
     if (!navigator.onLine) return;
     try {
@@ -42,9 +43,10 @@ const SGB = {
           setTimeout(() => this.applyLanguage(), 100);
         }
       }
-      if (!silent) this.notifySync('☁️ Data zote zimesawazishwa na Cloud (Firebase)!');
+      if (!silent) this.notifySync(this.lang === 'en' ? '☁️ System & Cloud Refreshed!' : '☁️ Mfumo na Data Zimesasishwa!');
     } catch (e) {}
   },
+
   insert(table, item) {
     item.id = Date.now() + Math.floor(Math.random() * 100);
     item.created_at = new Date().toLocaleString('sw-TZ');
@@ -53,7 +55,7 @@ const SGB = {
     localStorage.setItem('sgb_' + table, JSON.stringify(list));
     this.pushToCloud(table);
     this.logAction(`Ameongeza taarifa kwenye ${table}`);
-    this.notifySync('✅ Imehifadhiwa & Kupandishwa Hewani (Cloud)!');
+    this.notifySync('✅ Imehifadhiwa & Kupandishwa Hewani!');
     return item;
   },
 
@@ -74,20 +76,28 @@ const SGB = {
   getConfig() {
     return JSON.parse(localStorage.getItem('sgb_school_config') || '{"year":"2026","term":"Term I","crdb":"0150838972100"}');
   },
+  numberToWords(num) {
+    num = Math.floor(Number(num) || 0);
+    if (num === 0) return 'Zero shillings and zero cents only';
+    const a = ['','One','Two','Three','Four','Five','Six','Seven','Eight','Nine','Ten','Eleven','Twelve','Thirteen','Fourteen','Fifteen','Sixteen','Seventeen','Eighteen','Nineteen'];
+    const b = ['','','Twenty','Thirty','Forty','Fifty','Sixty','Seventy','Eighty','Ninety'];
+    const convert = (n) => {
+      if (n < 20) return a[n];
+      if (n < 100) return b[Math.floor(n / 10)] + (n % 10 ? ' ' + a[n % 10] : '');
+      if (n < 1000) return a[Math.floor(n / 100)] + ' Hundred' + (n % 100 ? ' ' + convert(n % 100) : '');
+      if (n < 1000000) return convert(Math.floor(n / 1000)) + ' Thousand' + (n % 1000 ? ' ' + convert(n % 1000) : '');
+      return convert(Math.floor(n / 1000000)) + ' Million' + (n % 1000000 ? ' ' + convert(n % 1000000) : '');
+    };
+    return convert(num) + ' shillings and zero cents only';
+  },
+
   findParentPhone(message) {
     const msgLower = (message || '').toLowerCase();
-    const users = this.select('users_profile');
-    const bus = this.select('school_bus_routes');
-
-    for (const u of users) {
-      if (u.full_name && msgLower.includes(u.full_name.toLowerCase()) && u.phone_number && /\d{9,}/.test(u.phone_number)) {
-        return u.phone_number;
-      }
+    for (const u of this.select('users_profile')) {
+      if (u.full_name && msgLower.includes(u.full_name.toLowerCase()) && u.phone_number && /\d{9,}/.test(u.phone_number)) return u.phone_number;
     }
-    for (const b of bus) {
-      if (b.student_name && msgLower.includes(b.student_name.toLowerCase()) && b.phone && /\d{9,}/.test(b.phone)) {
-        return b.phone;
-      }
+    for (const b of this.select('school_bus_routes')) {
+      if (b.student_name && msgLower.includes(b.student_name.toLowerCase()) && b.phone && /\d{9,}/.test(b.phone)) return b.phone;
     }
     return '';
   },
@@ -95,9 +105,8 @@ const SGB = {
   formatPhone(rawPhone, message = '') {
     let detected = rawPhone || this.findParentPhone(message);
     let p = (detected || '').replace(/\D/g, '');
-    if (!p) {
-      p = (prompt('Ingiza namba ya simu ya Mzazi (Mfano: 0755123456):') || '').replace(/\D/g, '');
-    } else {
+    if (!p) p = (prompt('Ingiza namba ya simu ya Mzazi (Mfano: 0755123456):') || '').replace(/\D/g, '');
+    else {
       const confirmed = prompt('Thibitisha au badilisha namba ya simu ya Mzazi:', detected);
       if (confirmed === null) return null;
       p = confirmed.replace(/\D/g, '');
@@ -121,6 +130,7 @@ const SGB = {
     this.insert('comms_logs', { channel: 'SMS', phone: localNum, message });
     window.location.href = `sms:${localNum}?body=${encodeURIComponent(message)}`;
   },
+
   compressPhoto(file, callback) {
     if (!file) return;
     const reader = new FileReader();
@@ -128,10 +138,8 @@ const SGB = {
       const img = new Image();
       img.onload = () => {
         const canvas = document.createElement('canvas');
-        canvas.width = 160;
-        canvas.height = 160;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, 160, 160);
+        canvas.width = 160; canvas.height = 160;
+        canvas.getContext('2d').drawImage(img, 0, 0, 160, 160);
         callback(canvas.toDataURL('image/jpeg', 0.75));
       };
       img.src = e.target.result;
@@ -139,12 +147,11 @@ const SGB = {
     reader.readAsDataURL(file);
   },
 
-  liveRefresh(silent = false) {
-    this.pullFromCloud(silent);
+  async liveRefresh(silent = false) {
+    await this.pullFromCloud(silent);
     const activeMenu = document.querySelector('.menu-btn.active');
     if (activeMenu) activeMenu.click();
-    this.applyLanguage();
-    if (!silent) this.notifySync(this.lang === 'en' ? '☁️ Synced with Cloud!' : '☁️ Data zote zimesawazishwa hewani!');
+    setTimeout(() => this.applyLanguage(), 120);
   },
 
   notifySync(msg) {
@@ -160,23 +167,27 @@ const SGB = {
     clearTimeout(this._toastTimer);
     this._toastTimer = setTimeout(() => { toast.style.opacity = '0'; }, 2500);
   },
+
   exportBackup() {
     const backup = { portal: 'Sangabuye SIS Portal', exported_at: new Date().toISOString(), data: {} };
+    let count = 0;
     for (let i = 0; i < localStorage.length; i++) {
       const k = localStorage.key(i);
-      if (k && k.startsWith('sgb_')) backup.data[k] = JSON.parse(localStorage.getItem(k));
+      if (k && k.startsWith('sgb_')) {
+        try { backup.data[k] = JSON.parse(localStorage.getItem(k)); count++; } catch (e) {}
+      }
     }
-    const jsonStr = JSON.stringify(backup);
+    const jsonStr = JSON.stringify(backup, null, 2);
+    const fileName = 'Sangabuye_Backup_' + new Date().toISOString().slice(0, 10) + '.json';
 
-    try {
-      const blob = new Blob([jsonStr], { type: 'application/json' });
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = 'Sangabuye_Backup_' + new Date().toISOString().slice(0, 10) + '.json';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-    } catch (e) {}
+    // Pakua Faili Moja kwa Moja kwa Data URI (Inafanya kazi kwenye Simu & PC zote)
+    const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(jsonStr);
+    const link = document.createElement('a');
+    link.setAttribute('href', dataUri);
+    link.setAttribute('download', fileName);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
 
     let modal = document.getElementById('sgbBackupModal');
     if (!modal) {
@@ -188,12 +199,12 @@ const SGB = {
     modal.style.display = 'flex';
     modal.innerHTML = `
       <div style="background:#fff;width:100%;max-width:500px;border-radius:12px;padding:18px;">
-        <h3 style="margin:0 0 8px;color:#0f294a;">💾 Nakala ya Data Zako (Backup Code)</h3>
-        <p style="font-size:12px;color:#475569;">Bofya <b>Nakili (Copy)</b> kunakili data zako, au bofya <b>☁️ Pandisha Zote Cloud</b> kuzipeleka moja kwa moja kwenye Firebase:</p>
+        <h3 style="margin:0 0 8px;color:#0f294a;">💾 Backup Imepakuliwa (Majedwali ${count})</h3>
+        <p style="font-size:12px;color:#475569;">Faili <b>${fileName}</b> limepakuliwa. Unaweza pia kunakili (Copy) maandishi haya au kuyapandisha Cloud:</p>
         <textarea id="bkOutText" rows="5" readonly style="width:100%;font-size:11px;padding:8px;border:1px solid #cbd5e1;border-radius:6px;">${jsonStr}</textarea><br><br>
         <div style="display:flex;gap:8px;flex-wrap:wrap;">
           <button onclick="SGB.copyBackupText()" style="background:#059669;color:#fff;border:none;padding:9px 12px;border-radius:6px;font-weight:bold;cursor:pointer;">📋 Nakili (Copy)</button>
-          <button onclick="SGB.pushAllLocalToCloud()" style="background:#1d4ed8;color:#fff;border:none;padding:9px 12px;border-radius:6px;font-weight:bold;cursor:pointer;">☁️ Pandisha Zote Cloud</button>
+          <button onclick="SGB.pushAllLocalToCloud()" style="background:#1d4ed8;color:#fff;border:none;padding:9px 12px;border-radius:6px;font-weight:bold;cursor:pointer;">☁️ Pandisha Cloud</button>
           <button onclick="document.getElementById('sgbBackupModal').style.display='none'" style="background:#dc2626;color:#fff;border:none;padding:9px 12px;border-radius:6px;font-weight:bold;cursor:pointer;">✕ Funga</button>
         </div>
       </div>`;
@@ -202,21 +213,19 @@ const SGB = {
   pushAllLocalToCloud() {
     for (let i = 0; i < localStorage.length; i++) {
       const k = localStorage.key(i);
-      if (k && k.startsWith('sgb_')) {
-        this.pushToCloud(k.replace('sgb_', ''));
-      }
+      if (k && k.startsWith('sgb_')) this.pushToCloud(k.replace('sgb_', ''));
     }
-    alert('☁️ Data zote za kwenye kifaa hiki zimepandishwa hewani (Firebase Cloud)!');
+    alert('☁️ Data zote zimepandishwa hewani (Firebase Cloud)!');
   },
 
   copyBackupText() {
     const el = document.getElementById('bkOutText');
-    el.select();
-    el.setSelectionRange(0, 999999);
+    el.select(); el.setSelectionRange(0, 999999);
     if (navigator.clipboard) navigator.clipboard.writeText(el.value).catch(() => {});
     document.execCommand('copy');
-    alert('✅ Data zimenakiliwa (Copied)!');
+    alert('✅ Backup imenakiliwa (Copied)!');
   },
+
   importBackup() {
     let modal = document.getElementById('sgbRestoreModal');
     if (!modal) {
@@ -229,15 +238,13 @@ const SGB = {
     modal.innerHTML = `
       <div style="background:#fff;width:100%;max-width:500px;border-radius:12px;padding:18px;">
         <h3 style="margin:0 0 8px;color:#0f294a;">📂 Rudisha Data Zako (Restore)</h3>
-        <p style="font-size:12px;color:#475569;">Bandika (Paste) maandishi ya Backup hapa chini AU chagua faili la <code>.json</code>:</p>
-        <textarea id="bkInText" rows="5" placeholder="Bandika (Paste) kodi ya Backup hapa..." style="width:100%;font-size:11px;padding:8px;border:1px solid #cbd5e1;border-radius:6px;"></textarea><br><br>
+        <textarea id="bkInText" rows="5" placeholder="Bandika (Paste) kodi ya Backup hapa au chagua faili..." style="width:100%;font-size:11px;padding:8px;border:1px solid #cbd5e1;border-radius:6px;"></textarea><br><br>
         <input type="file" id="bkFileInp" accept=".json" style="margin-bottom:12px;">
         <div style="display:flex;gap:8px;">
-          <button onclick="SGB.processRestoreText()" style="background:#1d4ed8;color:#fff;border:none;padding:9px 14px;border-radius:6px;font-weight:bold;cursor:pointer;">✅ Rudisha & Pandisha Cloud</button>
+          <button onclick="SGB.processRestoreText()" style="background:#1d4ed8;color:#fff;border:none;padding:9px 14px;border-radius:6px;font-weight:bold;cursor:pointer;">✅ Rudisha Data Sasa</button>
           <button onclick="document.getElementById('sgbRestoreModal').style.display='none'" style="background:#dc2626;color:#fff;border:none;padding:9px 14px;border-radius:6px;font-weight:bold;cursor:pointer;">✕ Funga</button>
         </div>
       </div>`;
-
     document.getElementById('bkFileInp').onchange = (e) => {
       const file = e.target.files;
       if (!file) return;
@@ -250,7 +257,7 @@ const SGB = {
   processRestoreText() {
     try {
       const raw = document.getElementById('bkInText').value.trim();
-      if (!raw) { alert('⚠️ Bandika maandishi ya Backup au chagua faili kwanza.'); return; }
+      if (!raw) { alert('⚠️ Bandika maandishi au chagua faili kwanza.'); return; }
       const parsed = JSON.parse(raw);
       const records = parsed.data || parsed;
       Object.keys(records).forEach(k => {
@@ -260,11 +267,9 @@ const SGB = {
         }
       });
       document.getElementById('sgbRestoreModal').style.display = 'none';
-      alert('✅ Data zote zimerudishwa na kupandishwa hewani (Cloud)!');
+      alert('✅ Data zote zimerudishwa kikamilifu!');
       this.liveRefresh(true);
-    } catch (err) {
-      alert('❌ Maandishi au faili la Backup si sahihi: ' + err.message);
-    }
+    } catch (err) { alert('❌ Faili la Backup si sahihi: ' + err.message); }
   },
   openHelpModal() {
     let modal = document.getElementById('sgbHelpModal');
@@ -281,12 +286,9 @@ const SGB = {
           <h3 style="margin:0;color:#0f294a;">❓ Mwongozo wa Haraka — Sangabuye SIS</h3>
           <button onclick="document.getElementById('sgbHelpModal').style.display='none'" style="background:#dc2626;color:#fff;border:none;padding:5px 10px;border-radius:6px;cursor:pointer;">✕ Funga</button>
         </div>
-        <p><b>🏫 Shule:</b> Sangabuye Secondary School (S.L.P 11898, Ilemela - Mwanza)</p>
+        <p><b>🏫 Shule:</b> Halmashauri ya Manispaa ya Ilemela — Shule ya Sekondari Sangabuye (S.L.P 11898, Mwanza)</p>
         <p><b>📞 Mkuu wa Shule:</b> 0784 755 173 | <b>Mhasibu:</b> 0615 000 305</p>
-        <p><b>🏦 Akaunti ya Benki:</b> CRDB <code>0150838972100</code> (SHULE YA SEKONDARI SANGABUYE E.K)</p>
-        <hr>
-        <p><b>1. Live Cloud Sync (Firebase):</b> Taarifa zote zinahifadhiwa hewani moja kwa moja na kuonekana kwenye simu na kompyuta zote za shule.</p>
-        <p><b>2. Kuweka Kwenye Simu Kama App:</b> Kwenye Chrome (Android) bofya vidoti vitatu (⋮) kisha <i>Add to Home screen / Install app</i>. Kwenye iPhone (Safari) bofya <i>Share ➔ Add to Home Screen</i>.</p>
+        <p><b>🏦 CRDB Bank:</b> <code>0150838972100</code> (SHULE YA SEKONDARI SANGABUYE E.K)</p>
       </div>`;
   },
 
@@ -310,21 +312,18 @@ const SGB = {
         </div>
         <form onsubmit="SGB.sendDirectMsg(event)" style="display:grid;gap:8px;margin-bottom:14px;">
           <select id="dmTo" style="padding:8px;border:1px solid #cbd5e1;border-radius:6px;">
-            <option value="Mkuu wa Shule">Kwenda: Mkuu wa Shule (0784 755 173)</option>
-            <option value="Mhasibu">Kwenda: Mhasibu (0615 000 305)</option>
-            <option value="Mtaaluma">Kwenda: Mtaaluma (Academic)</option>
-            <option value="Walimu">Kwenda: Walimu</option>
-            <option value="Wazazi">Kwenda: Wazazi</option>
+            <option value="Mkuu wa Shule">Mkuu wa Shule (0784 755 173)</option>
+            <option value="Mhasibu">Mhasibu (0615 000 305)</option>
+            <option value="Mtaaluma">Mtaaluma (Academic)</option>
+            <option value="Walimu">Walimu</option>
+            <option value="Wazazi">Wazazi</option>
           </select>
           <input type="text" id="dmSubj" required placeholder="Kichwa / Jina la Mwanafunzi" style="padding:8px;border:1px solid #cbd5e1;border-radius:6px;">
           <textarea id="dmBody" rows="2" required placeholder="Andika ujumbe wako hapa..." style="padding:8px;border:1px solid #cbd5e1;border-radius:6px;"></textarea>
           <button type="submit" style="background:#1d4ed8;color:#fff;border:none;padding:9px;border-radius:6px;font-weight:bold;cursor:pointer;">📤 Tuma Ujumbe</button>
         </form>
         <div style="font-size:12.5px;">
-          ${msgs.slice(0, 15).map(m => `<div style="border-bottom:1px solid #e2e8f0;padding:8px 0;">
-            <b>${m.sender} ➔ ${m.recipient}</b> <small style="color:#64748b;">(${m.created_at})</small><br>
-            <u>${m.subject}:</u> ${m.body}
-          </div>`).join('') || '<p style="color:#64748b;">Hakuna ujumbe wowote bado.</p>'}
+          ${msgs.slice(0, 15).map(m => `<div style="border-bottom:1px solid #e2e8f0;padding:8px 0;"><b>${m.sender} ➔ ${m.recipient}</b> <small>(${m.created_at})</small><br><u>${m.subject}:</u> ${m.body}</div>`).join('') || '<p>Hakuna ujumbe wowote bado.</p>'}
         </div>
       </div>`;
   },
@@ -332,46 +331,38 @@ const SGB = {
   sendDirectMsg(e) {
     e.preventDefault();
     const u = this.getUser();
-    this.insert('direct_messages', {
-      sender: u ? u.full_name : 'Mtumiaji',
-      recipient: document.getElementById('dmTo').value,
-      subject: document.getElementById('dmSubj').value,
-      body: document.getElementById('dmBody').value
-    });
+    this.insert('direct_messages', { sender: u ? u.full_name : 'Mtumiaji', recipient: document.getElementById('dmTo').value, subject: document.getElementById('dmSubj').value, body: document.getElementById('dmBody').value });
     this.openInboxModal();
   },
-  dict: [
-    ['OFISI YA MHASIBU', 'ACCOUNTANT OFFICE'],
-    ['OFISI YA MTAALUMA', 'ACADEMIC MASTER OFFICE'],
-    ['DASHIBODI YA MWALIMU', 'TEACHER DASHBOARD'],
-    ['MKUU WA SHULE', 'HEADMASTER OFFICE'],
-    ['MKURUGENZI (DIRECTOR)', 'SCHOOL DIRECTOR'],
-    ['TOVUTI YA MZAZI', 'PARENT PORTAL'],
-    ['TOVUTI YA MWANAFUNZI', 'STUDENT PORTAL'],
-    ['Toka (Logout)', 'Sign Out (Logout)'],
-    ['Jina la Mwanafunzi', 'Student Full Name'],
-    ['Mwanafunzi', 'Student'],
-    ['Somo', 'Subject'],
-    ['Darasa', 'Class'],
-    ['Jumla', 'Total'],
-    ['Daraja', 'Grade'],
-    ['Pointi', 'Points'],
-    ['Tarehe', 'Date'],
-    ['Hali', 'Status'],
-    ['Hatua', 'Action'],
-    ['Kiasi (TZS)', 'Amount (TZS)'],
-    ['Risiti Na.', 'Receipt No.'],
-    ['Mchango', 'Category'],
-    ['Njia', 'Method'],
-    ['Bidhaa', 'Item Name'],
-    ['Salio', 'Balance']
-  ],
 
+  dict: [
+    ['OFISI YA MHASIBU', 'ACCOUNTANT OFFICE'], ['OFISI YA MTAALUMA', 'ACADEMIC MASTER OFFICE'],
+    ['DASHIBODI YA MWALIMU', 'TEACHER DASHBOARD'], ['MKUU WA SHULE', 'HEADMASTER OFFICE'],
+    ['MKURUGENZI (DIRECTOR)', 'SCHOOL DIRECTOR'], ['TOVUTI YA MZAZI', 'PARENT PORTAL'],
+    ['TOVUTI YA MWANAFUNZI', 'STUDENT PORTAL'], ['MAKTABA YA SHULE', 'SCHOOL LIBRARY'],
+    ['MABWENI & ZAHANATI', 'HOSTELS & SICKBAY'], ['Muhtasari wa Fedha & Vyanzo', 'Finance & Sources Summary'],
+    ['Mapokezi (Kapu la Michango)', 'Receipts (Fee Basket)'], ['Taarifa Kwa Mzazi & Wadaiwa', 'Parent Statement & Defaulters'],
+    ['Matumizi (Filters & Vocha)', 'Expenses (Filters & Vouchers)'], ['Kamati ya Manunuzi', 'Procurement Committee'],
+    ['Mishahara (Pre-Audit, PV & Slip)', 'Payroll (Pre-Audit, PV & Slip)'], ['Kambi ya Masomo & Basi', 'Academic Camp & School Bus'],
+    ['Viwango vya Ada & Michango', 'Fee & Contribution Structures'], ['Stoo ya Vyakula & Vifaa', 'Food & Equipment Store'],
+    ['Ripoti Zote za Kifedha', 'All Financial Reports'], ['Funga Hesabu & Clearance', 'Lock Accounts & Clearance'],
+    ['Toka (Logout)', 'Sign Out (Logout)'], ['Jina la Mwanafunzi', 'Student Full Name'],
+    ['Namba ya Usajili', 'Registration Number'], ['Simu ya Mzazi', 'Parent Phone'],
+    ['Aina ya Malipo', 'Payment Category'], ['Kiasi Kilicholipwa', 'Amount Paid'],
+    ['Salio / Deni', 'Balance / Debt'], ['Chanzo cha Pato', 'Revenue Source'],
+    ['Maelezo ya Matumizi', 'Expense Description'], ['Kiasi (TZS)', 'Amount (TZS)'],
+    ['Tarehe', 'Date'], ['Hali', 'Status'], ['Hatua', 'Action'], ['Mtumishi', 'Staff Member'],
+    ['Kazi', 'Job Title'], ['Bidhaa', 'Item Name'], ['Salio', 'Balance'], ['Mtoaji', 'Donor / Supplier'],
+    ['Mwanafunzi', 'Student'], ['Somo', 'Subject'], ['Darasa', 'Class'], ['Jumla', 'Total'],
+    ['Daraja', 'Grade'], ['Pointi', 'Points'], ['Risiti Na.', 'Receipt No.'], ['Njia', 'Method'],
+    ['Andika jina la mwanafunzi...', 'Type student name...'], ['Hakuna miamala bado.', 'No transactions yet.'],
+    ['Hakuna matumizi kwenye kipindi hiki.', 'No expenses in this period.'], ['Hakuna vikao vya manunuzi bado.', 'No procurement meetings yet.']
+  ],
   toggleLang() {
     this.lang = this.lang === 'sw' ? 'en' : 'sw';
     localStorage.setItem('sgb_lang', this.lang);
     this.applyLanguage();
-    this.notifySync(this.lang === 'en' ? '🌐 Language switched to English' : '🌐 Lugha imebadilishwa kuwa Kiswahili');
+    this.notifySync(this.lang === 'en' ? '🌐 Full System Switched to English' : '🌐 Mfumo Mzima Umebadilishwa Kuwa Kiswahili');
   },
 
   applyLanguage() {
@@ -382,11 +373,19 @@ const SGB = {
       let txt = node.nodeValue;
       if (!txt || !txt.trim()) continue;
       this.dict.forEach(([sw, en]) => {
-        if (toEn && txt.includes(sw)) txt = txt.replace(sw, en);
-        else if (!toEn && txt.includes(en)) txt = txt.replace(en, sw);
+        if (toEn && txt.includes(sw)) txt = txt.split(sw).join(en);
+        else if (!toEn && txt.includes(en)) txt = txt.split(en).join(sw);
       });
       node.nodeValue = txt;
     }
+    document.querySelectorAll('input[placeholder], textarea[placeholder]').forEach(el => {
+      let ph = el.getAttribute('placeholder');
+      this.dict.forEach(([sw, en]) => {
+        if (toEn && ph.includes(sw)) ph = ph.split(sw).join(en);
+        else if (!toEn && ph.includes(en)) ph = ph.split(en).join(sw);
+      });
+      el.setAttribute('placeholder', ph);
+    });
   },
 
   logAction(action) {
@@ -408,10 +407,7 @@ const SGB = {
   },
   startSessionTimer() {
     let idle = 0;
-    setInterval(() => {
-      idle++;
-      if (idle >= 20) { alert('⏳ Muda wa kikao (dakika 20) umeisha.'); this.logout(); }
-    }, 60000);
+    setInterval(() => { idle++; if (idle >= 20) { alert('⏳ Muda wa kikao umeisha.'); this.logout(); } }, 60000);
     ['click', 'keypress', 'mousemove'].forEach(ev => document.addEventListener(ev, () => { idle = 0; }));
   },
   logout() {
@@ -434,11 +430,9 @@ setInterval(() => SGB.pullFromCloud(true), 12000);
 window.addEventListener('DOMContentLoaded', () => {
   if (!document.querySelector('link[rel="manifest"]')) {
     const link = document.createElement('link');
-    link.rel = 'manifest';
-    link.href = 'manifest.json';
+    link.rel = 'manifest'; link.href = 'manifest.json';
     document.head.appendChild(link);
   }
-
   const topbar = document.querySelector('.topbar');
   if (topbar) {
     const netStatus = navigator.onLine
@@ -450,16 +444,13 @@ window.addEventListener('DOMContentLoaded', () => {
       ${netStatus}
       <button class="btn" style="background:#0f294a;color:#fff;" onclick="SGB.openHelpModal()">❓ Msaada</button>
       <button class="btn" style="background:#7c3aed;color:#fff;" onclick="SGB.openInboxModal()">💬 Ujumbe</button>
-      <button class="btn" style="background:#0284c7;color:#fff;" onclick="SGB.liveRefresh()">🔄 Sync</button>
+      <button class="btn" style="background:#0284c7;color:#fff;" onclick="SGB.liveRefresh(false)">🔄 Refresh</button>
       <button class="btn" style="background:#d97706;color:#fff;" onclick="SGB.toggleLang()">🌐 SW | EN</button>
       <button class="btn" style="background:#059669;color:#fff;" onclick="SGB.exportBackup()">💾 Backup</button>
       <button class="btn" style="background:#475569;color:#fff;" onclick="SGB.importBackup()">📂 Restore</button>
     `;
-    if (topbar.lastElementChild && topbar.children.length > 1) {
-      topbar.replaceChild(tools, topbar.lastElementChild);
-    } else {
-      topbar.appendChild(tools);
-    }
+    if (topbar.lastElementChild && topbar.children.length > 1) topbar.replaceChild(tools, topbar.lastElementChild);
+    else topbar.appendChild(tools);
   }
   setTimeout(() => SGB.applyLanguage(), 150);
 });
