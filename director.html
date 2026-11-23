@@ -25,7 +25,8 @@
     table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 12.5px; }
     th, td { padding: 8px; border: 1px solid #e2e8f0; text-align: left; }
     th { background: #f8fafc; color: #0f172a; }
-    .btn { padding: 8px 14px; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold; background: #0284c7; color: white; }
+    .btn { padding: 7px 13px; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold; background: #0284c7; color: white; }
+    .btn-green { background: #059669; color: white; }
     .logout-btn { background: #dc2626; color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: bold; margin-top: auto; }
   </style>
 </head>
@@ -33,14 +34,14 @@
 <div class="sidebar">
   <h2>MKURUGENZI (DIRECTOR)</h2>
   <p>Executive Overview | Sangabuye</p>
-  <button class="menu-btn active" onclick="openTab('exec', this)">📊 1. Afya ya Fedha & Mali (Assets)</button>
-  <button class="menu-btn" onclick="openTab('acad_hr', this)">🎓 2. Takwimu za Taaluma & Watumishi</button>
+  <button class="menu-btn active" onclick="openTab('exec', this)">📊 1. Afya ya Fedha, Collection % & Idhini</button>
+  <button class="menu-btn" onclick="openTab('acad_hr', this)">🎓 2. NECTA Division, Uwiano & Mali</button>
   <button class="menu-btn" onclick="openTab('board', this)">📁 3. Kumbukumbu za Bodi ya Shule</button>
   <button class="logout-btn" onclick="SGB.logout()">🚪 Toka (Logout)</button>
 </div>
 <div class="main">
   <div class="topbar">
-    <div><strong id="tabTitle">📊 1. Afya ya Fedha & Mali (Assets)</strong> <span id="syncTime" style="font-size:11px; color:#0284c7;"></span></div>
+    <div><strong id="tabTitle">📊 1. Afya ya Fedha, Collection % & Idhini</strong> <span id="syncTime" style="font-size:11px; color:#0284c7;"></span></div>
     <div></div>
   </div>
   <div class="content" id="viewArea"></div>
@@ -67,28 +68,30 @@
       const cash = recs.filter(r => r.payment_method === 'Cash').reduce((s, r) => s + Number(r.amount_paid), 0);
       const totalIn = crdb + cash;
       const expense = vchs.reduce((s, v) => s + Number(v.amount), 0) + pays.reduce((s, p) => s + Number(p.net_pay), 0);
-      const assetVal = assets.reduce((s, a) => s + Number(a.val), 0);
       const pendingFees = stmts.reduce((s, x) => s + Number(x.balance || 0), 0);
+      const expectedTotal = totalIn + pendingFees;
+      const collRate = expectedTotal > 0 ? Math.round((totalIn / expectedTotal) * 100) : 100;
       const maxBar = Math.max(totalIn, expense, 1);
 
       area.innerHTML = `
         <div class="cards">
           <div class="card" style="border-color:#059669;"><h4>Mapato CRDB & Cash</h4><div class="val">TZS ${totalIn.toLocaleString()}</div></div>
           <div class="card" style="border-color:#dc2626;"><h4>Matumizi & Mishahara</h4><div class="val">TZS ${expense.toLocaleString()}</div></div>
-          <div class="card" style="border-color:#d97706;"><h4>Madeni ya Ada (Pending Fees)</h4><div class="val">TZS ${pendingFees.toLocaleString()}</div></div>
-          <div class="card"><h4>Thamani ya Mali (Fixed Assets)</h4><div class="val">TZS ${assetVal.toLocaleString()}</div></div>
+          <div class="card" style="border-color:#d97706;"><h4>Madeni (Pending Fees)</h4><div class="val">TZS ${pendingFees.toLocaleString()}</div></div>
+          <div class="card"><h4>Ufanisi wa Makusanyo</h4><div class="val">${collRate}% Collected</div></div>
         </div>
         <div class="panel">
-          <h3>Mlinganisho wa Mapato dhidi ya Matumizi (Financial Visual Bar)</h3>
-          <p style="font-size:12px; margin-bottom:4px;"><b>Mapato (Income):</b> TZS ${totalIn.toLocaleString()}</p>
+          <h3>Mlinganisho wa Mapato dhidi ya Matumizi (Cashflow Visual)</h3>
+          <p style="font-size:12px; margin-bottom:4px;"><b>Mapato (CRDB: ${crdb.toLocaleString()} | Cash: ${cash.toLocaleString()}):</b> TZS ${totalIn.toLocaleString()}</p>
           <div style="background:#e2e8f0; border-radius:6px; height:18px; margin-bottom:10px;"><div style="background:#059669; height:18px; border-radius:6px; width:${Math.round((totalIn/maxBar)*100)}%;"></div></div>
-          <p style="font-size:12px; margin-bottom:4px;"><b>Matumizi (Expenses):</b> TZS ${expense.toLocaleString()}</p>
+          <p style="font-size:12px; margin-bottom:4px;"><b>Matumizi & Mishahara:</b> TZS ${expense.toLocaleString()}</p>
           <div style="background:#e2e8f0; border-radius:6px; height:18px;"><div style="background:#dc2626; height:18px; border-radius:6px; width:${Math.round((expense/maxBar)*100)}%;"></div></div>
         </div>
         <div class="panel">
-          <h3>Nakala za Maamuzi ya Kamati ya Manunuzi & Idhini Kubwa</h3>
-          <table><tr><th>Kikao / Manunuzi</th><th>Bajeti (TZS)</th><th>Hali ya Idhini</th><th>Maoni ya Mkuu wa Shule</th></tr>
-          ${procs.map(p => `<tr><td><b>${p.meeting_title}</b></td><td>${Number(p.estimated_budget).toLocaleString()}</td><td><b>${p.status}</b></td><td>${p.hm_comments || '-'}</td></tr>`).join('') || '<tr><td colspan="4">Hakuna kumbukumbu za manunuzi bado.</td></tr>'}
+          <h3>Kamati ya Manunuzi & Baraka ya Mkurugenzi (Executive Counter-Sign)</h3>
+          <table><tr><th>Kikao / Manunuzi</th><th>Bajeti (TZS)</th><th>Hali ya Mkuu wa Shule</th><th>Baraka ya Mkurugenzi</th></tr>
+          ${procs.map(p => `<tr><td><b>${p.meeting_title}</b></td><td>${Number(p.estimated_budget).toLocaleString()}</td><td><b>${p.status}</b></td>
+          <td>${p.director_sign || `<button class="btn btn-green" onclick="SGB.update('procurement_committee', ${p.id}, {director_sign:'✅ Counter-Signed by Director'}); openTab('exec')">✍️ Counter-Sign</button>`}</td></tr>`).join('') || '<tr><td colspan="4">Hakuna kumbukumbu za manunuzi bado.</td></tr>'}
           </table>
         </div>`;
     }
@@ -97,15 +100,15 @@
       const users = SGB.select('users_profile');
       const maps = SGB.select('student_subjects');
       const marks = SGB.select('exam_results');
+      const assets = SGB.select('fixed_assets');
+      const stCount = users.filter(u => u.role === 'student').length;
+      const trCount = users.filter(u => u.role === 'teacher').length;
+      const ratio = trCount > 0 ? `1 : ${Math.round(stCount / trCount)}` : `Wanafunzi ${stCount} / Walimu ${trCount}`;
       const boys = maps.filter(m => m.sex === 'M').length;
       const girls = maps.filter(m => m.sex === 'F').length;
 
-      // Kokotoa muhtasari wa NECTA Division I-IV
       const bySt = {};
-      marks.forEach(m => {
-        if (!bySt[m.student_name]) bySt[m.student_name] = [];
-        if (m.points > 0) bySt[m.student_name].push(Number(m.points));
-      });
+      marks.forEach(m => { if (!bySt[m.student_name]) bySt[m.student_name] = []; if (m.points > 0) bySt[m.student_name].push(Number(m.points)); });
       const divs = { I:0, II:0, III:0, IV:0, O:0 };
       Object.values(bySt).forEach(pts => {
         if (pts.length < 7) return;
@@ -115,9 +118,9 @@
 
       area.innerHTML = `
         <div class="cards">
-          <div class="card"><h4>Wanafunzi (O & A-Level)</h4><div class="val">${users.filter(u => u.role === 'student').length}</div></div>
-          <div class="card"><h4>Uwiano wa Kijinsia</h4><div class="val">M: ${boys} | F: ${girls}</div></div>
-          <div class="card" style="border-color:#059669;"><h4>Watumishi & Walimu</h4><div class="val">${users.filter(u => u.role !== 'student' && u.role !== 'parent').length}</div></div>
+          <div class="card"><h4>Wanafunzi (O & A-Level)</h4><div class="val">${stCount} (M:${boys} | F:${girls})</div></div>
+          <div class="card"><h4>Uwiano Walimu:Wanafunzi</h4><div class="val">${ratio}</div></div>
+          <div class="card" style="border-color:#059669;"><h4>Thamani ya Mali (Assets)</h4><div class="val">TZS ${assets.reduce((s,a)=>s+Number(a.val),0).toLocaleString()}</div></div>
         </div>
         <div class="panel">
           <h3>Mwenendo wa Ufaulu wa Shule (NECTA Division I–IV Summary)</h3>
@@ -127,7 +130,10 @@
         </div>`;
     }
 
-    lass="panel">
+    if (tab === 'board') {
+      const notes = SGB.select('board_minutes');
+      area.innerHTML = `
+        <div class="panel">
           <h3>Hifadhi Nyaraka & Muhtasari wa Vikao vya Bodi ya Shule</h3>
           <form onsubmit="addBoard(event)" style="display:grid; gap:10px; margin-bottom:15px;">
             <input type="text" id="bTitle" required placeholder="Kichwa cha Kikao cha Bodi">
