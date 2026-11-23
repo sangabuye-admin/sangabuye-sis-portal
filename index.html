@@ -3,142 +3,93 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sangabuye SIS Portal | S.L.P 11898, Ilemela - Mwanza</title>
+  <title>Sangabuye SIS Portal | Lango Kuu la Kuingia</title>
   <script src="core.js"></script>
   <style>
-    :root { --primary: #0f294a; --accent: #1d4ed8; --bg: #f1f5f9; --text: #1e293b; }
-    * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-    body { margin: 0; background: var(--bg); color: var(--text); display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 15px; }
-    .container { display: flex; flex-wrap: wrap; max-width: 920px; width: 100%; background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.12); }
-    .brand-side { flex: 1; min-width: 300px; background: linear-gradient(135deg, #0f294a 0%, #1e40af 100%); color: white; padding: 40px 30px; display: flex; flex-direction: column; justify-content: center; text-align: center; }
-    .crest { width: 85px; height: 85px; background: rgba(255,255,255,0.15); border: 2px solid #fbbf24; border-radius: 50%; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; font-size: 36px; }
-    .brand-side h1 { font-size: 22px; margin: 0 0 8px; letter-spacing: 0.5px; }
-    .brand-side p { font-size: 13px; color: #cbd5e1; margin: 4px 0; }
-    .badge { display: inline-block; background: rgba(251,191,36,0.2); color: #fde68a; border: 1px solid #fbbf24; padding: 6px 14px; border-radius: 20px; font-size: 12px; margin-top: 20px; }
-    .form-side { flex: 1.1; min-width: 320px; padding: 30px 35px; position: relative; }
-    .top-bar { display: flex; justify-content: flex-end; gap: 8px; margin-bottom: 15px; }
-    .lang-btn, .refresh-btn { background: #e2e8f0; border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer; color: var(--primary); }
-    .lang-btn.active { background: var(--primary); color: white; }
-    .tabs { display: flex; border-bottom: 2px solid #e2e8f0; margin-bottom: 20px; }
-    .tab { flex: 1; text-align: center; padding: 10px; cursor: pointer; font-weight: bold; color: #64748b; border-bottom: 3px solid transparent; transition: 0.2s; }
-    .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
-    .form-group { margin-bottom: 14px; position: relative; }
-    label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 5px; color: #334155; }
-    input, select { width: 100%; padding: 11px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; outline: none; }
-    input:focus, select:focus { border-color: var(--accent); }
-    .eye-icon { position: absolute; right: 12px; top: 32px; cursor: pointer; font-size: 16px; user-select: none; }
-    .btn-primary { width: 100%; padding: 12px; background: var(--accent); color: white; border: none; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; margin-top: 8px; }
-    .btn-primary:hover { background: #1e3a8a; }
-    .forgot-link { display: block; text-align: right; font-size: 12px; color: var(--accent); text-decoration: none; margin-top: 6px; cursor: pointer; }
-    .notice-box { background: #fef3c7; border-left: 4px solid #f59e0b; padding: 10px 12px; font-size: 12px; color: #92400e; border-radius: 4px; margin-top: 15px; }
-    .bank-box { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); padding: 10px; border-radius: 8px; font-size: 11.5px; color: #f8fafc; margin-top: 25px; text-align: left; }
-    .hidden { display: none; }
-    .alert { padding: 10px; border-radius: 6px; font-size: 13px; margin-bottom: 12px; display: none; }
-    .alert-error { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
-    .alert-success { background: #dcfce7; color: #166534; border: 1px solid #86efac; }
+    * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
+    body { margin: 0; background: linear-gradient(135deg, #0f294a 0%, #1e3a8a 100%); min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 18px; color: #1e293b; }
+    .box { background: white; width: 100%; max-width: 440px; border-radius: 16px; padding: 26px; box-shadow: 0 12px 30px rgba(0,0,0,0.28); }
+    .header { text-align: center; margin-bottom: 18px; border-bottom: 2px solid #f1f5f9; padding-bottom: 14px; }
+    .header h2 { margin: 0; color: #0f294a; font-size: 18px; }
+    .header p { margin: 4px 0 0; font-size: 12px; color: #64748b; }
+    .tabs { display: flex; gap: 8px; margin-bottom: 16px; }
+    .tab-btn { flex: 1; padding: 10px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 13px; background: #f1f5f9; color: #475569; }
+    .tab-btn.active { background: #1d4ed8; color: white; }
+    label { display: block; font-size: 12px; font-weight: bold; margin: 10px 0 4px; color: #334155; }
+    input, select { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 13.5px; }
+    .submit-btn { width: 100%; padding: 12px; background: #059669; color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: bold; cursor: pointer; margin-top: 16px; }
+    .submit-btn:hover { background: #047857; }
+    .info-bar { background: #eff6ff; border: 1px solid #bfdbfe; padding: 10px; border-radius: 8px; font-size: 11.5px; color: #1e3a8a; margin-top: 14px; text-align: center; }
+    .maint-banner { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; padding: 10px; border-radius: 8px; font-size: 12px; margin-bottom: 12px; text-align: center; font-weight: bold; }
   </style>
 </head>
 <body>
-<div class="container">
-  <div class="brand-side">
-    <div class="crest">🎓</div>
-    <h1>SANGABUYE SECONDARY SCHOOL</h1>
-    <p>S.L.P 11898, ILEMELA - MWANZA, TANZANIA</p>
-    <p style="font-size:12px; margin-top:6px;">O-Level (Form 1–4) & A-Level (Form 5–6)</p>
-    <div><span class="badge" id="portalBadge">Sangabuye SIS Portal (Toleo 5.0)</span></div>
-    <div class="bank-box">
-      <strong id="bankTitle">Taarifa Rasmi za Malipo (CRDB Bank):</strong><br>
-      Jina: <b>SHULE YA SEKONDARI SANGABUYE E.K</b><br>
-      Akaunti: <b>0150838972100</b> | Cash (Ofisi ya Mhasibu)<br>
-      Mkuu wa Shule: 0784 755 173 | Mhasibu: 0615 000 305
-    </div>
+<div class="box">
+  <div class="header">
+    <h2>SANGABUYE SECONDARY SCHOOL</h2>
+    <p>S.L.P 11898, Ilemela - Mwanza | SIS Portal v5.6</p>
   </div>
 
-  <div class="form-side">
-    <div class="top-bar">
-      <button class="refresh-btn" onclick="location.reload()" title="Live Refresh">🔄 Refresh</button>
-      <button class="lang-btn active" id="btnSW" onclick="setLang('sw')">SW</button>
-      <button class="lang-btn" id="btnEN" onclick="setLang('en')">EN</button>
-    </div>
+  <div id="maintNotice"></div>
 
-    <div class="tabs">
-      <div class="tab active" id="tabLogin" onclick="switchTab('login')">Ingia (Login)</div>
-      <div class="tab" id="tabRegister" onclick="switchTab('register')">Jisajili (Register)</div>
-    </div>
+  <div class="tabs">
+    <button class="tab-btn active" id="btnTabLogin" onclick="switchAuthTab('login')">🔐 Ingia (Sign In)</button>
+    <button class="tab-btn" id="btnTabReg" onclick="switchAuthTab('register')">📝 Jisajili (Register)</button>
+  </div>
 
-    <div id="alertBox" class="alert"></div>
+  <form id="loginForm" onsubmit="handleLogin(event)">
+    <label>Chagua Nafasi Yako (Select Role):</label>
+    <select id="loginRole" required>
+      <option value="teacher">Mwalimu (Teacher)</option>
+      <option value="student">Mwanafunzi (Student)</option>
+      <option value="parent">Mzazi / Mlezi (Parent)</option>
+      <option value="accountant">Mhasibu (Accountant - 0615 000 305)</option>
+      <option value="academic">Mtaaluma (Academic Master)</option>
+      <option value="headmaster">Mkuu wa Shule (Headmaster - 0784 755 173)</option>
+      <option value="director">Mkurugenzi (School Director)</option>
+      <option value="librarian">Mkutubi (Librarian / Maktaba)</option>
+      <option value="matron_patron">Matron / Patron / Zahanati</option>
+      <option value="super_admin">IT & Super Admin</option>
+    </select>
 
-    <form id="loginForm" onsubmit="handleLogin(event)">
-      <div class="form-group">
-        <label id="lblUser">Namba ya Simu / Namba ya Usajili / Username</label>
-        <input type="text" id="loginUser" required placeholder="Mfano: accountant, academic, admin, 0784755173">
-      </div>
-      <div class="form-group">
-        <label id="lblPass">Nenosiri (Password)</label>
-        <input type="password" id="loginPass" required placeholder="••••••••">
-        <span class="eye-icon" onclick="togglePass('loginPass')">👁️</span>
-      </div>
-      <a class="forgot-link" id="linkForgot" onclick="switchTab('otp')">Umesahau Nenosiri? (OTP Email & SMS)</a>
-      <button type="submit" class="btn-primary" id="btnSubmitLogin">Ingia Kwenye Mfumo 🔒</button>
-      <div class="notice-box" id="noticeApproval">
-        ⚠️ <b>Kumbuka:</b> Kila mtumiaji hupelekwa moja kwa moja kwenye Dashibodi yake mahususi kulingana na nafasi yake.
-      </div>
-    </form>
-    <form id="registerForm" class="hidden" onsubmit="handleRegister(event)">
-      <div class="form-group">
-        <label>Majina Kamili (Full Name)</label>
-        <input type="text" id="regName" required placeholder="Mfano: Juma Mwita">
-      </div>
-      <div class="form-group">
-        <label>Chagua Nafasi Yako (Select Role)</label>
-        <select id="regRole" required>
-          <option value="student">Mwanafunzi (Student)</option>
-          <option value="parent">Mzazi / Mlezi (Parent)</option>
-          <option value="teacher">Mwalimu (Teacher)</option>
-          <option value="academic">Mtaaluma (Academic Master)</option>
-          <option value="accountant">Mhasibu (Accountant - 0615 000 305)</option>
-          <option value="headmaster">Mkuu wa Shule (Headmaster - 0784 755 173)</option>
-          <option value="director">Mkurugenzi (Director)</option>
-          <option value="super_admin">Super Admin / IT</option>
-          <option value="librarian">Mkutubi (Librarian / Maktaba)</option>
-          <option value="matron_patron">Matron / Patron / Zahanati</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>Namba ya Usajili / Mtumishi (Adm / Staff No.)</label>
-        <input type="text" id="regNo" required placeholder="Mfano: S.2026/0045">
-      </div>
-      <div class="form-group">
-        <label>Namba ya Simu (SMS OTP) & Email</label>
-        <input type="text" id="regPhone" required placeholder="07XXXXXXXX">
-      </div>
-      <div class="form-group">
-        <label>Tengeneza Nenosiri (Create Password)</label>
-        <input type="password" id="regPass" required placeholder="••••••••">
-        <span class="eye-icon" onclick="togglePass('regPass')">👁️</span>
-      </div>
-      <div style="font-size:12px; margin-bottom:10px;">
-        <input type="checkbox" id="pdpaCheck" required style="width:auto;">
-        <span>Nakubali masharti ya ulinzi wa taarifa binafsi (PDPA Tanzania 2022).</span>
-      </div>
-      <button type="submit" class="btn-primary">Tuma Maombi ya Usajili ✅</button>
-    </form>
+    <label>Jina Kamili / Namba ya Usajili / Simu:</label>
+    <input type="text" id="loginId" required placeholder="Mfano: admin au S.2026/0001">
 
-    <form id="otpForm" class="hidden" onsubmit="handleOtp(event)">
-      <p style="font-size:13px; color:#475569;">Weka Barua Pepe au Namba yako ya Simu ili kupokea namba ya siri ya muda (OTP tarakimu 6).</p>
-      <div class="form-group">
-        <label>Email / Namba ya Simu</label>
-        <input type="text" id="otpContact" required placeholder="07XXXXXXXX au jina@email.com">
-      </div>
-      <button type="submit" class="btn-primary">Tuma OTP Sasa 📲</button>
-      <a class="forgot-link" onclick="switchTab('login')" style="text-align:center; margin-top:12px;">← Rudi Kwenye Login</a>
-    </form>
+    <label>Nenosiri (Password):</label>
+    <input type="password" id="loginPass" required placeholder="Weka nenosiri lako...">
+
+    <button type="submit" class="submit-btn">🚀 Ingia Kwenye Dashibodi</button>
+  </form>
+
+  <form id="regForm" onsubmit="handleRegister(event)" style="display:none;">
+    <label>Majina Kamili (Full Name):</label>
+    <input type="text" id="regName" required placeholder="Mfano: Asha Juma Kassim">
+
+    <label>Nafasi Unayoomba (Role):</label>
+    <select id="regRole" required>
+      <option value="student">Mwanafunzi (Student)</option>
+      <option value="parent">Mzazi / Mlezi (Parent)</option>
+      <option value="teacher">Mwalimu (Teacher)</option>
+      <option value="librarian">Mkutubi (Librarian / Maktaba)</option>
+      <option value="matron_patron">Matron / Patron / Zahanati</option>
+    </select>
+
+    <label>Namba ya Usajili / Namba ya Simu:</label>
+    <input type="text" id="regNo" required placeholder="Mfano: S.2026/0045 au 0755123456">
+
+    <label>Tengeneza Nenosiri (Password):</label>
+    <input type="password" id="regPass" required placeholder="Weka nenosiri jipya...">
+
+    <button type="submit" class="submit-btn" style="background:#1d4ed8;">📩 Tuma Maombi ya Usajili (OTP)</button>
+  </form>
+
+  <div class="info-bar">
+    <b>CRDB Bank:</b> SHULE YA SEKONDARI SANGABUYE E.K (<code>0150838972100</code>)<br>
+    Msaada wa Haraka: <b>0784 755 173</b> (Mkuu) | <b>0615 000 305</b> (Mhasibu)
   </div>
 </div>
 <script>
-  let attempts = 0;
-
-  const ROLE_PAGES = {
+  const roleRedirects = {
     super_admin: 'admin.html',
     director: 'director.html',
     headmaster: 'headmaster.html',
@@ -146,107 +97,107 @@
     academic: 'academic.html',
     teacher: 'teacher.html',
     parent: 'parent.html',
-    student: 'student.html'
+    student: 'student.html',
     librarian: 'library.html',
-     matron_patron: 'matron_patron.html',
+    matron_patron: 'matron_patron.html'
   };
 
-  function togglePass(id) {
-    const inp = document.getElementById(id);
-    inp.type = inp.type === 'password' ? 'text' : 'password';
+  if (localStorage.getItem('sgb_maintenance') === 'true') {
+    document.getElementById('maintNotice').innerHTML = `<div class="maint-banner">⚙️ MFUMO UKO KWENYE MATENGENEZO (MAINTENANCE MODE) — Super Admin Pekee Ndiye Anayeweza Kuingia.</div>`;
   }
 
-  function switchTab(tab) {
-    document.getElementById('alertBox').style.display = 'none';
-    ['loginForm', 'registerForm', 'otpForm'].forEach(f => document.getElementById(f).classList.add('hidden'));
-    ['tabLogin', 'tabRegister'].forEach(t => document.getElementById(t).classList.remove('active'));
-    if (tab === 'login') { document.getElementById('loginForm').classList.remove('hidden'); document.getElementById('tabLogin').classList.add('active'); }
-    if (tab === 'register') { document.getElementById('registerForm').classList.remove('hidden'); document.getElementById('tabRegister').classList.add('active'); }
-    if (tab === 'otp') { document.getElementById('otpForm').classList.remove('hidden'); }
-  }
-
-  function showAlert(msg, type) {
-    const box = document.getElementById('alertBox');
-    box.className = 'alert ' + (type === 'error' ? 'alert-error' : 'alert-success');
-    box.innerHTML = msg;
-    box.style.display = 'block';
+  function switchAuthTab(mode) {
+    document.getElementById('loginForm').style.display = mode === 'login' ? 'block' : 'none';
+    document.getElementById('regForm').style.display = mode === 'register' ? 'block' : 'none';
+    document.getElementById('btnTabLogin').classList.toggle('active', mode === 'login');
+    document.getElementById('btnTabReg').classList.toggle('active', mode === 'register');
   }
 
   function handleLogin(e) {
     e.preventDefault();
-    if (attempts >= 5) {
-      showAlert('⛔ Akaunti imefungwa kwa dakika 15 (Brute-Force Lock) baada ya kukosea mara 5.', 'error');
+    const lockUntil = Number(localStorage.getItem('sgb_lock_until') || 0);
+    if (Date.now() < lockUntil) {
+      alert('🔒 Akaunti imefungwa kwa muda kutokana na majaribio mengi yasiyo sahihi. Jaribu tena baada ya dakika chache.');
       return;
     }
-    const user = document.getElementById('loginUser').value.trim();
+
+    const role = document.getElementById('loginRole').value;
+    const idVal = document.getElementById('loginId').value.trim().toLowerCase();
     const pass = document.getElementById('loginPass').value.trim();
 
-    const builtIn = {
-      'admin': { full_name: 'Super Admin (IT)', role: 'super_admin' },
-      'director': { full_name: 'Mkurugenzi wa Shule', role: 'director' },
-      'headmaster': { full_name: 'Mkuu wa Shule (0784 755 173)', role: 'headmaster' },
-      'accountant': { full_name: 'Mhasibu wa Shule (0615 000 305)', role: 'accountant' },
-      'academic': { full_name: 'Mtaaluma (Academic Master)', role: 'academic' },
-      'teacher': { full_name: 'Mwalimu wa Somo', role: 'teacher' },
-      'parent': { full_name: 'Mzazi / Mlezi', role: 'parent' },
-      'student': { full_name: 'Mwanafunzi (Sangabuye)', role: 'student' }
-    };
-
-    if (builtIn[user.toLowerCase()] && pass === '123456') {
-      const acc = builtIn[user.toLowerCase()];
-      sessionStorage.setItem('sgb_active_user', JSON.stringify(acc));
-      SGB.logAction('Ameingia kwenye mfumo (Login)');
-      showAlert(`✅ Karibu <b>${acc.full_name}</b>! Tunafungua Dashibodi yako...`, 'success');
-      setTimeout(() => { window.location.href = ROLE_PAGES[acc.role]; }, 700);
+    if (localStorage.getItem('sgb_maintenance') === 'true' && role !== 'super_admin') {
+      alert('⚙️ Mfumo uko kwenye matengenezo (Maintenance Mode). Tafadhali subiri.');
       return;
     }
 
-    const users = SGB.select('users_profile');
-    const found = users.find(u => (u.phone_number === user || u.reg_or_staff_no === user) && u.password_hash === pass);
+    // Akaunti Chaguo-msingi za Uongozi & IT (Default Master Accounts)
+    const defaults = [
+      { id: 'admin', pass: 'admin123', role: 'super_admin', name: 'IT & Super Admin' },
+      { id: 'director', pass: 'director123', role: 'director', name: 'Mkurugenzi wa Shule' },
+      { id: '0784755173', pass: 'head123', role: 'headmaster', name: 'Mkuu wa Shule (0784 755 173)' },
+      { id: '0615000305', pass: 'acc123', role: 'accountant', name: 'Mhasibu (0615 000 305)' },
+      { id: 'academic', pass: 'acad123', role: 'academic', name: 'Mtaaluma (Academic Master)' },
+      { id: 'library', pass: 'lib123', role: 'librarian', name: 'Mkutubi (Librarian)' },
+      { id: 'matron', pass: 'matron123', role: 'matron_patron', name: 'Matron / Patron & Zahanati' }
+    ];
 
-    if (!found) {
-      attempts++;
-      showAlert(`❌ Taarifa si sahihi (Jaribio ${attempts}/5).`, 'error');
-    } else if (found.status !== 'approved') {
-      showAlert('⏳ Akaunti yako bado inasubiri idhini (Approval) ya Super Admin / IT.', 'error');
+    const defMatch = defaults.find(d => d.role === role && (d.id === idVal || d.name.toLowerCase().includes(idVal)) && d.pass === pass);
+    if (defMatch) {
+      localStorage.removeItem('sgb_login_fails');
+      sessionStorage.setItem('sgb_active_user', JSON.stringify({ full_name: defMatch.name, role: defMatch.role }));
+      SGB.logAction(`Ameingia kwenye mfumo (${defMatch.role})`);
+      window.location.href = roleRedirects[defMatch.role];
+      return;
+    }
+
+    // Akaunti Zilizosajiliwa Kwenye Database (users_profile)
+    const users = SGB.select('users_profile');
+    const found = users.find(u =>
+      u.role === role &&
+      ((u.full_name || '').toLowerCase() === idVal || (u.reg_or_staff_no || '').toLowerCase() === idVal || (u.phone_number || '').toLowerCase() === idVal) &&
+      u.password_hash === pass
+    );
+
+    if (found) {
+      if (found.status !== 'approved') {
+        alert('⏳ Akaunti yako bado inasubiri idhini ya IT & Super Admin.');
+        return;
+      }
+      localStorage.removeItem('sgb_login_fails');
+      sessionStorage.setItem('sgb_active_user', JSON.stringify({ full_name: found.full_name, role: found.role }));
+      SGB.logAction(`Ameingia kwenye mfumo (${found.role})`);
+      window.location.href = roleRedirects[found.role];
+      return;
+    }
+
+    const fails = Number(localStorage.getItem('sgb_login_fails') || 0) + 1;
+    localStorage.setItem('sgb_login_fails', String(fails));
+    if (fails >= 5) {
+      localStorage.setItem('sgb_lock_until', String(Date.now() + 5 * 60000));
+      alert('🔒 Umeingiza taarifa zisizo sahihi mara 5. Mfumo umefungwa kwa dakika 5.');
     } else {
-      sessionStorage.setItem('sgb_active_user', JSON.stringify(found));
-      SGB.logAction('Ameingia kwenye mfumo (Login)');
-      showAlert(`✅ Karibu <b>${found.full_name}</b>! Tunafungua Dashibodi yako...`, 'success');
-      setTimeout(() => { window.location.href = ROLE_PAGES[found.role] || 'index.html'; }, 700);
+      alert(`❌ Taarifa za kuingia si sahihi (Jaribio ${fails}/5). Hakikisha umechagua Nafasi (Role) sahihi.`);
     }
   }
 
   function handleRegister(e) {
     e.preventDefault();
-    const payload = SGB.insert('users_profile', {
+    const otp = Math.floor(1000 + Math.random() * 9000);
+    const entered = prompt(`Namba yako ya uthibitisho (OTP) ni: ${otp}\nIngiza namba hiyo hapo chini kukamilisha usajili:`);
+    if (String(entered).trim() !== String(otp)) {
+      alert('❌ Namba ya OTP si sahihi. Usajili umesitishwa.');
+      return;
+    }
+    SGB.insert('users_profile', {
       full_name: document.getElementById('regName').value.trim(),
       role: document.getElementById('regRole').value,
       reg_or_staff_no: document.getElementById('regNo').value.trim(),
-      phone_number: document.getElementById('regPhone').value.trim(),
+      phone_number: document.getElementById('regNo').value.trim(),
       password_hash: document.getElementById('regPass').value.trim(),
       status: 'pending'
     });
-    showAlert(`✅ Asante <b>${payload.full_name}</b>! Maombi yako yamehifadhiwa na yanasubiri idhini ya Admin.`, 'success');
-    document.getElementById('registerForm').reset();
-  }
-
-  function handleOtp(e) {
-    e.preventDefault();
-    const contact = document.getElementById('otpContact').value;
-    showAlert(`📲 Namba ya OTP (tarakimu 6) imetumwa kwenda <b>${contact}</b> kupitia Brevo Email & SMS Gateway.`, 'success');
-  }
-
-  function setLang(lang) {
-    document.getElementById('btnSW').classList.toggle('active', lang === 'sw');
-    document.getElementById('btnEN').classList.toggle('active', lang === 'en');
-    const isEn = lang === 'en';
-    document.getElementById('tabLogin').innerText = isEn ? 'Sign In (Login)' : 'Ingia (Login)';
-    document.getElementById('tabRegister').innerText = isEn ? 'Register Account' : 'Jisajili (Register)';
-    document.getElementById('lblUser').innerText = isEn ? 'Phone / Registration No. / Username' : 'Namba ya Simu / Namba ya Usajili / Username';
-    document.getElementById('lblPass').innerText = isEn ? 'Password' : 'Nenosiri (Password)';
-    document.getElementById('linkForgot').innerText = isEn ? 'Forgot Password? (OTP Email & SMS)' : 'Umesahau Nenosiri? (OTP Email & SMS)';
-    document.getElementById('btnSubmitLogin').innerText = isEn ? 'Sign In to Portal 🔒' : 'Ingia Kwenye Mfumo 🔒';
+    alert('✅ Maombi yako ya usajili yametumwa! IT & Super Admin ataidhinisha akaunti yako hivi punde.');
+    switchAuthTab('login');
   }
 </script>
 </body>
