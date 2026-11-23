@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mabweni, Malezi & Zahanati | Sangabuye SIS Portal</title>
+  <script src="core.js"></script>
+  <style>
+    * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
+    body { margin: 0; background: #f1f5f9; display: flex; min-height: 100vh; color: #1e293b; }
+    .sidebar { width: 265px; background: #134e4a; color: white; display: flex; flex-direction: column; padding: 18px 12px; }
+    .sidebar h2 { font-size: 15px; margin: 0 0 4px; color: #fde68a; text-align: center; }
+    .sidebar p { font-size: 11px; text-align: center; color: #99f6e4; margin: 0 0 18px; }
+    .menu-btn { background: transparent; border: none; color: #ccfbf1; text-align: left; padding: 10px 12px; border-radius: 8px; cursor: pointer; font-size: 13px; margin-bottom: 4px; }
+    .menu-btn:hover, .menu-btn.active { background: #0d9488; color: white; font-weight: bold; }
+    .main { flex: 1; display: flex; flex-direction: column; }
+    .topbar { background: white; padding: 14px 22px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
+    .content { padding: 22px; }
+    .panel { background: white; padding: 18px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 18px; }
+    input, select { padding: 9px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; width: 100%; }
+    table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 12.5px; }
+    th, td { padding: 8px; border: 1px solid #e2e8f0; text-align: left; }
+    th { background: #f8fafc; color: #134e4a; }
+    .btn { padding: 7px 12px; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold; }
+    .btn-teal { background: #0d9488; color: white; }
+    .btn-green { background: #059669; color: white; }
+    .btn-amber { background: #d97706; color: white; }
+    .logout-btn { background: #dc2626; color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: bold; margin-top: auto; }
+  </style>
+</head>
+<body>
+
+<div class="sidebar">
+  <h2>MABWENI & ZAHANATI</h2>
+  <p>Matron / Patron / Nurse</p>
+  <button class="menu-btn active" onclick="openTab('hostels', this)">🛏️ 1. Usimamizi wa Mabweni & Vitanda</button>
+  <button class="menu-btn" onclick="openTab('sickbay', this)">🏥 2. Zahanati (Sickbay + SMS/WA)</button>
+  <button class="menu-btn" onclick="openTab('dorm_roll', this)">🌙 3. Roll Call ya Usiku Bwenini</button>
+  <button class="logout-btn" onclick="SGB.logout()">🚪 Toka (Logout)</button>
+</div>
+
+<div class="main">
+  <div class="topbar">
+    <div><strong id="tabTitle">🛏️ 1. Usimamizi wa Mabweni & Vitanda</strong> <span id="syncTime" style="font-size:11px; color:#0d9488;"></span></div>
+    <div></div>
+  </div>
+  <div class="content" id="viewArea"></div>
+  <datalist id="stList"></datalist>
+</div>
+
+<script>
+  const user = SGB.requireRole(['matron_patron', 'super_admin']);
+  SGB.startSessionTimer();
+
+  function updateNames() {
+    const names = new Set();
+    SGB.select('users_profile').filter(u => u.role === 'student').forEach(u => names.add(u.full_name));
+    document.getElementById('stList').innerHTML = Array.from(names).map(n => `<option value="${n}">`).join('');
+  }
+
+  function openTab(tab, btn) {
+    document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+    if (btn) document.getElementById('tabTitle').innerText = btn.innerText;
+    updateNames();
+    const area = document.getElementById('viewArea');
+
+    if (tab === 'hostels') {
+      const beds = SGB.select('hostel_beds');
+      area.innerHTML = `
+        <div class="panel">
+          <h3>Panga Wanafunzi Kwenye Mabweni & Vitanda (Hostel Allocation)</h3>
+          <form onsubmit="assignBed(event)" style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:15px;">
+            <input type="text" id="hbSt" list="stList" required placeholder="Jina la Mwanafunzi">
+            <input type="text" id="hbRoom" required placeholder="Bweni & Kitanda (Mfano: Serengeti - Bed 12)">
+            <button type="submit" class="btn btn-teal">🛏️ Panga Kitanda Sasa</button>
+          </form>
+          <table><tr><th>Mwanafunzi</th><th>Bweni & Namba ya Kitanda</th><th>Tarehe</th></tr>
+          ${beds.map(b => `<tr><td><b>${b.student_name}</b></td><td>${b.room_bed}</td><td>${b.created_at}</td></tr>`).join('') || '<tr><td colspan="3">Hakuna mwanafunzi aliyepangiwa bweni bado.</td></tr>'}
+          </table>
+        </div>`;
+    }
+
+    if (tab === 'sickbay') {
+      const sicks = SGB.select('sickbay_records');
+      area.innerHTML = `
+        <div class="panel">
+          <h3>Zahanati ya Shule (Sickbay Log & Taarifa Kwa Mzazi)</h3>
+          <form onsubmit="addSickCase(event)" style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:15px;">
+            <input type="text" id="skSt" list="stList" required placeholder="Jina la Mwanafunzi">
+            <input type="text" id="skDiag" required placeholder="Dalili / Matibabu Aliyopewa">
+            <button type="submit" class="btn btn-teal">🏥 Hifadhi & Mjulishe Mzazi</button>
+          </form>
+          <table><tr><th>Mwanafunzi</th><th>Matibabu</th><th>Muda</th><th>Mjulishe Mzazi</th></tr>
+          ${sicks.map(s => {
+            const msg = `SANGABUYE ZAHANATI: Mzazi wa ${s.student_name}, mwanao amepata matibabu shuleni leo (${s.diagnosis}). Kwa maelezo zaidi piga 0784 755 173.`;
+            return `<tr><td><b>${s.student_name}</b></td><td>${s.diagnosis}</td><td>${s.created_at}</td>
+            <td><button class="btn btn-green" onclick="SGB.sendWhatsApp('', '${msg}')">💬 WhatsApp</button> <button class="btn btn-amber" onclick="SGB.sendSMS('', '${msg}')">📲 SMS</button></td></tr>`;
+          }).join('') || '<tr><td colspan="4">Hakuna rekodi ya zahanati bado.</td></tr>'}
+          </table>
+        </div>`;
+    }
+
+    if (tab === 'dorm_roll') {
+      const logs = SGB.select('dorm_rollcall');
+      area.innerHTML = `
+        <div class="panel">
+          <h3>Roll Call ya Usiku Bwenini (Night Dormitory Roll Call)</h3>
+          <form onsubmit="addDormRoll(event)" style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:15px;">
+            <input type="text" id="drSt" list="stList" required placeholder="Jina la Mwanafunzi">
+            <select id="drStat"><option value="Yupo Bwenini (Present)">Yupo Bwenini (Present)</option><option value="Hayupo Bwenini (Missing)">Hayupo Bwenini (Missing)</option><option value="Yuko Zahanati (Sickbay)">Yuko Zahanati (Sickbay)</option></select>
+            <button type="submit" class="btn btn-teal">✅ Rekodi Mahudhurio ya Usiku</button>
+          </form>
+          <table><tr><th>Mwanafunzi</th><th>Hali Bwenini</th><th>Muda</th></tr>
+          ${logs.map(l => `<tr><td><b>${l.student_name}</b></td><td><b>${l.status}</b></td><td>${l.created_at}</td></tr>`).join('') || '<tr><td colspan="3">Hakuna rekodi ya usiku bado.</td></tr>'}
+          </table>
+        </div>`;
+    }
+  }
+
+  function assignBed(e) {
+    e.preventDefault();
+    SGB.insert('hostel_beds', { student_name: document.getElementById('hbSt').value.trim(), room_bed: document.getElementById('hbRoom').value.trim() });
+    openTab('hostels');
+  }
+
+  function addSickCase(e) {
+    e.preventDefault();
+    const st = document.getElementById('skSt').value.trim();
+    const diag = document.getElementById('skDiag').value.trim();
+    SGB.insert('sickbay_records', { student_name: st, diagnosis: diag });
+    const msg = `SANGABUYE ZAHANATI: Mzazi wa ${st}, mwanao amepata matibabu shuleni leo (${diag}). Kwa maelezo zaidi wasiliana na Mkuu wa Shule 0784 755 173.`;
+    if (confirm(`🏥 Rekodi imehifadhiwa! Je, ungependa kumtumia mzazi wa ${st} taarifa kwa WhatsApp sasa hivi?`)) {
+      SGB.sendWhatsApp('', msg);
+    }
+    openTab('sickbay');
+  }
+
+  function addDormRoll(e) {
+    e.preventDefault();
+    SGB.insert('dorm_rollcall', { student_name: document.getElementById('drSt').value.trim(), status: document.getElementById('drStat').value });
+    openTab('dorm_roll');
+  }
+
+  openTab('hostels', document.querySelector('.menu-btn'));
+</script>
+</body>
+</html>
