@@ -1,32 +1,79 @@
-// INJINI KUU YA SANGABUYE SIS PORTAL (v5.7 - MOBILE BACKUP MODAL, AUTO PHONE & PWA)
+// INJINI KUU YA SANGABUYE SIS PORTAL (v6.0 - FIREBASE LIVE CLOUD SYNC + PWA)
+const FIREBASE_DB_URL = 'https://sangabuye-sis-default-rtdb.firebaseio.com';
+
 const SGB = {
   lang: localStorage.getItem('sgb_lang') || 'sw',
 
+  pushToCloud(table) {
+    if (!navigator.onLine) return;
+    const raw = localStorage.getItem('sgb_' + table);
+    if (!raw) return;
+    fetch(`${FIREBASE_DB_URL}/sgb_${table}.json`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: raw
+    }).then(() => {
+      const syncEl = document.getElementById('syncTime');
+      if (syncEl) syncEl.innerText = ' • ☁️ Cloud Saved: ' + new Date().toLocaleTimeString();
+    }).catch(() => {});
+  },
+  async pullFromCloud(silent = true) {
+    if (!navigator.onLine) return;
+    try {
+      const res = await fetch(`${FIREBASE_DB_URL}/.json`);
+      if (!res.ok) return;
+      const cloudData = await res.json();
+      if (cloudData && typeof cloudData === 'object') {
+        let changed = false;
+        Object.keys(cloudData).forEach(k => {
+          if (k.startsWith('sgb_') && cloudData[k] !== null) {
+            const incoming = JSON.stringify(cloudData[k]);
+            if (localStorage.getItem(k) !== incoming) {
+              localStorage.setItem(k, incoming);
+              changed = true;
+            }
+          }
+        });
+        const syncEl = document.getElementById('syncTime');
+        if (syncEl) syncEl.innerText = ' • ☁️ Cloud Live: ' + new Date().toLocaleTimeString();
+        if (changed) {
+          const activeMenu = document.querySelector('.menu-btn.active');
+          if (activeMenu) activeMenu.click();
+          setTimeout(() => this.applyLanguage(), 100);
+        }
+      }
+      if (!silent) this.notifySync('☁️ Data zote zimesawazishwa na Cloud (Firebase)!');
+    } catch (e) {}
+  },
   insert(table, item) {
     item.id = Date.now() + Math.floor(Math.random() * 100);
     item.created_at = new Date().toLocaleString('sw-TZ');
     const list = JSON.parse(localStorage.getItem('sgb_' + table) || '[]');
     list.unshift(item);
     localStorage.setItem('sgb_' + table, JSON.stringify(list));
+    this.pushToCloud(table);
     this.logAction(`Ameongeza taarifa kwenye ${table}`);
-    this.notifySync('✅ Data zimehifadhiwa na kusasishwa!');
+    this.notifySync('✅ Imehifadhiwa & Kupandishwa Hewani (Cloud)!');
     return item;
   },
+
   select(table) {
     return JSON.parse(localStorage.getItem('sgb_' + table) || '[]');
   },
+
   update(table, id, changes) {
     const list = JSON.parse(localStorage.getItem('sgb_' + table) || '[]').map(x =>
       String(x.id) === String(id) ? { ...x, ...changes } : x
     );
     localStorage.setItem('sgb_' + table, JSON.stringify(list));
+    this.pushToCloud(table);
     this.logAction(`Amebadilisha taarifa kwenye ${table} (ID: ${id})`);
-    this.notifySync('✅ Mabadiliko yamehifadhiwa!');
+    this.notifySync('✅ Mabadiliko yamehifadhiwa hewani!');
   },
+
   getConfig() {
     return JSON.parse(localStorage.getItem('sgb_school_config') || '{"year":"2026","term":"Term I","crdb":"0150838972100"}');
   },
-
   findParentPhone(message) {
     const msgLower = (message || '').toLowerCase();
     const users = this.select('users_profile');
@@ -74,7 +121,6 @@ const SGB = {
     this.insert('comms_logs', { channel: 'SMS', phone: localNum, message });
     window.location.href = `sms:${localNum}?body=${encodeURIComponent(message)}`;
   },
-
   compressPhoto(file, callback) {
     if (!file) return;
     const reader = new FileReader();
@@ -94,12 +140,11 @@ const SGB = {
   },
 
   liveRefresh(silent = false) {
+    this.pullFromCloud(silent);
     const activeMenu = document.querySelector('.menu-btn.active');
     if (activeMenu) activeMenu.click();
-    const syncEl = document.getElementById('syncTime');
-    if (syncEl) syncEl.innerText = ' • Live synced: ' + new Date().toLocaleTimeString();
     this.applyLanguage();
-    if (!silent) this.notifySync(this.lang === 'en' ? '✅ Live data refreshed!' : '✅ Data zote zimesasishwa (Live)!');
+    if (!silent) this.notifySync(this.lang === 'en' ? '☁️ Synced with Cloud!' : '☁️ Data zote zimesawazishwa hewani!');
   },
 
   notifySync(msg) {
@@ -144,14 +189,24 @@ const SGB = {
     modal.innerHTML = `
       <div style="background:#fff;width:100%;max-width:500px;border-radius:12px;padding:18px;">
         <h3 style="margin:0 0 8px;color:#0f294a;">💾 Nakala ya Data Zako (Backup Code)</h3>
-        <p style="font-size:12px;color:#475569;">Bofya kitufe cha <b>Nakili (Copy)</b> hapa chini, kisha uende kwenye link/simu mpya ubofye <b>📂 Restore</b> na kubandika (Paste):</p>
-        <textarea id="bkOutText" rows="6" readonly style="width:100%;font-size:11px;padding:8px;border:1px solid #cbd5e1;border-radius:6px;">${jsonStr}</textarea><br><br>
-        <div style="display:flex;gap:8px;">
-          <button onclick="SGB.copyBackupText()" style="background:#059669;color:#fff;border:none;padding:9px 14px;border-radius:6px;font-weight:bold;cursor:pointer;">📋 Nakili (Copy Data)</button>
-          <button onclick="document.getElementById('sgbBackupModal').style.display='none'" style="background:#dc2626;color:#fff;border:none;padding:9px 14px;border-radius:6px;font-weight:bold;cursor:pointer;">✕ Funga</button>
+        <p style="font-size:12px;color:#475569;">Bofya <b>Nakili (Copy)</b> kunakili data zako, au bofya <b>☁️ Pandisha Zote Cloud</b> kuzipeleka moja kwa moja kwenye Firebase:</p>
+        <textarea id="bkOutText" rows="5" readonly style="width:100%;font-size:11px;padding:8px;border:1px solid #cbd5e1;border-radius:6px;">${jsonStr}</textarea><br><br>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button onclick="SGB.copyBackupText()" style="background:#059669;color:#fff;border:none;padding:9px 12px;border-radius:6px;font-weight:bold;cursor:pointer;">📋 Nakili (Copy)</button>
+          <button onclick="SGB.pushAllLocalToCloud()" style="background:#1d4ed8;color:#fff;border:none;padding:9px 12px;border-radius:6px;font-weight:bold;cursor:pointer;">☁️ Pandisha Zote Cloud</button>
+          <button onclick="document.getElementById('sgbBackupModal').style.display='none'" style="background:#dc2626;color:#fff;border:none;padding:9px 12px;border-radius:6px;font-weight:bold;cursor:pointer;">✕ Funga</button>
         </div>
       </div>`;
-    this.logAction('Amepakua nakala ya mfumo (System Backup)');
+  },
+
+  pushAllLocalToCloud() {
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (k && k.startsWith('sgb_')) {
+        this.pushToCloud(k.replace('sgb_', ''));
+      }
+    }
+    alert('☁️ Data zote za kwenye kifaa hiki zimepandishwa hewani (Firebase Cloud)!');
   },
 
   copyBackupText() {
@@ -160,9 +215,8 @@ const SGB = {
     el.setSelectionRange(0, 999999);
     if (navigator.clipboard) navigator.clipboard.writeText(el.value).catch(() => {});
     document.execCommand('copy');
-    alert('✅ Data zimenakiliwa (Copied)! Nenda kwenye link/simu mpya ubofye Restore na ubandike (Paste).');
+    alert('✅ Data zimenakiliwa (Copied)!');
   },
-
   importBackup() {
     let modal = document.getElementById('sgbRestoreModal');
     if (!modal) {
@@ -179,13 +233,13 @@ const SGB = {
         <textarea id="bkInText" rows="5" placeholder="Bandika (Paste) kodi ya Backup hapa..." style="width:100%;font-size:11px;padding:8px;border:1px solid #cbd5e1;border-radius:6px;"></textarea><br><br>
         <input type="file" id="bkFileInp" accept=".json" style="margin-bottom:12px;">
         <div style="display:flex;gap:8px;">
-          <button onclick="SGB.processRestoreText()" style="background:#1d4ed8;color:#fff;border:none;padding:9px 14px;border-radius:6px;font-weight:bold;cursor:pointer;">✅ Rudisha Data Sasa</button>
+          <button onclick="SGB.processRestoreText()" style="background:#1d4ed8;color:#fff;border:none;padding:9px 14px;border-radius:6px;font-weight:bold;cursor:pointer;">✅ Rudisha & Pandisha Cloud</button>
           <button onclick="document.getElementById('sgbRestoreModal').style.display='none'" style="background:#dc2626;color:#fff;border:none;padding:9px 14px;border-radius:6px;font-weight:bold;cursor:pointer;">✕ Funga</button>
         </div>
       </div>`;
 
     document.getElementById('bkFileInp').onchange = (e) => {
-      const file = e.target.files[0];
+      const file = e.target.files;
       if (!file) return;
       const reader = new FileReader();
       reader.onload = (ev) => { document.getElementById('bkInText').value = ev.target.result; };
@@ -200,10 +254,13 @@ const SGB = {
       const parsed = JSON.parse(raw);
       const records = parsed.data || parsed;
       Object.keys(records).forEach(k => {
-        if (k.startsWith('sgb_')) localStorage.setItem(k, JSON.stringify(records[k]));
+        if (k.startsWith('sgb_')) {
+          localStorage.setItem(k, JSON.stringify(records[k]));
+          this.pushToCloud(k.replace('sgb_', ''));
+        }
       });
       document.getElementById('sgbRestoreModal').style.display = 'none';
-      alert('✅ Data zote zimerudishwa kikamilifu!');
+      alert('✅ Data zote zimerudishwa na kupandishwa hewani (Cloud)!');
       this.liveRefresh(true);
     } catch (err) {
       alert('❌ Maandishi au faili la Backup si sahihi: ' + err.message);
@@ -228,9 +285,8 @@ const SGB = {
         <p><b>📞 Mkuu wa Shule:</b> 0784 755 173 | <b>Mhasibu:</b> 0615 000 305</p>
         <p><b>🏦 Akaunti ya Benki:</b> CRDB <code>0150838972100</code> (SHULE YA SEKONDARI SANGABUYE E.K)</p>
         <hr>
-        <p><b>1. Kuweka Kwenye Simu Kama App:</b> Kwenye Chrome (Android) bofya vidoti vitatu (⋮) kisha <i>Add to Home screen / Install app</i>. Kwenye iPhone (Safari) bofya <i>Share ➔ Add to Home Screen</i>.</p>
-        <p><b>2. Kuhamisha Data (Backup & Restore):</b> Bofya <b>💾 Backup</b> kunakili data zako, kisha nenda kwenye kifaa/link mpya na ubofye <b>📂 Restore</b>.</p>
-        <p><b>3. Mawasiliano ya Papo Hapo:</b> Tumia vitufe vya <b>💬 WhatsApp</b> na <b>📲 SMS</b> kutuma risiti, madeni, au matokeo moja kwa moja kwa mzazi.</p>
+        <p><b>1. Live Cloud Sync (Firebase):</b> Taarifa zote zinahifadhiwa hewani moja kwa moja na kuonekana kwenye simu na kompyuta zote za shule.</p>
+        <p><b>2. Kuweka Kwenye Simu Kama App:</b> Kwenye Chrome (Android) bofya vidoti vitatu (⋮) kisha <i>Add to Home screen / Install app</i>. Kwenye iPhone (Safari) bofya <i>Share ➔ Add to Home Screen</i>.</p>
       </div>`;
   },
 
@@ -284,7 +340,6 @@ const SGB = {
     });
     this.openInboxModal();
   },
-
   dict: [
     ['OFISI YA MHASIBU', 'ACCOUNTANT OFFICE'],
     ['OFISI YA MTAALUMA', 'ACADEMIC MASTER OFFICE'],
@@ -309,10 +364,7 @@ const SGB = {
     ['Mchango', 'Category'],
     ['Njia', 'Method'],
     ['Bidhaa', 'Item Name'],
-    ['Salio', 'Balance'],
-    ['Tahadhari', 'Alert'],
-    ['Inatosha', 'In Stock'],
-    ['Kinakaribia Kuisha', 'Low Stock']
+    ['Salio', 'Balance']
   ],
 
   toggleLang() {
@@ -336,11 +388,13 @@ const SGB = {
       node.nodeValue = txt;
     }
   },
+
   logAction(action) {
     const user = this.getUser();
     const logs = JSON.parse(localStorage.getItem('sgb_audit_logs') || '[]');
     logs.unshift({ time: new Date().toLocaleString('sw-TZ'), actor: user ? `${user.full_name} (${user.role})` : 'System', action });
     localStorage.setItem('sgb_audit_logs', JSON.stringify(logs.slice(0, 200)));
+    this.pushToCloud('audit_logs');
   },
   getUser() { return JSON.parse(sessionStorage.getItem('sgb_active_user') || 'null'); },
   requireRole(allowedRoles) {
@@ -374,6 +428,9 @@ if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('./sw.js').catch(() => {});
 }
 
+SGB.pullFromCloud(true);
+setInterval(() => SGB.pullFromCloud(true), 12000);
+
 window.addEventListener('DOMContentLoaded', () => {
   if (!document.querySelector('link[rel="manifest"]')) {
     const link = document.createElement('link');
@@ -385,7 +442,7 @@ window.addEventListener('DOMContentLoaded', () => {
   const topbar = document.querySelector('.topbar');
   if (topbar) {
     const netStatus = navigator.onLine
-      ? '<span style="color:#059669;font-size:11px;font-weight:bold;">🟢 Online</span>'
+      ? '<span style="color:#059669;font-size:11px;font-weight:bold;">☁️ Cloud Online</span>'
       : '<span style="color:#d97706;font-size:11px;font-weight:bold;">🟠 Offline Mode</span>';
     const tools = document.createElement('div');
     tools.style.cssText = 'display:flex; gap:6px; flex-wrap:wrap; align-items:center;';
@@ -393,7 +450,7 @@ window.addEventListener('DOMContentLoaded', () => {
       ${netStatus}
       <button class="btn" style="background:#0f294a;color:#fff;" onclick="SGB.openHelpModal()">❓ Msaada</button>
       <button class="btn" style="background:#7c3aed;color:#fff;" onclick="SGB.openInboxModal()">💬 Ujumbe</button>
-      <button class="btn" style="background:#0284c7;color:#fff;" onclick="SGB.liveRefresh()">🔄 Refresh</button>
+      <button class="btn" style="background:#0284c7;color:#fff;" onclick="SGB.liveRefresh()">🔄 Sync</button>
       <button class="btn" style="background:#d97706;color:#fff;" onclick="SGB.toggleLang()">🌐 SW | EN</button>
       <button class="btn" style="background:#059669;color:#fff;" onclick="SGB.exportBackup()">💾 Backup</button>
       <button class="btn" style="background:#475569;color:#fff;" onclick="SGB.importBackup()">📂 Restore</button>
@@ -405,8 +462,4 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   }
   setTimeout(() => SGB.applyLanguage(), 150);
-});
-
-window.addEventListener('storage', (e) => {
-  if (e.key && e.key.startsWith('sgb_')) SGB.liveRefresh(true);
 });
