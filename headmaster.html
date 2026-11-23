@@ -120,7 +120,7 @@
           </form>
           <table><tr><th>Mwanafunzi</th><th>Sababu</th><th>Tarehe ya Kurudi</th><th>Hali</th><th>Hatua</th></tr>
           ${gps.map(g => `<tr><td><b>${g.student_name}</b></td><td>${g.reason}</td><td>${g.return_date}</td><td><b>${g.status}</b></td>
-          <td>${g.status.includes('Pending') ? `<button class="btn btn-green" onclick="SGB.update('gate_passes', ${g.id}, {status:'Approved by Headmaster'}); openTab('gate_disc')">✅ Idhinisha</button>` : '✓'}</td></tr>`).join('')}
+          <td>${g.status.includes('Pending') ? `<button class="btn btn-green" onclick="SGB.update('gate_passes', ${g.id}, {status:'Approved by Headmaster'}); openTab('gate_disc')">✅ Idhinisha</button>` : `<button class="btn btn-blue" onclick="printGatePass('${g.student_name}', '${g.reason}', '${g.return_date}', ${g.id})">🖨️ Kibali + QR</button>`}</td></tr>`).join('')}
           </table>
         </div>
         <div class="panel">
@@ -152,16 +152,19 @@
       const rolls = SGB.select('rollcall_logs');
       const allocs = SGB.select('teacher_allocations');
       const byTeacher = {};
-      allocs.forEach(a => { byTeacher[a.teacher_name] = { subjects: 0, marksCount: 0, rollCount: 0 }; });
-      allocs.forEach(a => { if (byTeacher[a.teacher_name]) byTeacher[a.teacher_name].subjects++; });
-      marks.forEach(m => { if (m.teacher && byTeacher[m.teacher]) byTeacher[m.teacher].marksCount++; });
+      allocs.forEach(a => { byTeacher[a.teacher_name] = { subjects: new Set(), scores: [], rollCount: 0 }; });
+      allocs.forEach(a => { if (byTeacher[a.teacher_name]) byTeacher[a.teacher_name].subjects.add(a.subject_name); });
+      marks.forEach(m => { if (m.teacher && byTeacher[m.teacher] && m.grade !== 'X') byTeacher[m.teacher].scores.push(Number(m.total_score)); });
       rolls.forEach(r => { if (r.teacher && byTeacher[r.teacher]) byTeacher[r.teacher].rollCount++; });
 
       area.innerHTML = `
         <div class="panel">
-          <h3>Tathmini ya Utendaji wa Walimu (Teacher KPIs)</h3>
-          <table><tr><th>Jina la Mwalimu</th><th>Masomo Aliyopangiwa</th><th>Alama Alizoingiza</th><th>Mahudhurio Aliyochukua</th></tr>
-          ${Object.entries(byTeacher).map(([t, d]) => `<tr><td><b>${t}</b></td><td>${d.subjects}</td><td>${d.marksCount}</td><td>${d.rollCount}</td></tr>`).join('') || '<tr><td colspan="4">Hakuna walimu waliopangiwa masomo bado.</td></tr>'}
+          <h3>Tathmini ya Utendaji wa Walimu (Teacher KPIs & Subject Pass Average)</h3>
+          <table><tr><th>Jina la Mwalimu</th><th>Masomo</th><th>Wastani wa Ufaulu (%)</th><th>Mahudhurio Aliyochukua</th></tr>
+          ${Object.entries(byTeacher).map(([t, d]) => {
+            const avg = d.scores.length ? (d.scores.reduce((a,b)=>a+b,0)/d.scores.length).toFixed(1) + '%' : 'Hakuna alama';
+            return `<tr><td><b>${t}</b></td><td>${Array.from(d.subjects).join(', ')}</td><td><b>${avg}</b></td><td>${d.rollCount}</td></tr>`;
+          }).join('') || '<tr><td colspan="4">Hakuna walimu waliopangiwa masomo bado.</td></tr>'}
           </table>
         </div>`;
     }
@@ -194,6 +197,17 @@
     e.preventDefault();
     SGB.insert('gate_passes', { student_name: document.getElementById('gName').value, reason: document.getElementById('gReason').value, return_date: document.getElementById('gDate').value, status: 'Approved (Active)' });
     openTab('gate_disc');
+  }
+  function printGatePass(name, reason, retDate, id) {
+    const qr = SGB.qrImg(`GATE-PASS:${id}|${name}`);
+    const w = window.open('', '', 'width=400,height=450');
+    w.document.write(`<html><body style="font-family:monospace;padding:20px;border:2px dashed #000;width:300px;margin:auto;">
+      <center><b>SANGABUYE SECONDARY SCHOOL</b><br>S.L.P 11898, ILEMELA - MWANZA<br>Simu: 0784 755 173<br>------------------------<br><b>KIBALI CHA RUHUSA (GATE PASS)</b></center><br>
+      <b>Mwanafunzi:</b> ${name}<br><b>Sababu:</b> ${reason}<br><b>Tarehe ya Kurudi:</b> ${retDate}<br><b>Imeidhinishwa na:</b> Mkuu wa Shule<br>------------------------<br>
+      <center><img src="${qr}"><br><small>Onyesha kwa Mlinzi wa Getini</small></center>
+    </body></html>`);
+    w.document.close(); w.focus();
+    setTimeout(() => { w.print(); w.close(); }, 300);
   }
   function addDisc(e) {
     e.preventDefault();
