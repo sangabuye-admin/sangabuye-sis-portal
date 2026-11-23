@@ -8,12 +8,12 @@
   <style>
     * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
     body { margin: 0; background: #f1f5f9; color: #1e293b; }
-    .topbar { background: #1e40af; color: white; padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; }
-    .container { max-width: 920px; margin: 20px auto; padding: 0 15px; }
-    .panel { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-bottom: 18px; }
+    .topbar { background: #1e40af; color: white; padding: 14px 22px; display: flex; justify-content: space-between; align-items: center; }
+    .container { max-width: 950px; margin: 20px auto; padding: 0 15px; }
+    .panel { background: white; padding: 18px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-bottom: 18px; }
     input, textarea { padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; width: 100%; }
     table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
-    th, td { padding: 9px; border-bottom: 1px solid #e2e8f0; text-align: left; }
+    th, td { padding: 8px; border: 1px solid #e2e8f0; text-align: left; }
     th { background: #f8fafc; color: #1e40af; }
     .btn { padding: 8px 14px; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold; background: #1d4ed8; color: white; }
     .btn-green { background: #059669; color: white; }
@@ -23,14 +23,9 @@
 <body>
 <div class="topbar">
   <div><strong>🎒 TOVUTI YA MWANAFUNZI — SANGABUYE SIS PORTAL</strong></div>
-  <div style="display:flex; gap:8px;">
-    <button class="btn" onclick="location.reload()">🔄 Live Refresh</button>
-    <button class="btn btn-red" onclick="SGB.logout()">🚪 Toka</button>
-  </div>
+  <div></div>
 </div>
-
 <div class="container" id="stBody"></div>
-
 <script>
   const user = SGB.requireRole(['student', 'super_admin']);
   SGB.startSessionTimer();
@@ -41,11 +36,18 @@
     const mySubs = SGB.select('assignment_submissions').filter(s => s.student_name.toLowerCase() === cleanStudentName.toLowerCase());
     const myMarks = SGB.select('exam_results').filter(m => m.student_name.toLowerCase().includes(cleanStudentName.toLowerCase()));
     const tt = SGB.select('smart_timetable');
+    const news = SGB.select('announcements');
+    const myBooks = SGB.select('library_loans').filter(l => l.student_name.toLowerCase().includes(cleanStudentName.toLowerCase()));
+    const myHostel = SGB.select('hostel_beds').filter(h => h.student_name.toLowerCase().includes(cleanStudentName.toLowerCase()));
 
     document.getElementById('stBody').innerHTML = `
-      <div class="panel">
+      <div class="panel" style="border-left:4px solid #1d4ed8;">
         <h3>Karibu, ${cleanStudentName}!</h3>
-        <p style="font-size:13px; color:#475569;">Hapa unaweza kufanya kazi za nyumbani (Assignments), majaribio ya mtandaoni (Online CBT), kuona matokeo yako, ratiba ya vipindi, na kutuma maoni ya siri.</p>
+        <p style="font-size:13px; color:#475569;">
+          <b>Bweni & Kitanda:</b> ${myHostel.length ? myHostel.room_bed : 'Mwanafunzi wa Kutwa (Day Scholar)'} |
+          <b>Vitabu vya Maktaba:</b> ${myBooks.length ? myBooks.map(b => `${b.book} (${b.status})`).join(', ') : 'Huna kitabu ulichoazima'}
+        </p>
+        ${news.length ? `<div style="background:#fef3c7; padding:8px 12px; border-radius:6px; font-size:12px;"><b>📢 Tangazo la Shule:</b> ${news.message}</div>` : ''}
       </div>
 
       <div class="panel">
@@ -57,7 +59,7 @@
           </div>
           <p style="margin:8px 0;">${c.question}</p>
           ${c.type === 'WRITTEN' ? `
-            <textarea id="ans_${c.id}" rows="3" placeholder="Andika majibu yako hapa kwa ufasaha..."></textarea><br><br>
+            <textarea id="ans_${c.id}" rows="3" placeholder="Andika majibu yako hapa..."></textarea><br><br>
             <button class="btn btn-green" onclick="submitWritten(${c.id}, '${c.title}', '${c.teacher}')">📤 Wasilisha Kazi Kwa Mwalimu</button>
           ` : `
             <small style="color:#334155;"><b>Chaguo:</b> ${c.options}</small><br><br>
@@ -84,10 +86,11 @@
       </div>
 
       <div class="panel">
-        <h3>3. Ratiba ya Vipindi (Smart Timetable)</h3>
+        <h3>3. Ratiba ya Vipindi & Maktaba ya NECTA Past Papers</h3>
         <table><tr><th>Siku</th><th>Muda</th><th>Darasa</th><th>Mwalimu & Somo</th></tr>
         ${tt.map(t => `<tr><td><b>${t.day}</b></td><td>${t.time}</td><td>${t.cls}</td><td>${t.teacher}</td></tr>`).join('') || '<tr><td colspan="4">Ratiba haijapakiwa bado.</td></tr>'}
         </table>
+        <p style="margin-top:12px; font-size:12px;">📚 <b>Maktaba ya Kidijitali (NECTA Past Papers):</b> <a href="https://tetea.org" target="_blank">Fungua Maktaba ya NECTA Past Papers (Form 2, 4 & 6) ↗</a></p>
       </div>
 
       <div class="panel">
@@ -102,13 +105,7 @@
   function submitWritten(id, title, teacher) {
     const answer_text = document.getElementById('ans_' + id).value.trim();
     if (!answer_text) return;
-    SGB.insert('assignment_submissions', {
-      student_name: cleanStudentName,
-      title,
-      teacher,
-      answer_text,
-      score: 'Inasubiri kusahihishwa'
-    });
+    SGB.insert('assignment_submissions', { student_name: cleanStudentName, title, teacher, answer_text, score: 'Inasubiri kusahihishwa' });
     alert('✅ Kazi yako imetumwa kwa mwalimu ' + teacher + '!');
     renderStudentPortal();
   }
