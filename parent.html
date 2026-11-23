@@ -8,81 +8,154 @@
   <style>
     * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
     body { margin: 0; background: #f1f5f9; color: #1e293b; }
-    .topbar { background: #0f294a; color: white; padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; }
-    .container { max-width: 900px; margin: 20px auto; padding: 0 15px; }
-    .panel { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-bottom: 18px; }
+    .topbar { background: #0f294a; color: white; padding: 14px 22px; display: flex; justify-content: space-between; align-items: center; }
+    .container { max-width: 960px; margin: 20px auto; padding: 0 15px; }
+    .panel { background: white; padding: 18px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-bottom: 18px; }
     input, textarea { padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; width: 100%; }
     table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
-    th, td { padding: 9px; border-bottom: 1px solid #e2e8f0; text-align: left; }
-    .btn { padding: 9px 15px; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold; background: #1d4ed8; color: white; }
-    .btn-red { background: #dc2626; }
+    th, td { padding: 8px; border: 1px solid #e2e8f0; text-align: left; }
+    th { background: #f8fafc; color: #0f294a; }
+    .btn { padding: 8px 14px; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold; background: #1d4ed8; color: white; }
+    .btn-green { background: #059669; color: white; }
+    .btn-amber { background: #d97706; color: white; }
+    .btn-red { background: #dc2626; color: white; }
+    .child-chip { display: inline-block; padding: 7px 14px; background: #e0e7ff; color: #1e3a8a; border-radius: 20px; font-weight: bold; font-size: 12px; margin: 4px; cursor: pointer; border: 1px solid #93c5fd; }
+    .child-chip.active { background: #1d4ed8; color: white; }
   </style>
 </head>
 <body>
 <div class="topbar">
   <div><strong>👨‍👩‍👧 TOVUTI YA MZAZI — SANGABUYE SECONDARY SCHOOL</strong></div>
-  <button class="btn btn-red" onclick="SGB.logout()">🚪 Toka</button>
+  <div></div>
 </div>
 <div class="container">
+  <div class="panel" style="border-left:4px solid #d97706;">
+    <h3>📢 Matangazo Rasmi Kutoka Ofisi ya Mkuu wa Shule (0784 755 173)</h3>
+    <div id="schoolNewsArea"></div>
+  </div>
   <div class="panel">
-    <h3>Multi-Child Switcher — Chagua / Tafuta Mtoto Wako</h3>
-    <div style="display:flex; gap:10px;">
+    <h3>👨‍👩‍👧‍👦 Multi-Child Switcher — Watoto Wangu Wanaosoma Sangabuye</h3>
+    <div style="display:flex; gap:10px; margin-bottom:10px;">
       <input type="text" id="childInput" list="stList" placeholder="Andika herufi chache za jina la mtoto wako...">
-      <button class="btn" onclick="loadChild()">🔍 Fungua Taarifa za Mtoto</button>
+      <button class="btn btn-green" onclick="addAndSelectChild()">➕ Ongeza / Fungua Taarifa za Mtoto</button>
     </div>
     <datalist id="stList"></datalist>
+    <div id="savedChildrenChips"></div>
   </div>
   <div id="childArea"></div>
 </div>
 <script>
-  SGB.requireRole(['parent', 'super_admin']);
+  const user = SGB.requireRole(['parent', 'super_admin']);
   SGB.startSessionTimer();
+  const parentKey = 'sgb_parent_children_' + user.full_name.replace(/\s+/g, '_');
 
+  // Pakia matangazo ya shule
+  const news = SGB.select('announcements');
+  document.getElementById('schoolNewsArea').innerHTML = news.length
+    ? news.slice(0, 3).map(n => `<p style="margin:5px 0; font-size:13px;">• <b>[${n.created_at}]</b> ${n.message}</p>`).join('')
+    : '<p style="font-size:12px; color:#64748b;">Hakuna matangazo mapya kwa sasa.</p>';
+
+  // Pakia majina ya wanafunzi kwa Autocomplete
   const names = new Set();
+  SGB.select('users_profile').filter(u => u.role === 'student').forEach(u => names.add(u.full_name));
   SGB.select('accounting_receipts').forEach(r => names.add(r.student_name));
   SGB.select('exam_results').forEach(m => names.add(m.student_name));
   document.getElementById('stList').innerHTML = Array.from(names).map(n => `<option value="${n}">`).join('');
 
-  function loadChild() {
+  function getSavedChildren() {
+    return JSON.parse(localStorage.getItem(parentKey) || '[]');
+  }
+
+  function renderChips(activeName = '') {
+    const list = getSavedChildren();
+    document.getElementById('savedChildrenChips').innerHTML = list.map(c =>
+      `<span class="child-chip ${c.toLowerCase() === activeName.toLowerCase() ? 'active' : ''}" onclick="loadChild('${c}')">🎒 ${c}</span>`
+    ).join('');
+  }
+
+  function addAndSelectChild() {
     const name = document.getElementById('childInput').value.trim();
     if (!name) return;
+    const list = getSavedChildren();
+    if (!list.some(x => x.toLowerCase() === name.toLowerCase())) {
+      list.push(name);
+      localStorage.setItem(parentKey, JSON.stringify(list));
+    }
+    loadChild(name);
+  }
+  function loadChild(selectedName) {
+    const name = selectedName || document.getElementById('childInput').value.trim();
+    if (!name) return;
+    document.getElementById('childInput').value = name;
+    renderChips(name);
+
     const recs = SGB.select('accounting_receipts').filter(r => r.student_name.toLowerCase() === name.toLowerCase());
+    const stmts = SGB.select('contribution_statements').filter(s => s.student_name.toLowerCase() === name.toLowerCase() && s.status.includes('Verified'));
     const marks = SGB.select('exam_results').filter(m => m.student_name.toLowerCase() === name.toLowerCase());
     const rolls = SGB.select('rollcall_logs').filter(x => x.student_name.toLowerCase() === name.toLowerCase());
     const sick = SGB.select('sickbay_records').filter(x => x.student_name.toLowerCase() === name.toLowerCase());
+    const disc = SGB.select('discipline_cases').filter(x => x.student_name.toLowerCase() === name.toLowerCase());
+    const gps = SGB.select('gate_passes').filter(x => x.student_name.toLowerCase() === name.toLowerCase());
     const totalPaid = recs.reduce((s, r) => s + Number(r.amount_paid), 0);
+    const qr = SGB.qrImg(`PARENT-REPORT:${name}`);
 
     document.getElementById('childArea').innerHTML = `
-      <div class="panel">
-        <h3>1. Taarifa ya Michango & Risiti (CRDB: 0150838972100 & Cash)</h3>
-        <p>Jumla Aliyolipa: <b style="color:#059669;">TZS ${totalPaid.toLocaleString()}</b></p>
-        <table><tr><th>Risiti Na.</th><th>Mchango</th><th>Njia</th><th>Kiasi (TZS)</th><th>Tarehe</th></tr>
-        ${recs.map(r => `<tr><td><b>${r.receipt_number}</b></td><td>${r.payment_category}</td><td>${r.payment_method}</td><td>${Number(r.amount_paid).toLocaleString()}</td><td>${r.created_at}</td></tr>`).join('') || '<tr><td colspan="5">Hakuna risiti bado.</td></tr>'}
-        </table><br><button class="btn" onclick="window.print()">🖨️ Pakua Taarifa ya Michango & Ripoti (PDF)</button>
-      </div>
-      <div class="panel">
-        <h3>2. Matokeo ya Mitihani ya Mtoto</h3>
-        <table><tr><th>Somo</th><th>CA (30%)</th><th>Final (70%)</th><th>Jumla</th><th>Daraja</th></tr>
-        ${marks.map(m => `<tr><td><b>${m.subject_name}</b></td><td>${m.ca_score}</td><td>${m.final_score}</td><td><b>${m.total_score}%</b></td><td><b>${m.grade}</b></td></tr>`).join('') || '<tr><td colspan="5">Hakuna matokeo bado.</td></tr>'}
+      <div class="panel" id="parentPrintArea">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <div><h3>1. Taarifa ya Michango & Risiti — ${name}</h3><p style="font-size:12px;">Akaunti ya Shule: <b>CRDB 0150838972100 (SHULE YA SEKONDARI SANGABUYE E.K)</b></p></div>
+          <img src="${qr}">
+        </div>
+        <p>Jumla ya Michango Aliyolipa: <b style="color:#059669; font-size:15px;">TZS ${totalPaid.toLocaleString()}</b></p>
+        ${stmts.length ? `<div style="padding:10px; background:#ecfdf5; border:1px solid #059669; border-radius:6px; margin-bottom:10px;">
+          <b>✅ Taarifa Rasmi Iliyoidhinishwa na Mkuu wa Shule (0784 755 173):</b><br>
+          Kinachotakiwa: <b>TZS ${Number(stmts.required).toLocaleString()}</b> | Amelipa: <b>TZS ${Number(stmts.paid).toLocaleString()}</b> | Deni Lililobaki: <b style="color:#dc2626;">TZS ${Number(stmts.balance).toLocaleString()}</b>
+        </div>` : ''}
+        <table><tr><th>Risiti Na.</th><th>Aina ya Mchango</th><th>Njia</th><th>Kiasi (TZS)</th><th>Tarehe</th></tr>
+        ${recs.map(r => `<tr><td><b>${r.receipt_number}</b></td><td>${r.payment_category}</td><td>${r.payment_method}</td><td><b>${Number(r.amount_paid).toLocaleString()}</b></td><td>${r.created_at}</td></tr>`).join('') || '<tr><td colspan="5">Hakuna risiti zilizorekodiwa bado.</td></tr>'}
+        </table>
+
+        <h3 style="margin-top:20px;">2. Ripoti ya Matokeo ya Mitihani (NECTA Grading)</h3>
+        <table><tr><th>Somo</th><th>CA (30%)</th><th>Final (70%)</th><th>Jumla</th><th>Daraja</th><th>Pointi</th></tr>
+        ${marks.map(m => `<tr><td><b>${m.subject_name}</b></td><td>${m.ca_score}</td><td>${m.final_score}</td><td><b>${m.total_score}%</b></td><td><b>${m.grade}</b></td><td>${m.points}</td></tr>`).join('') || '<tr><td colspan="6">Hakuna matokeo yaliyopatikana bado.</td></tr>'}
         </table>
       </div>
+      <div style="margin-bottom:18px;"><button class="btn" onclick="printParentDoc()">🖨️ Pakua Taarifa ya Michango & Ripoti (A4 PDF)</button></div>
+
       <div class="panel">
-        <h3>3. Mahudhurio, Afya (Zahanati) & Ombi la Gate Pass</h3>
-        <p><b>Rekodi za Zahanati:</b> ${sick.map(s => `${s.diagnosis} (${s.created_at})`).join(', ') || 'Hakuna tatizo la afya lililorekodiwa.'}</p>
-        <p><b>Mahudhurio:</b> ${rolls.map(r => `${r.status} (${r.created_at})`).join(', ') || 'Hakuna rekodi ya kutokuwepo.'}</p>
-        <form onsubmit="reqPass(event, '${name}')" style="display:flex; gap:10px; margin-top:10px;">
-          <input type="text" id="gpWhy" required placeholder="Andika sababu ya kuomba ruhusa ya mtoto (Gate Pass)...">
-          <button type="submit" class="btn">🎫 Omba Gate Pass</button>
+        <h3>3. Mahudhurio, Afya (Zahanati), Nidhamu & Maombi ya Gate Pass</h3>
+        <p><b>🏥 Afya (Zahanati):</b> ${sick.map(s => `${s.diagnosis} (${s.created_at})`).join(', ') || 'Hakuna rekodi ya ugonjwa.'}</p>
+        <p><b>⚖️ Nidhamu:</b> ${disc.map(d => `${d.offense} — Hatua: ${d.action} (${d.created_at})`).join(', ') || 'Nidhamu ni nzuri, hakuna kesi.'}</p>
+        <p><b>📋 Mahudhurio Darasani:</b> ${rolls.map(r => `${r.status} (${r.created_at})`).join(', ') || 'Hakuna taarifa ya kutokuwepo.'}</p>
+        <hr>
+        <h4>Omba Ruhusa ya Mtoto Kutoka Nje ya Shule (Gate Pass Request):</h4>
+        <form onsubmit="reqPass(event, '${name}')" style="display:grid; grid-template-columns:2fr 1fr 1fr; gap:10px; margin-bottom:10px;">
+          <input type="text" id="gpWhy" required placeholder="Sababu ya kuomba ruhusa (Mfano: Kliniki / Matibabu / Shughuli ya Familia)">
+          <input type="date" id="gpRet" required>
+          <button type="submit" class="btn btn-amber">🎫 Tuma Ombi Kwa Mkuu</button>
         </form>
+        <table><tr><th>Sababu</th><th>Tarehe ya Kurudi</th><th>Hali ya Idhini (Mkuu wa Shule)</th></tr>
+        ${gps.map(g => `<tr><td>${g.reason}</td><td>${g.return_date}</td><td><b>${g.status}</b></td></tr>`).join('') || '<tr><td colspan="3">Hakuna maombi ya Gate Pass.</td></tr>'}
+        </table>
       </div>`;
   }
 
   function reqPass(e, name) {
     e.preventDefault();
-    SGB.insert('gate_passes', { student_name: name, reason: document.getElementById('gpWhy').value, return_date: 'Inasubiri Mkuu wa Shule', status: 'Pending (Ombi la Mzazi)' });
+    SGB.insert('gate_passes', { student_name: name, reason: document.getElementById('gpWhy').value, return_date: document.getElementById('gpRet').value, status: 'Pending (Ombi la Mzazi)' });
     alert('✅ Ombi la Gate Pass limetumwa kwa Mkuu wa Shule (0784 755 173)!');
-    e.target.reset();
+    loadChild(name);
   }
+
+  function printParentDoc() {
+    const html = document.getElementById('parentPrintArea').innerHTML;
+    const w = window.open('', '', 'width=800,height=650');
+    w.document.write('<html><head><title>Sangabuye Parent Report</title><style>body{font-family:sans-serif;padding:20px;}table{width:100%;border-collapse:collapse;}th,td{border:1px solid #000;padding:7px;font-size:12px;}</style></head><body><h2>SANGABUYE SECONDARY SCHOOL (S.L.P 11898, ILEMELA - MWANZA)</h2>' + html + '</body></html>');
+    w.document.close(); w.focus();
+    setTimeout(() => { w.print(); w.close(); }, 300);
+  }
+
+  const saved = getSavedChildren();
+  if (saved.length) loadChild(saved);
 </script>
 </body>
 </html>
