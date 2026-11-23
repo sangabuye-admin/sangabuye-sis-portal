@@ -11,21 +11,17 @@
     .sidebar { width: 270px; background: #1e1b4b; color: white; display: flex; flex-direction: column; padding: 18px 12px; }
     .sidebar h2 { font-size: 15px; margin: 0 0 4px; color: #fde68a; text-align: center; }
     .sidebar p { font-size: 11px; text-align: center; color: #c7d2fe; margin: 0 0 18px; }
-    .menu-btn { background: transparent; border: none; color: #e0e7ff; text-align: left; padding: 10px 12px; border-radius: 8px; cursor: pointer; font-size: 13px; margin-bottom: 4px; }
+    .menu-btn { background: transparent; border: none; color: #e0e7ff; text-align: left; padding: 9px 12px; border-radius: 8px; cursor: pointer; font-size: 12.5px; margin-bottom: 4px; }
     .menu-btn:hover, .menu-btn.active { background: #4338ca; color: white; font-weight: bold; }
     .main { flex: 1; display: flex; flex-direction: column; }
     .topbar { background: white; padding: 14px 22px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
     .content { padding: 22px; }
-    .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-bottom: 18px; }
-    .card { background: white; padding: 15px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border-left: 4px solid #4338ca; }
-    .card h4 { margin: 0 0 5px; font-size: 11px; color: #64748b; text-transform: uppercase; }
-    .card .val { font-size: 18px; font-weight: bold; color: #1e1b4b; }
     .panel { background: white; padding: 18px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 18px; }
-    input, select, textarea { padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; width: 100%; }
+    input, select, textarea { padding: 9px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; width: 100%; }
     table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 12.5px; }
     th, td { padding: 8px; border: 1px solid #e2e8f0; text-align: left; }
     th { background: #f8fafc; color: #1e1b4b; }
-    .btn { padding: 8px 14px; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold; }
+    .btn { padding: 7px 13px; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold; }
     .btn-indigo { background: #4338ca; color: white; }
     .btn-green { background: #059669; color: white; }
     .btn-amber { background: #d97706; color: white; }
@@ -42,19 +38,17 @@
   <button class="menu-btn" onclick="openTab('seating_isal', this)">🪑 3. Viti 40 (Real Mix), ISAL & CAL</button>
   <button class="menu-btn" onclick="openTab('analytics_gpa', this)">📈 4. Kijinsia (M/F), GPA & Remedial</button>
   <button class="menu-btn" onclick="openTab('report_card', this)">📄 5. Ripoti Binafsi (A4 PDF)</button>
-  <button class="menu-btn" onclick="openTab('subjects_map', this)">📚 6. Tahasusi & Masomo ya Hiari</button>
+  <button class="menu-btn" onclick="openTab('subjects_map', this)">📚 6. Pangia Walimu & Tahasusi</button>
   <button class="menu-btn" onclick="openTab('timetable', this)">🗓️ 7. Smart Timetable (Clash-Free)</button>
   <button class="menu-btn" onclick="openTab('transfer_bulk', this)">🎓 8. Transfer Cert & Bulk Marks</button>
+  <button class="menu-btn" onclick="openTab('top_awards', this)">🏆 9. Top 10 Wanafunzi & Walimu Bora</button>
   <button class="logout-btn" onclick="SGB.logout()">🚪 Toka (Logout)</button>
 </div>
 
 <div class="main">
   <div class="topbar">
     <div><strong id="tabTitle">📝 1. Usimamizi wa Mitihani & Publish</strong> <span id="syncTime" style="font-size:11px; color:#4338ca;"></span></div>
-    <div style="display:flex; gap:8px;">
-      <button class="btn btn-indigo" onclick="document.querySelector('.menu-btn.active').click()">🔄 Live Refresh</button>
-      <button class="btn btn-amber" onclick="alert('Lugha imebadilishwa (SW / EN).')">SW | EN</button>
-    </div>
+    <div></div>
   </div>
   <div class="content" id="viewArea"></div>
   <datalist id="stList"></datalist>
@@ -90,7 +84,6 @@
     document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('active'));
     if (btn) btn.classList.add('active');
     if (btn) document.getElementById('tabTitle').innerText = btn.innerText;
-    document.getElementById('syncTime').innerText = ' • Last synced: ' + new Date().toLocaleTimeString();
     updateNames();
     const area = document.getElementById('viewArea');
 
@@ -137,8 +130,7 @@
     if (tab === 'seating_isal') {
       area.innerHTML = `
         <div class="panel">
-          <h3>Upangaji wa Viti 40 (Real Student Anti-Cheating Mix), ISAL & CAL</h3>
-          <p style="font-size:12px; color:#475569;">Mfumo unavuta majina halisi ya wanafunzi waliosajiliwa na kuwachanganya kwenye vyumba vya viti 40 (Safu 5 x 8).</p>
+          <h3>Upangaji wa Viti 40 (Real Student Mix), ISAL & CAL</h3>
           <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:15px;">
             <input type="text" id="exRoom" value="Chumba 01 (Hall A)" placeholder="Jina la Chumba">
             <input type="text" id="exSubj" value="012 History" placeholder="Somo & Msimbo">
@@ -258,7 +250,6 @@
         </div>`;
     }
 
-
     if (tab === 'timetable') {
       const tt = SGB.select('smart_timetable');
       area.innerHTML = `
@@ -292,14 +283,60 @@
         </div>
         <div class="panel">
           <h3>2. Kupakia Alama kwa Mkupuo (Bulk Marks CSV) & Kurekebisha Alama</h3>
-          <p style="font-size:12px; color:#475569;">Muundo: <b>Jina la Mwanafunzi, Somo, CA(30), Final(70)</b></p>
           <textarea id="bulkMarksTxt" rows="4" placeholder="Amina Hassan, Mathematics, 24, 58&#10;Baraka John, Mathematics, 19, 46"></textarea><br><br>
           <button class="btn btn-green" onclick="importBulkMarks()">📥 Pakia Alama Zote Sasa</button>
-          <h4>Rekebisha Alama Iliyokosewa:</h4>
           <table><tr><th>Mwanafunzi</th><th>Somo</th><th>Jumla</th><th>Daraja</th><th>Hatua</th></tr>
           ${marks.slice(0, 15).map(m => `<tr><td>${m.student_name}</td><td>${m.subject_name}</td><td>${m.total_score}%</td><td><b>${m.grade}</b></td><td><button class="btn btn-amber" onclick="editMark(${m.id}, ${m.ca_score}, ${m.final_score})">✏️ Rekebisha</button></td></tr>`).join('')}
           </table>
         </div>`;
+    }
+
+    if (tab === 'top_awards') {
+      const marks = SGB.select('exam_results').filter(m => m.grade !== 'X');
+      const bySt = {};
+      const bySubjTeacher = {};
+
+      marks.forEach(m => {
+        const sk = m.student_name.toLowerCase();
+        if (!bySt[sk]) bySt[sk] = { name: m.student_name, cls: m.class_name || '-', scores: [], pts: [] };
+        bySt[sk].scores.push(Number(m.total_score));
+        if (m.points > 0) bySt[sk].pts.push(Number(m.points));
+
+        const tk = `${m.subject_name} (${m.teacher || 'Mwalimu'})`;
+        if (!bySubjTeacher[tk]) bySubjTeacher[tk] = { label: tk, scores: [] };
+        bySubjTeacher[tk].scores.push(Number(m.total_score));
+      });
+
+      const top10Students = Object.values(bySt).map(s => {
+        const tot = s.scores.reduce((a,b) => a + b, 0);
+        const avg = s.scores.length ? (tot / s.scores.length).toFixed(1) : 0;
+        const agg = s.pts.sort((a,b) => a - b).slice(0, 7).reduce((a,b) => a + b, 0);
+        return { ...s, tot, avg: Number(avg), agg };
+      }).sort((a,b) => b.avg - a.avg).slice(0, 10);
+
+      const topTeachers = Object.values(bySubjTeacher).map(t => {
+        const avg = (t.scores.reduce((a,b) => a + b, 0) / t.scores.length).toFixed(1);
+        return { ...t, avg: Number(avg), count: t.scores.length };
+      }).sort((a,b) => b.avg - a.avg).slice(0, 5);
+
+      const qr = SGB.qrImg('SANGABUYE-TOP-10-AWARDS');
+
+      area.innerHTML = `
+        <div class="panel" id="awardsPrintArea">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div><h3>🏆 WANAFUNZI 10 BORA WA SHULE (TOP 10 OVERALL STUDENTS)</h3><p style="font-size:12px;">Sangabuye Secondary School — Orodha ya Zawadi za Taaluma</p></div>
+            <img src="${qr}">
+          </div>
+          <table><tr><th>Nafasi</th><th>Jina Kamili la Mwanafunzi</th><th>Kidato</th><th>Jumla ya Alama</th><th>Wastani (%)</th><th>Pointi (Best 7)</th></tr>
+          ${top10Students.map((s, idx) => `<tr><td><b>#${idx + 1}</b></td><td><b>${s.name}</b></td><td>${s.cls}</td><td>${s.tot}</td><td><b style="color:#059669;">${s.avg}%</b></td><td>${s.agg}</td></tr>`).join('') || '<tr><td colspan="6">Hakuna alama za kutosha bado.</td></tr>'}
+          </table>
+
+          <h3 style="margin-top:25px;">⭐ WALIMU & MASOMO 5 BORA (TOP PERFORMING SUBJECTS & TEACHERS)</h3>
+          <table><tr><th>Nafasi</th><th>Somo & Mwalimu</th><th>Watahiniwa</th><th>Wastani wa Ufaulu (%)</th></tr>
+          ${topTeachers.map((t, idx) => `<tr><td><b>#${idx + 1}</b></td><td><b>${t.label}</b></td><td>${t.count}</td><td><b style="color:#4338ca;">${t.avg}%</b></td></tr>`).join('') || '<tr><td colspan="4">Hakuna takwimu za masomo bado.</td></tr>'}
+          </table>
+        </div>
+        <button class="btn btn-indigo" onclick="printSection('awardsPrintArea')">🖨️ Chapisha Orodha ya Zawadi (A4 PDF)</button>`;
     }
   }
   function createExam(e) {
@@ -340,7 +377,7 @@
     let html = `<div style="display:flex; justify-content:space-between; align-items:center;"><div><h4>SANGABUYE SECONDARY SCHOOL — ${level} MASTER SHEET (${fmt})</h4></div><img src="${qr}"></div>`;
 
     if (fmt === 'NECTA') {
-      html += `<table><tr><th>Cand No.</th><th>Jina Kamili</th><th>Sex</th><th>Agg</th><th>Division</th><th>Matokeo Kila Somo (Detailed Subjects)</th></tr>
+      html += `<table><tr><th>Cand No.</th><th>Jina Kamili</th><th>Sex</th><th>Agg</th><th>Division</th><th>Matokeo Kila Somo</th></tr>
       ${ranked.map((r, i) => `<tr><td>S.2026/${String(i+1).padStart(4,'0')}</td><td><b>${r.name}</b></td><td>${r.sex}</td><td><b>${r.agg}</b></td><td><b style="color:#4338ca;">${r.div}</b></td><td>${r.subList.join('  ')}</td></tr>`).join('') || '<tr><td colspan="6">Hakuna alama zilizotumwa bado.</td></tr>'}</table>`;
     } else {
       html += `<table><tr><th>Pos</th><th>Jina Kamili</th><th>Sex</th><th>Total</th><th>Average</th><th>Division</th></tr>
@@ -422,9 +459,9 @@
     document.getElementById('trOutput').innerHTML = `
       <div id="trPrint" style="border:2px solid #0f294a; padding:22px; background:white;">
         <div style="display:flex; justify-content:space-between;"><div><h2>SANGABUYE SECONDARY SCHOOL</h2><p>S.L.P 11898, Ilemela - Mwanza | Simu: 0784 755 173</p><h4>HATI RASMI YA UHAMISHO WA MWANAFUNZI (TRANSFER CERTIFICATE)</h4></div><img src="${qr}"></div>
-        <p>Inathibitishwa kuwa mwanafunzi <b>${name}</b> amekuwa mwanafunzi halali wa Sangabuye Secondary School na amekamilisha taratibu zote za uhakiki (Clearance) za uhasibu, maktaba, na taaluma.</p>
-        <p><b>Shule Anakohamia:</b> ${toSch}<br><b>Sababu ya Uhamisho:</b> ${rsn}<br><b>Tarehe ya Kutolewa:</b> ${new Date().toLocaleDateString('sw-TZ')}</p><br>
-        <p><b>Imethibitishwa na Mkuu wa Shule:</b> _______________________ (Simu: 0784 755 173)</p>
+        <p>Inathibitishwa kuwa mwanafunzi <b>${name}</b> amekuwa mwanafunzi halali wa Sangabuye Secondary School na amekamilisha taratibu zote za uhakiki (Clearance).</p>
+        <p><b>Shule Anakohamia:</b> ${toSch}<br><b>Sababu ya Uhamisho:</b> ${rsn}<br><b>Tarehe:</b> ${new Date().toLocaleDateString('sw-TZ')}</p><br>
+        <p><b>Imethibitishwa na Mkuu wa Shule:</b> _______________________ (0784 755 173)</p>
       </div><br><button class="btn btn-indigo" onclick="printSection('trPrint')">🖨️ Chapisha Hati ya Uhamisho (PDF)</button>`;
   }
 
@@ -458,8 +495,20 @@
     else if (tot >= 45) { grade = 'C'; points = 3; }
     else if (tot >= 30) { grade = 'D'; points = 4; }
     SGB.update('exam_results', id, { ca_score: newCa, final_score: fin, total_score: tot, grade, points });
-    alert('✅ Alama imerekebishwa!');
     openTab('transfer_bulk');
+  }
+
+  function saveTeacherAlloc(e) {
+    e.preventDefault();
+    SGB.insert('teacher_allocations', { teacher_name: document.getElementById('taTeacher').value.trim(), class_name: document.getElementById('taClass').value.trim(), subject_name: document.getElementById('taSubject').value.trim(), is_class_teacher: document.getElementById('taIsClassTeacher').value });
+    alert('✅ Mwalimu amepangiwa darasa na somo kikamilifu!');
+    openTab('subjects_map');
+  }
+
+  function delAlloc(id) {
+    const list = SGB.select('teacher_allocations').filter(x => x.id !== id);
+    localStorage.setItem('sgb_teacher_allocations', JSON.stringify(list));
+    openTab('subjects_map');
   }
 
   function saveSubjMap(e) {
@@ -489,23 +538,6 @@
   }
 
   openTab('exams_ctrl', document.querySelector('.menu-btn'));
-    function saveTeacherAlloc(e) {
-    e.preventDefault();
-    SGB.insert('teacher_allocations', {
-      teacher_name: document.getElementById('taTeacher').value.trim(),
-      class_name: document.getElementById('taClass').value.trim(),
-      subject_name: document.getElementById('taSubject').value.trim(),
-      is_class_teacher: document.getElementById('taIsClassTeacher').value
-    });
-    alert('✅ Mwalimu amepangiwa darasa na somo kikamilifu!');
-    openTab('subjects_map');
-  }
-  function delAlloc(id) {
-    const list = SGB.select('teacher_allocations').filter(x => x.id !== id);
-    localStorage.setItem('sgb_teacher_allocations', JSON.stringify(list));
-    openTab('subjects_map');
-  }
-
 </script>
 </body>
 </html>
