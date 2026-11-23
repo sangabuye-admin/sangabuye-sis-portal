@@ -38,6 +38,7 @@
   <button class="menu-btn" onclick="openTab('private_tests', this)">🗂️ 3. Mitihani Binafsi ya Somo</button>
   <button class="menu-btn" onclick="openTab('assignments', this)">💻 4. Assignments, CBT & Sahihisha</button>
   <button class="menu-btn" onclick="openTab('rollcall', this)">✅ 5. Mahudhurio & Benki ya Maswali</button>
+  <button class="menu-btn" onclick="openTab('lesson_plans', this)">📑 6. Schemes & Lesson Plans</button>
   <button class="logout-btn" onclick="SGB.logout()">🚪 Toka (Logout)</button>
 </div>
 
@@ -181,6 +182,28 @@
           </table>
         </div>`;
     }
+
+    if (tab === 'lesson_plans') {
+      const plans = SGB.select('lesson_plans').filter(p => user.role === 'super_admin' || p.teacher.toLowerCase() === teacherName.toLowerCase());
+      area.innerHTML = `
+        <div class="panel">
+          <h3>1. Wasilisha Scheme of Work au Lesson Plan Kwa Ofisi ya Taaluma</h3>
+          <form onsubmit="saveLessonPlan(event)" style="display:grid; gap:10px; margin-bottom:15px;">
+            <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px;">
+              <select id="lpType"><option value="Lesson Plan">Andalio la Somo (Lesson Plan)</option><option value="Scheme of Work">Mpango Kazi (Scheme of Work)</option></select>
+              <input type="text" id="lpSubj" required placeholder="Somo & Darasa (Mfano: Chemistry Form 3A)">
+              <input type="text" id="lpTopic" required placeholder="Mada Kuu / Ndogo (Topic & Subtopic)">
+            </div>
+            <textarea id="lpObj" rows="3" required placeholder="Malengo ya Somo, Zana za Kufundishia na Tathmini..."></textarea>
+            <button type="submit" class="btn btn-green">📤 Tuma Kwa Mtaaluma Akague & Asaini</button>
+          </form>
+
+          <h3>2. Maandalio Yangu & Hali ya Ukaguzi (Inspection Status)</h3>
+          <table><tr><th>Aina</th><th>Somo & Darasa</th><th>Mada (Topic)</th><th>Tarehe</th><th>Hali ya Mtaaluma</th></tr>
+          ${plans.map(p => `<tr><td><b>${p.type}</b></td><td>${p.subject}</td><td>${p.topic}</td><td>${p.created_at}</td><td><b>${p.status}</b></td></tr>`).join('') || '<tr><td colspan="5">Bado hujawasilisha Scheme of Work au Lesson Plan.</td></tr>'}
+          </table>
+        </div>`;
+    }
   }
   function buildClassMarksGrid() {
     const myAllocs = getMyAllocations();
@@ -238,7 +261,6 @@
     SGB.insert('teacher_private_tests', { teacher: teacherName, title: document.getElementById('ptTitle').value, subject: document.getElementById('ptSubj').value, student_name: document.getElementById('ptSt').value, score: document.getElementById('ptScore').value });
     openTab('private_tests');
   }
-
   function saveCBT(e) {
     e.preventDefault();
     const type = document.getElementById('cbtType').value;
@@ -269,6 +291,20 @@
       }
     }
     openTab('rollcall');
+  }
+
+  function saveLessonPlan(e) {
+    e.preventDefault();
+    SGB.insert('lesson_plans', {
+      teacher: teacherName,
+      type: document.getElementById('lpType').value,
+      subject: document.getElementById('lpSubj').value.trim(),
+      topic: document.getElementById('lpTopic').value.trim(),
+      objectives: document.getElementById('lpObj').value.trim(),
+      status: 'Inasubiri Kukaguliwa (Pending Academic)'
+    });
+    alert('✅ Andalio la somo limetumwa Ofisi ya Taaluma!');
+    openTab('lesson_plans');
   }
 
   openTab('my_alloc', document.querySelector('.menu-btn'));
