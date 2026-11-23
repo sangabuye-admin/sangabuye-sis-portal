@@ -61,18 +61,29 @@
       const pays = SGB.select('staff_payroll');
       const assets = SGB.select('fixed_assets');
       const procs = SGB.select('procurement_committee');
+      const stmts = SGB.select('contribution_statements');
 
       const crdb = recs.filter(r => r.payment_method === 'CRDB_Bank').reduce((s, r) => s + Number(r.amount_paid), 0);
       const cash = recs.filter(r => r.payment_method === 'Cash').reduce((s, r) => s + Number(r.amount_paid), 0);
+      const totalIn = crdb + cash;
       const expense = vchs.reduce((s, v) => s + Number(v.amount), 0) + pays.reduce((s, p) => s + Number(p.net_pay), 0);
       const assetVal = assets.reduce((s, a) => s + Number(a.val), 0);
+      const pendingFees = stmts.reduce((s, x) => s + Number(x.balance || 0), 0);
+      const maxBar = Math.max(totalIn, expense, 1);
 
       area.innerHTML = `
         <div class="cards">
-          <div class="card" style="border-color:#059669;"><h4>Mapato CRDB (0150838972100)</h4><div class="val">TZS ${crdb.toLocaleString()}</div></div>
-          <div class="card" style="border-color:#059669;"><h4>Mapato Cash</h4><div class="val">TZS ${cash.toLocaleString()}</div></div>
+          <div class="card" style="border-color:#059669;"><h4>Mapato CRDB & Cash</h4><div class="val">TZS ${totalIn.toLocaleString()}</div></div>
           <div class="card" style="border-color:#dc2626;"><h4>Matumizi & Mishahara</h4><div class="val">TZS ${expense.toLocaleString()}</div></div>
-          <div class="card" style="border-color:#d97706;"><h4>Thamani ya Mali (Fixed Assets)</h4><div class="val">TZS ${assetVal.toLocaleString()}</div></div>
+          <div class="card" style="border-color:#d97706;"><h4>Madeni ya Ada (Pending Fees)</h4><div class="val">TZS ${pendingFees.toLocaleString()}</div></div>
+          <div class="card"><h4>Thamani ya Mali (Fixed Assets)</h4><div class="val">TZS ${assetVal.toLocaleString()}</div></div>
+        </div>
+        <div class="panel">
+          <h3>Mlinganisho wa Mapato dhidi ya Matumizi (Financial Visual Bar)</h3>
+          <p style="font-size:12px; margin-bottom:4px;"><b>Mapato (Income):</b> TZS ${totalIn.toLocaleString()}</p>
+          <div style="background:#e2e8f0; border-radius:6px; height:18px; margin-bottom:10px;"><div style="background:#059669; height:18px; border-radius:6px; width:${Math.round((totalIn/maxBar)*100)}%;"></div></div>
+          <p style="font-size:12px; margin-bottom:4px;"><b>Matumizi (Expenses):</b> TZS ${expense.toLocaleString()}</p>
+          <div style="background:#e2e8f0; border-radius:6px; height:18px;"><div style="background:#dc2626; height:18px; border-radius:6px; width:${Math.round((expense/maxBar)*100)}%;"></div></div>
         </div>
         <div class="panel">
           <h3>Nakala za Maamuzi ya Kamati ya Manunuzi & Idhini Kubwa</h3>
@@ -89,25 +100,34 @@
       const boys = maps.filter(m => m.sex === 'M').length;
       const girls = maps.filter(m => m.sex === 'F').length;
 
+      // Kokotoa muhtasari wa NECTA Division I-IV
+      const bySt = {};
+      marks.forEach(m => {
+        if (!bySt[m.student_name]) bySt[m.student_name] = [];
+        if (m.points > 0) bySt[m.student_name].push(Number(m.points));
+      });
+      const divs = { I:0, II:0, III:0, IV:0, O:0 };
+      Object.values(bySt).forEach(pts => {
+        if (pts.length < 7) return;
+        const agg = pts.sort((a,b)=>a-b).slice(0,7).reduce((a,b)=>a+b,0);
+        if (agg <= 17) divs.I++; else if (agg <= 21) divs.II++; else if (agg <= 25) divs.III++; else if (agg <= 33) divs.IV++; else divs.O++;
+      });
+
       area.innerHTML = `
         <div class="cards">
-          <div class="card"><h4>Wanafunzi Waliosajiliwa</h4><div class="val">${users.filter(u => u.role === 'student').length}</div></div>
-          <div class="card"><h4>Uwiano wa Kijinsia (M / F)</h4><div class="val">Wavulana: ${boys} | Wasichana: ${girls}</div></div>
+          <div class="card"><h4>Wanafunzi (O & A-Level)</h4><div class="val">${users.filter(u => u.role === 'student').length}</div></div>
+          <div class="card"><h4>Uwiano wa Kijinsia</h4><div class="val">M: ${boys} | F: ${girls}</div></div>
           <div class="card" style="border-color:#059669;"><h4>Watumishi & Walimu</h4><div class="val">${users.filter(u => u.role !== 'student' && u.role !== 'parent').length}</div></div>
-          <div class="card"><h4>Rekodi za Mitihani</h4><div class="val">${marks.length}</div></div>
         </div>
         <div class="panel">
-          <h3>Rejista ya Mali za Kudumu za Shule (Fixed Assets Summary)</h3>
-          <table><tr><th>Mali</th><th>Idara</th><th>Thamani (TZS)</th></tr>
-          ${SGB.select('fixed_assets').map(a => `<tr><td><b>${a.name}</b></td><td>${a.dept}</td><td>${Number(a.val).toLocaleString()}</td></tr>`).join('') || '<tr><td colspan="3">Hakuna mali zilizosajiliwa bado.</td></tr>'}
+          <h3>Mwenendo wa Ufaulu wa Shule (NECTA Division I–IV Summary)</h3>
+          <table><tr><th>Division I</th><th>Division II</th><th>Division III</th><th>Division IV</th><th>Division 0</th></tr>
+          <tr><td><b style="color:#059669;">${divs.I}</b></td><td><b>${divs.II}</b></td><td><b>${divs.III}</b></td><td>${divs.IV}</td><td style="color:#dc2626;">${divs.O}</td></tr>
           </table>
         </div>`;
     }
 
-    if (tab === 'board') {
-      const notes = SGB.select('board_minutes');
-      area.innerHTML = `
-        <div class="panel">
+    lass="panel">
           <h3>Hifadhi Nyaraka & Muhtasari wa Vikao vya Bodi ya Shule</h3>
           <form onsubmit="addBoard(event)" style="display:grid; gap:10px; margin-bottom:15px;">
             <input type="text" id="bTitle" required placeholder="Kichwa cha Kikao cha Bodi">
