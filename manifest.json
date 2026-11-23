@@ -1,0 +1,16 @@
+{
+  "name": "Sangabuye Secondary School SIS Portal",
+  "short_name": "Sangabuye SIS",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0f294a",
+  "theme_color": "#0f294a",
+  "description": "Mfumo Jumuishi wa Usimamizi wa Shule - Sangabuye Secondary School (Ilemela - Mwanza)",
+  "icons": [
+    {
+      "src": "https://flaticon.com",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
