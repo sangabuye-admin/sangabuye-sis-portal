@@ -27,10 +27,12 @@
     th { background: #f8fafc; color: #1e3a8a; }
     .btn { padding: 8px 14px; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold; background: #1d4ed8; color: white; }
     .btn-green { background: #059669; color: white; }
+    .btn-amber { background: #d97706; color: white; }
     .logout-btn { background: #dc2626; color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: bold; margin-top: auto; }
   </style>
 </head>
 <body>
+
 <div class="sidebar">
   <h2>TOVUTI YA MWANAFUNZI</h2>
   <p id="stBadge">Sangabuye Secondary School</p>
@@ -91,7 +93,7 @@
       const mySubs = SGB.select('assignment_submissions').filter(s => s.student_name.toLowerCase() === cleanStudentName.toLowerCase());
       area.innerHTML = `
         <div class="panel">
-          <h3>1. Kazi za Nyumbani (Written Assignments) & Online CBT</h3>
+          <h3>1. Kazi za Nyumbani (Written Assignments) & Online CBT (yenye Saa)</h3>
           ${cbts.map(c => `<div style="border:1px solid #cbd5e1; padding:14px; border-radius:8px; margin-bottom:12px; background:#f8fafc;">
             <div style="display:flex; justify-content:space-between;">
               <b>${c.title} (${c.sub || 'Somo'})</b>
@@ -102,10 +104,15 @@
               <textarea id="ans_${c.id}" rows="3" placeholder="Andika majibu yako hapa..."></textarea><br><br>
               <button class="btn btn-green" onclick="submitWritten(${c.id}, '${c.title}', '${c.teacher}')">📤 Wasilisha Kazi Kwa Mwalimu</button>
             ` : `
+              <div style="margin-bottom:8px;">
+                <span style="background:#dbeafe;color:#1e40af;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:bold;">⏱️ Muda: Dakika ${c.duration_mins || 15}</span>
+                <span id="timer_${c.id}" style="margin-left:10px;font-weight:bold;color:#dc2626;"></span>
+              </div>
               <small style="color:#334155;"><b>Chaguo:</b> ${c.options}</small><br><br>
-              <div style="display:flex; gap:8px; max-width:340px;">
+              <div style="display:flex; gap:8px; max-width:440px;">
+                <button class="btn btn-amber" onclick="startCBTTimer(${c.id}, ${c.duration_mins || 15}, '${c.title}', '${c.teacher}', '${c.answer}')">⏱️ Anza Saa</button>
                 <input type="text" id="ans_${c.id}" placeholder="Weka herufi (A, B, C au D)">
-                <button class="btn" onclick="checkCBT(${c.id}, '${c.answer}')">✅ Wasilisha Jibu</button>
+                <button class="btn" onclick="submitCBT(${c.id}, '${c.title}', '${c.teacher}', '${c.answer}')">✅ Wasilisha</button>
               </div>
             `}
           </div>`).join('') || '<p>Hakuna kazi au jaribio lililowekwa na walimu kwa sasa.</p>'}
@@ -117,6 +124,7 @@
           </table>
         </div>`;
     }
+
     if (tab === 'results') {
       const myMarks = SGB.select('exam_results').filter(m => m.student_name.toLowerCase().includes(cleanStudentName.toLowerCase()));
       area.innerHTML = `
@@ -127,7 +135,6 @@
           </table>
         </div>`;
     }
-
     if (tab === 'timetable_lib') {
       const tt = SGB.select('smart_timetable');
       area.innerHTML = `
@@ -148,7 +155,6 @@
       area.innerHTML = `
         <div class="panel">
           <h3>Sanduku la Maoni la Siri (Whistleblower Box)</h3>
-          <p style="font-size:12px; color:#475569;">Taarifa unayotuma hapa inafika moja kwa moja kwa Mkuu wa Shule na Super Admin <b>bila jina lako kuonekana</b>.</p>
           <form onsubmit="sendSecret(event)">
             <textarea id="secTxt" rows="4" required placeholder="Andika taarifa nyeti au ushauri wako hapa..."></textarea><br><br>
             <button type="submit" class="btn">🔒 Tuma Taarifa Kwa Siri</button>
@@ -165,11 +171,33 @@
     openTab('cbt_hw');
   }
 
-  function checkCBT(id, correct) {
-    const val = document.getElementById('ans_' + id).value.trim().toUpperCase();
-    if (!val) return;
-    if (val === correct) alert('🎉 HONGERA! Jibu lako (' + val + ') ni SAHIHI (100%)!');
-    else alert('❌ Si sahihi. Jibu sahihi lilikuwa: ' + correct);
+  const activeTimers = {};
+  function startCBTTimer(id, mins, title, teacher, correct) {
+    if (activeTimers[id]) return;
+    let secs = mins * 60;
+    activeTimers[id] = setInterval(() => {
+      const m = Math.floor(secs / 60);
+      const s = secs % 60;
+      const el = document.getElementById('timer_' + id);
+      if (el) el.innerText = `⏳ Muda Uliobaki: ${m}:${s < 10 ? '0' : ''}${s}`;
+      if (secs <= 0) {
+        clearInterval(activeTimers[id]);
+        alert('⏰ Muda umeisha! Jaribio linawasilishwa lenyewe (Auto-Submit).');
+        submitCBT(id, title, teacher, correct, true);
+      }
+      secs--;
+    }, 1000);
+  }
+
+  function submitCBT(id, title, teacher, correct, isAuto = false) {
+    if (activeTimers[id]) { clearInterval(activeTimers[id]); delete activeTimers[id]; }
+    const val = (document.getElementById('ans_' + id)?.value || '').trim().toUpperCase();
+    if (!val && !isAuto) return;
+    const isRight = val === correct;
+    const scoreStr = isRight ? '100% (Sahihi - Auto Graded)' : `0% (Alijibu: ${val || 'Hakujibu'} | Sahihi: ${correct})`;
+    SGB.insert('assignment_submissions', { student_name: cleanStudentName, title, teacher, answer_text: `Chaguo: ${val || 'Hakujibu'}`, score: scoreStr });
+    alert(isRight ? `🎉 HONGERA! Jibu lako (${val}) ni SAHIHI (100%) na limetumwa kwa mwalimu!` : `❌ Si sahihi. Jibu sahihi lilikuwa: ${correct}`);
+    openTab('cbt_hw');
   }
 
   function sendSecret(e) {
