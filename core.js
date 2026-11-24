@@ -1,4 +1,4 @@
-// INJINI KUU YA SANGABUYE SIS PORTAL (v7.0 - FFARS, FULL BILINGUAL, CLOUD SYNC, BACKUP & TOPBAR LOGOUT)
+// INJINI KUU YA SANGABUYE SIS PORTAL (v7.1 - MOBILE RESPONSIVE, BILINGUAL, CLOUD SYNC, BACKUP & TOPBAR LOGOUT)
 const FIREBASE_DB_URL = 'https://firebaseio.com';
 
 const SGB = {
@@ -244,7 +244,7 @@ const SGB = {
         </div>
       </div>`;
     document.getElementById('bkFileInp').onchange = (e) => {
-      const file = e.target.files;
+      const file = e.target.files[0];
       if (!file) return;
       const reader = new FileReader();
       reader.onload = (ev) => { document.getElementById('bkInText').value = ev.target.result; };
@@ -427,6 +427,25 @@ window.addEventListener('DOMContentLoaded', () => {
     link.rel = 'manifest'; link.href = 'manifest.json';
     document.head.appendChild(link);
   }
+
+  // MOBILE RESPONSIVE STYLE INJECTOR (FOMU NA JEDWALI ZIKAE VIZURI KWENYE SIMU)
+  const mobStyle = document.createElement('style');
+  mobStyle.innerHTML = `
+    @media (max-width: 820px) {
+      body { flex-direction: column !important; }
+      .sidebar { width: 100% !important; flex-direction: row !important; flex-wrap: wrap !important; gap: 5px !important; padding: 10px !important; }
+      .sidebar h2, .sidebar p, .menu-grp { width: 100% !important; text-align: left !important; margin: 2px 0 !important; }
+      .menu-btn { width: auto !important; flex: 1 1 46% !important; font-size: 11.5px !important; padding: 8px !important; background: rgba(255,255,255,0.08) !important; }
+      .topbar { flex-direction: column !important; align-items: flex-start !important; gap: 8px !important; padding: 10px 14px !important; }
+      .content { padding: 10px !important; }
+      .panel { padding: 12px !important; overflow-x: auto !important; }
+      form, div[style*="grid-template-columns"] { grid-template-columns: 1fr !important; display: grid !important; }
+      form button, div[style*="grid-template-columns"] button, form input, form select, form textarea { grid-column: span 1 !important; width: 100% !important; font-size: 14px !important; padding: 10px !important; }
+      table { display: block !important; overflow-x: auto !important; white-space: nowrap !important; }
+    }
+  `;
+  document.head.appendChild(mobStyle);
+
   const topbar = document.querySelector('.topbar');
   if (topbar) {
     const netStatus = navigator.onLine
