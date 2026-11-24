@@ -69,7 +69,9 @@
 
   function getSeatStats() {
     const raw = JSON.parse(localStorage.getItem('sgb_library_seats') || '{"total":50,"occupied":2}');
-    return { total: Number(raw.total || 50), occupied: Number(raw.occupied || 0), free: Math.max(0, Number(raw.total || 50) - Number(raw.occupied || 0)) };
+    const tot = Number(raw.total || 50);
+    const occ = Number(raw.occupied || 0);
+    return { total: tot, occupied: occ, free: Math.max(0, tot - occ) };
   }
 
   function changeSeats(delta) {
@@ -104,7 +106,7 @@
   function openTab(tab, btn) {
     document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('active'));
     if (btn) btn.classList.add('active');
-    if (btn) document.getElementById('tabTitle').innerText = btn ? btn.innerText : '👋 Karibu, Librarian!';
+    if (btn) document.getElementById('tabTitle').innerText = btn.innerText;
     syncDatalists();
     const area = document.getElementById('viewArea');
 
@@ -116,19 +118,23 @@
       const seats = getSeatStats();
 
       const totalCopies = books.reduce((s, b) => s + Number(b.total_copies || 1), 0);
-      const activeLoans = loans.filter(l => (l.status || '').includes('Ameazima') || (l.status || '').includes('Kwa Wakati') || (l.status || '').includes('Imechelewa'));
+      const activeLoans = loans.filter(l => !(l.status || '').includes('Amerudisha'));
       const todayIso = new Date().toISOString().slice(0, 10);
       const dueToday = activeLoans.filter(l => l.due_date === todayIso).length;
 
-      // Takwimu za Vitabu Vinavyopendwa, Wasomaji Bora na Madarasa Yanayoongoza
-      const bookCounts = {}, readerCounts = {}, classCounts = {};
+      const bookCounts = {};
+      const readerCounts = {};
+      const classCounts = {};
       loans.forEach(l => {
-        bookCounts[l.book] = (bookCounts[l.book] || 0) + 1;
-        readerCounts[l.student_name] = (readerCounts[l.student_name] || 0) + 1;
-        const mObj = members.find(m => m.full_name.toLowerCase() === (l.student_name || '').toLowerCase());
-        const cls = mObj ? mObj.class_dept : 'Form 4';
-        classCounts[cls] = (classCounts[cls] || 0) + 1;
+        if (l.book) bookCounts[l.book] = (bookCounts[l.book] || 0) + 1;
+        if (l.student_name) {
+          readerCounts[l.student_name] = (readerCounts[l.student_name] || 0) + 1;
+          const mObj = members.find(m => (m.full_name || '').toLowerCase() === l.student_name.toLowerCase());
+          const cls = mObj ? mObj.class_dept : 'Form 4';
+          classCounts[cls] = (classCounts[cls] || 0) + 1;
+        }
       });
+
       const topBooks = Object.entries(bookCounts).sort((a, b) => b - a).slice(0, 3);
       const topReaders = Object.entries(readerCounts).sort((a, b) => b - a).slice(0, 3);
       const topClasses = Object.entries(classCounts).sort((a, b) => b - a).slice(0, 3);
@@ -334,7 +340,7 @@
             <button type="submit" class="btn btn-green">✅ Rekodi Kuingia</button>
           </form>
           <table><tr><th>Muda</th><th>Jina</th><th>Sababu</th></tr>
-          ${logs.map(a => `<tr><td>${a.created_at}</td><td><b>${a.name}</b></td><td>${a.purpose}</td></tr>`).join('')}
+          ${logs.map(a => `<tr><td>${a.created_at}</td><td><b>${a.name}</b></td><td>${a.purpose}</td></tr>`).join('') || '<tr><td colspan="3">Hakuna mahudhurio bado.</td></tr>'}
           </table>
         </div>`;
       return;
@@ -352,7 +358,7 @@
             <button type="submit" class="btn btn-blue">➕ Ongeza E-Book</button>
           </form>
           <table><tr><th>Jina la E-Book</th><th>Somo</th><th>Kiungo</th></tr>
-          ${ebooks.map(e => `<tr><td><b>${e.title}</b></td><td>${e.subject}</td><td><a href="${e.link}" target="_blank">Fungua Kitabu</a></td></tr>`).join('')}
+          ${ebooks.map(e => `<tr><td><b>${e.title}</b></td><td>${e.subject}</td><td><a href="${e.link}" target="_blank">Fungua Kitabu</a></td></tr>`).join('') || '<tr><td colspan="3">Hakuna E-Books bado.</td></tr>'}
           </table>
         </div>`;
       return;
@@ -370,7 +376,7 @@
             <button type="submit" class="btn btn-green">➕ Hifadhi</button>
           </form>
           <table><tr><th>Kifaa</th><th>Namba</th><th>Hali</th></tr>
-          ${ict.map(x => `<tr><td><b>${x.name}</b></td><td>${x.code}</td><td>${x.status}</td></tr>`).join('')}
+          ${ict.map(x => `<tr><td><b>${x.name}</b></td><td>${x.code}</td><td>${x.status}</td></tr>`).join('') || '<tr><td colspan="3">Hakuna vifaa vilivyosajiliwa bado.</td></tr>'}
           </table>
         </div>`;
       return;
@@ -393,13 +399,12 @@
                 <img src="${SGB.qrImg(code + '|' + title)}" style="margin:6px 0;"><br>
                 <b>${title}</b><br><small>${code} | ${sub}</small>
               </div>`;
-            }).join('')}
+            }).join('') || '<p>Hakuna rekodi za kuchapisha bado.</p>'}
           </div>
         </div>`;
       return;
     }
 
-    // Vichupo vingine vilivyobaki (Reservations, Fines, Suggestions, Reports)
     const loansAll = SGB.select('library_loans');
     area.innerHTML = `
       <div class="panel">
@@ -433,7 +438,7 @@
   }
 
   function uploadBooksCsv() {
-    const file = document.getElementById('bkCsvFile').files[0];
+    const file = document.getElementById('bkCsvFile').files;
     if (!file) { alert('⚠️ Chagua faili la CSV kwanza.'); return; }
     const reader = new FileReader();
     reader.onload = (ev) => {
@@ -441,9 +446,9 @@
       let added = 0;
       lines.forEach(line => {
         const cols = line.split(',');
-        if (cols.length >= 2 && cols[0].trim()) {
-          const qty = Number(cols[5] || 1);
-          SGB.insert('library_books', { barcode: cols[0].trim(), title: cols[1].trim(), author: (cols[2] || '-').trim(), category: (cols[3] || 'Jumla').trim(), shelf: (cols[4] || 'R-01').trim(), total_copies: qty, available_copies: qty });
+        if (cols.length >= 2 && cols.trim()) {
+          const qty = Number(cols || 1);
+          SGB.insert('library_books', { barcode: cols.trim(), title: cols.trim(), author: (cols || '-').trim(), category: (cols || 'Jumla').trim(), shelf: (cols || 'R-01').trim(), total_copies: qty, available_copies: qty });
           added++;
         }
       });
@@ -475,7 +480,7 @@
   }
 
   function uploadMembersCsv() {
-    const file = document.getElementById('memCsvFile').files[0];
+    const file = document.getElementById('memCsvFile').files;
     if (!file) { alert('⚠️ Chagua faili la CSV kwanza.'); return; }
     const reader = new FileReader();
     reader.onload = (ev) => {
@@ -483,9 +488,9 @@
       let added = 0;
       lines.forEach(line => {
         const cols = line.split(',');
-        if (cols.length >= 2 && cols[0].trim()) {
-          const role = (cols[1] || 'Student').trim().toLowerCase().includes('teach') ? 'Teacher' : 'Student';
-          SGB.insert('library_members', { member_id: generateNextMemberId(role), full_name: cols[0].trim(), role, class_dept: (cols[2] || 'Form 1').trim() });
+        if (cols.length >= 2 && cols.trim()) {
+          const role = (cols || 'Student').trim().toLowerCase().includes('teach') ? 'Teacher' : 'Student';
+          SGB.insert('library_members', { member_id: generateNextMemberId(role), full_name: cols.trim(), role, class_dept: (cols || 'Form 1').trim() });
           added++;
         }
       });
