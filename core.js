@@ -1,27 +1,43 @@
-// INJINI KUU YA SANGABUYE SIS PORTAL (v7.1 - MOBILE RESPONSIVE, BILINGUAL, CLOUD SYNC, BACKUP & TOPBAR LOGOUT)
-const FIREBASE_DB_URL = 'https://firebaseio.com';
+// INJINI KUU YA SANGABUYE SIS PORTAL (v7.5 - REAL-TIME CLOUD MERGE, NO-OVERWRITE & MULTI-PC SYNC)
+const FIREBASE_DB_URL = 'https://sangabuye-sis-default-rtdb.firebaseio.com';
 
 const SGB = {
   lang: localStorage.getItem('sgb_lang') || 'sw',
 
-  pushToCloud(table) {
+  async pushToCloud(table) {
     if (!navigator.onLine) return;
-    const raw = localStorage.getItem('sgb_' + table);
-    if (!raw) return;
-    fetch(`${FIREBASE_DB_URL}/sgb_${table}.json`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: raw
-    }).then(() => {
+    try {
+      const res = await fetch(`${FIREBASE_DB_URL}/sgb_${table}.json?t=${Date.now()}`, { cache: 'no-store' });
+      const cloudVal = res.ok ? await res.json() : null;
+      const localVal = JSON.parse(localStorage.getItem('sgb_' + table) || 'null');
+
+      let payload = localVal;
+      if (Array.isArray(localVal) && Array.isArray(cloudVal)) {
+        const mergedMap = new Map();
+        cloudVal.forEach(item => { if (item && item.id) mergedMap.set(String(item.id), item); });
+        localVal.forEach(item => { if (item && item.id) mergedMap.set(String(item.id), item); });
+        payload = Array.from(mergedMap.values()).sort((a, b) => Number(b.id || 0) - Number(a.id || 0));
+        localStorage.setItem('sgb_' + table, JSON.stringify(payload));
+      }
+
+      if (payload === null) return;
+      await fetch(`${FIREBASE_DB_URL}/sgb_${table}.json`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
       const syncEl = document.getElementById('syncTime');
-      if (syncEl) syncEl.innerText = ' • ☁️ Cloud Live: ' + new Date().toLocaleTimeString();
-    }).catch(() => {});
+      if (syncEl) syncEl.innerText = ' • ☁️ Synced: ' + new Date().toLocaleTimeString();
+    } catch (e) {
+      const syncEl = document.getElementById('syncTime');
+      if (syncEl) syncEl.innerText = ' • ⚠️ Offline';
+    }
   },
 
   async pullFromCloud(silent = true) {
     if (!navigator.onLine) return;
     try {
-      const res = await fetch(`${FIREBASE_DB_URL}/.json`);
+      const res = await fetch(`${FIREBASE_DB_URL}/.json?t=${Date.now()}`, { cache: 'no-store' });
       if (!res.ok) return;
       const cloudData = await res.json();
       if (cloudData && typeof cloudData === 'object') {
@@ -43,12 +59,12 @@ const SGB = {
           setTimeout(() => this.applyLanguage(), 100);
         }
       }
-      if (!silent) this.notifySync(this.lang === 'en' ? '☁️ System & Cloud Refreshed!' : '☁️ Mfumo na Data Zimesasishwa!');
+      if (!silent) this.notifySync(this.lang === 'en' ? '☁️ All PCs Synced!' : '☁️ Taarifa Zote Zimesawazishwa Hewani!');
     } catch (e) {}
   },
 
   insert(table, item) {
-    item.id = Date.now() + Math.floor(Math.random() * 100);
+    item.id = Date.now() + Math.floor(Math.random() * 1000);
     item.created_at = new Date().toLocaleString('sw-TZ');
     const list = JSON.parse(localStorage.getItem('sgb_' + table) || '[]');
     list.unshift(item);
@@ -198,7 +214,6 @@ const SGB = {
     modal.innerHTML = `
       <div style="background:#fff;width:100%;max-width:500px;border-radius:12px;padding:18px;">
         <h3 style="margin:0 0 8px;color:#0f294a;">💾 Backup Imepakuliwa (Majedwali ${count})</h3>
-        <p style="font-size:12px;color:#475569;">Faili <b>${fileName}</b> limepakuliwa. Unaweza pia kunakili (Copy) maandishi haya au kuyapandisha Cloud:</p>
         <textarea id="bkOutText" rows="5" readonly style="width:100%;font-size:11px;padding:8px;border:1px solid #cbd5e1;border-radius:6px;">${jsonStr}</textarea><br><br>
         <div style="display:flex;gap:8px;flex-wrap:wrap;">
           <button onclick="SGB.copyBackupText()" style="background:#059669;color:#fff;border:none;padding:9px 12px;border-radius:6px;font-weight:bold;cursor:pointer;">📋 Nakili (Copy)</button>
@@ -208,12 +223,12 @@ const SGB = {
       </div>`;
   },
 
-  pushAllLocalToCloud() {
+  async pushAllLocalToCloud() {
     for (let i = 0; i < localStorage.length; i++) {
       const k = localStorage.key(i);
-      if (k && k.startsWith('sgb_')) this.pushToCloud(k.replace('sgb_', ''));
+      if (k && k.startsWith('sgb_')) await this.pushToCloud(k.replace('sgb_', ''));
     }
-    alert('☁️ Data zote zimepandishwa hewani (Firebase Cloud)!');
+    alert('☁️ Data zote zimeunganishwa na kupandishwa hewani (Firebase Cloud)!');
   },
 
   copyBackupText() {
@@ -252,18 +267,18 @@ const SGB = {
     };
   },
 
-  processRestoreText() {
+  async processRestoreText() {
     try {
       const raw = document.getElementById('bkInText').value.trim();
       if (!raw) { alert('⚠️ Bandika maandishi au chagua faili kwanza.'); return; }
       const parsed = JSON.parse(raw);
       const records = parsed.data || parsed;
-      Object.keys(records).forEach(k => {
+      for (const k of Object.keys(records)) {
         if (k.startsWith('sgb_')) {
           localStorage.setItem(k, JSON.stringify(records[k]));
-          this.pushToCloud(k.replace('sgb_', ''));
+          await this.pushToCloud(k.replace('sgb_', ''));
         }
-      });
+      }
       document.getElementById('sgbRestoreModal').style.display = 'none';
       alert('✅ Data zote zimerudishwa kikamilifu!');
       this.liveRefresh(true);
@@ -338,25 +353,17 @@ const SGB = {
     ['DASHIBODI YA MWALIMU', 'TEACHER DASHBOARD'], ['MKUU WA SHULE', 'HEADMASTER OFFICE'],
     ['MKURUGENZI (DIRECTOR)', 'SCHOOL DIRECTOR'], ['TOVUTI YA MZAZI', 'PARENT PORTAL'],
     ['TOVUTI YA MWANAFUNZI', 'STUDENT PORTAL'], ['MAKTABA YA SHULE', 'SCHOOL LIBRARY'],
-    ['MABWENI & ZAHANATI', 'HOSTELS & SICKBAY'], ['Muhtasari (Fedha & Stoo)', 'Summary (Finance & Store)'],
-    ['Mapokezi (Kapu la Michango)', 'Receipts (Fee Basket)'], ['Taarifa Kwa Mzazi & Wadaiwa', 'Parent Statement & Defaulters'],
-    ['Viwango vya Ada, Kambi & Basi', 'Fee Structures, Camp & Bus'], ['Matumizi & FFARS PV', 'Expenses & FFARS PV'],
-    ['Kamati ya Manunuzi', 'Procurement Committee'], ['Mishahara (Pre-Audit & Slip)', 'Payroll (Pre-Audit & Slip)'],
-    ['Masurufu (Imprest) & Petty Cash', 'Staff Imprest & Petty Cash'], ['Ruzuku (Capitation Grant)', 'Government Capitation Grant'],
-    ['Bajeti vs Utekelezaji', 'Budget vs Actual Variance'], ['Stoo ya Vyakula & Vifaa', 'Food & Equipment Store'],
-    ['Daftari la Mali (Fixed Assets)', 'Fixed Assets Register'], ['Ripoti, Funga Hesabu & Clearance', 'Reports, Lock & Clearance'],
-    ['Jina la Mwanafunzi', 'Student Full Name'], ['Namba ya Usajili', 'Registration Number'],
-    ['Simu ya Mzazi', 'Parent Phone'], ['Aina ya Malipo', 'Payment Category'],
-    ['Kiasi Kilicholipwa', 'Amount Paid'], ['Salio / Deni', 'Balance / Debt'],
-    ['Chanzo cha Pato', 'Revenue Source'], ['Kiasi (TZS)', 'Amount (TZS)'],
-    ['Tarehe', 'Date'], ['Hali', 'Status'], ['Hatua', 'Action'], ['Mtumishi', 'Staff Member'],
-    ['Kazi', 'Job Title'], ['Bidhaa', 'Item Name'], ['Salio', 'Balance'], ['Mwanafunzi', 'Student']
+    ['MABWENI & ZAHANATI', 'HOSTELS & SICKBAY'], ['Jina la Mwanafunzi', 'Student Full Name'],
+    ['Namba ya Usajili', 'Registration Number'], ['Simu ya Mzazi', 'Parent Phone'],
+    ['Aina ya Malipo', 'Payment Category'], ['Kiasi Kilicholipwa', 'Amount Paid'],
+    ['Salio / Deni', 'Balance / Debt'], ['Chanzo cha Pato', 'Revenue Source'],
+    ['Kiasi (TZS)', 'Amount (TZS)'], ['Tarehe', 'Date'], ['Hali', 'Status'], ['Hatua', 'Action']
   ],
   toggleLang() {
     this.lang = this.lang === 'sw' ? 'en' : 'sw';
     localStorage.setItem('sgb_lang', this.lang);
     this.applyLanguage();
-    this.notifySync(this.lang === 'en' ? '🌐 Full System Switched to English' : '🌐 Mfumo Mzima Umebadilishwa Kuwa Kiswahili');
+    this.notifySync(this.lang === 'en' ? '🌐 Switched to English' : '🌐 Imebadilishwa Kuwa Kiswahili');
   },
 
   applyLanguage() {
@@ -372,14 +379,6 @@ const SGB = {
       });
       node.nodeValue = txt;
     }
-    document.querySelectorAll('input[placeholder], textarea[placeholder]').forEach(el => {
-      let ph = el.getAttribute('placeholder');
-      this.dict.forEach(([sw, en]) => {
-        if (toEn && ph.includes(sw)) ph = ph.split(sw).join(en);
-        else if (!toEn && ph.includes(en)) ph = ph.split(en).join(sw);
-      });
-      el.setAttribute('placeholder', ph);
-    });
   },
 
   logAction(action) {
@@ -387,7 +386,6 @@ const SGB = {
     const logs = JSON.parse(localStorage.getItem('sgb_audit_logs') || '[]');
     logs.unshift({ time: new Date().toLocaleString('sw-TZ'), actor: user ? `${user.full_name} (${user.role})` : 'System', action });
     localStorage.setItem('sgb_audit_logs', JSON.stringify(logs.slice(0, 200)));
-    this.pushToCloud('audit_logs');
   },
   getUser() { return JSON.parse(sessionStorage.getItem('sgb_active_user') || 'null'); },
   requireRole(allowedRoles) {
@@ -419,7 +417,7 @@ if ('serviceWorker' in navigator) {
 }
 
 SGB.pullFromCloud(true);
-setInterval(() => SGB.pullFromCloud(true), 12000);
+setInterval(() => SGB.pullFromCloud(true), 5000);
 
 window.addEventListener('DOMContentLoaded', () => {
   if (!document.querySelector('link[rel="manifest"]')) {
@@ -428,58 +426,33 @@ window.addEventListener('DOMContentLoaded', () => {
     document.head.appendChild(link);
   }
 
-  // MUONEKANO WA ZAMANI KABISA KWENYE PC + UWEZO WA KUFICHA MENYU + DROO YA KUSHOTO KWENYE SIMU
-  const layoutStyle = document.createElement('style');
-  layoutStyle.innerHTML = `
-    body.sb-hidden .sidebar { display: none !important; }
-    .sb-toggle-btn {
-      background: #0f294a; color: #fff; border: none; padding: 6px 10px;
-      border-radius: 5px; cursor: pointer; font-size: 13px; font-weight: bold;
-      margin-right: 8px;
+  const cleanStyle = document.createElement('style');
+  cleanStyle.innerHTML = `
+    body.hide-menu .sidebar { display: none !important; }
+    .toggle-menu-btn {
+      background: #0f294a; color: #fff; border: none; padding: 5px 10px;
+      border-radius: 5px; cursor: pointer; font-size: 13px; font-weight: bold; margin-right: 8px;
     }
-    .sb-toggle-btn:hover { background: #1d4ed8; }
-
-    /* KWENYE SIMU PEKEE (<= 768px): MENYU ISIZIBE SCREEN YOTE NA FOMU ZIJIPANGE VIZURI */
     @media (max-width: 768px) {
-      .sidebar {
-        position: fixed !important; left: 0; top: 0; bottom: 0; z-index: 9998;
-        width: 245px !important; max-width: 78vw !important;
-        box-shadow: 4px 0 20px rgba(0,0,0,0.45);
-      }
-      body.sb-hidden .sidebar { display: none !important; }
-      .main { width: 100% !important; }
-      .topbar { flex-wrap: wrap !important; gap: 6px !important; padding: 10px 12px !important; }
-      .content { padding: 10px !important; }
-      .panel { padding: 12px !important; }
       form, div[style*="grid-template-columns"] { grid-template-columns: 1fr !important; }
       form button, div[style*="grid-template-columns"] button { grid-column: span 1 !important; }
-      table { display: block !important; overflow-x: auto !important; white-space: nowrap !important; }
+      table { display: block; overflow-x: auto; white-space: nowrap; }
     }
   `;
-  document.head.appendChild(layoutStyle);
-
-  // Kwenye simu, anza menyu ikiwa imefichwa ili fomu zionekane vizuri, na ifiche ukibofya kipengele
-  if (window.innerWidth <= 768) {
-    document.body.classList.add('sb-hidden');
-  }
-  document.querySelectorAll('.menu-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      if (window.innerWidth <= 768) document.body.classList.add('sb-hidden');
-    });
-  });
+  document.head.appendChild(cleanStyle);
 
   const topbar = document.querySelector('.topbar');
   if (topbar) {
     const leftDiv = topbar.firstElementChild;
-    if (leftDiv && !document.getElementById('sbToggleBtn')) {
-      const toggleBtn = document.createElement('button');
-      toggleBtn.id = 'sbToggleBtn';
-      toggleBtn.type = 'button';
-      toggleBtn.className = 'sb-toggle-btn';
-      toggleBtn.innerHTML = '☰';
-      toggleBtn.title = 'Ficha / Onyesha Menyu ya Kushoto';
-      toggleBtn.onclick = () => document.body.classList.toggle('sb-hidden');
-      leftDiv.insertBefore(toggleBtn, leftDiv.firstChild);
+    if (leftDiv && !document.getElementById('btnHideMenu')) {
+      const btn = document.createElement('button');
+      btn.id = 'btnHideMenu';
+      btn.type = 'button';
+      btn.className = 'toggle-menu-btn';
+      btn.innerHTML = '☰';
+      btn.title = 'Ficha / Rudisha Menyu';
+      btn.onclick = () => document.body.classList.toggle('hide-menu');
+      leftDiv.insertBefore(btn, leftDiv.firstChild);
     }
 
     const netStatus = navigator.onLine
