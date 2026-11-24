@@ -3,59 +3,56 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>IT & Super Admin | Sangabuye SIS Portal</title>
-  <script src="core.js"></script>
+  <title>Mkurugenzi & Super Admin | Sangabuye SIS Portal</title>
+  <script src="core.js?v=6.8"></script>
   <style>
     * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
     body { margin: 0; background: #f1f5f9; display: flex; min-height: 100vh; color: #1e293b; }
-    .sidebar { width: 270px; background: #0f172a; color: white; display: flex; flex-direction: column; padding: 18px 12px; }
+    .sidebar { width: 270px; background: #1e1b4b; color: white; display: flex; flex-direction: column; padding: 18px 12px; }
     .sidebar h2 { font-size: 15px; margin: 0 0 4px; color: #fbbf24; text-align: center; }
-    .sidebar p { font-size: 11px; text-align: center; color: #94a3b8; margin: 0 0 18px; }
-    .menu-btn { background: transparent; border: none; color: #e2e8f0; text-align: left; padding: 9px 12px; border-radius: 8px; cursor: pointer; font-size: 12.5px; margin-bottom: 4px; }
-    .menu-btn:hover, .menu-btn.active { background: #2563eb; color: white; font-weight: bold; }
+    .sidebar p { font-size: 11px; text-align: center; color: #c7d2fe; margin: 0 0 18px; }
+    .menu-btn { background: transparent; border: none; color: #e0e7ff; text-align: left; padding: 9px 12px; border-radius: 8px; cursor: pointer; font-size: 12.5px; margin-bottom: 4px; }
+    .menu-btn:hover, .menu-btn.active { background: #4338ca; color: white; font-weight: bold; }
     .main { flex: 1; display: flex; flex-direction: column; }
     .topbar { background: white; padding: 14px 22px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
     .content { padding: 22px; }
     .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-bottom: 18px; }
-    .card { background: white; padding: 15px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border-left: 4px solid #2563eb; }
+    .card { background: white; padding: 15px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border-left: 4px solid #4338ca; }
     .card h4 { margin: 0 0 5px; font-size: 11px; color: #64748b; text-transform: uppercase; }
-    .card .val { font-size: 18px; font-weight: bold; color: #0f172a; }
+    .card .val { font-size: 17px; font-weight: bold; color: #1e1b4b; }
     .panel { background: white; padding: 18px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 18px; }
     input, select, textarea { padding: 9px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; width: 100%; }
     table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 12.5px; }
     th, td { padding: 8px; border: 1px solid #e2e8f0; text-align: left; }
-    th { background: #f8fafc; color: #0f172a; }
+    th { background: #f8fafc; color: #1e1b4b; }
     .btn { padding: 7px 12px; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold; }
-    .btn-blue { background: #2563eb; color: white; }
     .btn-green { background: #059669; color: white; }
     .btn-red { background: #dc2626; color: white; }
+    .btn-blue { background: #1d4ed8; color: white; }
     .btn-amber { background: #d97706; color: white; }
     .logout-btn { background: #dc2626; color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: bold; margin-top: auto; }
   </style>
 </head>
 <body>
 <div class="sidebar">
-  <h2>IT & SUPER ADMIN</h2>
-  <p>Sangabuye Sec | Full System Control</p>
-  <button class="menu-btn active" onclick="openTab('users', this)">👥 1. Watumiaji, Idhini & Passwords</button>
-  <button class="menu-btn" onclick="openTab('impersonate', this)">🎭 2. Ingia Kama Mtumiaji (Login As)</button>
-  <button class="menu-btn" onclick="openTab('bulk_promo', this)">📥 3. Bulk Import & Class Promotion</button>
-  <button class="menu-btn" onclick="openTab('operations', this)">🏛️ 4. Maktaba, Mabweni & Getini</button>
-  <button class="menu-btn" onclick="openTab('audit_secret', this)">🛡️ 5. Live Audit Logs & Sanduku la Siri</button>
-  <button class="menu-btn" onclick="openTab('sys_tools', this)">⚙️ 6. Mipangilio, QR Verifier & Cleanup</button>
-  <button class="menu-btn" onclick="openTab('id_demo', this)">🪪 7. Vitambulisho (Picha + QR) & Demo</button>
+  <h2>MKURUGENZI (DIRECTOR)</h2>
+  <p>Ilemela MC | Sangabuye Sec</p>
+  <button class="menu-btn active" onclick="openTab('exec_overview', this)">🏛️ 1. Muhtasari Mkuu & Vyanzo</button>
+  <button class="menu-btn" onclick="openTab('verify_receipt', this)">🧾 2. Uhakiki wa Risiti (SGB-)</button>
+  <button class="menu-btn" onclick="openTab('users_mgmt', this)">👥 3. Usimamizi wa Watumiaji & Nywila</button>
+  <button class="menu-btn" onclick="openTab('sys_config', this)">⚙️ 4. Mipangilio ya Shule & Hesabu</button>
+  <button class="menu-btn" onclick="openTab('audit_logs', this)">🛡️ 5. Kumbukumbu za Usalama (Audit Logs)</button>
   <button class="logout-btn" onclick="SGB.logout()">🚪 Toka (Logout)</button>
 </div>
-
 <div class="main">
   <div class="topbar">
-    <div><strong id="tabTitle">👥 1. Watumiaji, Idhini & Passwords</strong> <span id="syncTime" style="font-size:11px; color:#059669;">● System Secure</span></div>
+    <div><strong id="tabTitle">🏛️ 1. Muhtasari Mkuu & Vyanzo</strong> <span id="syncTime" style="font-size:11px; color:#059669;"></span></div>
     <div></div>
   </div>
   <div class="content" id="viewArea"></div>
 </div>
 <script>
-  const user = SGB.requireRole(['super_admin']);
+  const user = SGB.requireRole(['super_admin', 'director']);
   SGB.startSessionTimer();
 
   function openTab(tab, btn) {
@@ -64,351 +61,208 @@
     if (btn) document.getElementById('tabTitle').innerText = btn.innerText;
     const area = document.getElementById('viewArea');
 
-    if (tab === 'users') {
+    if (tab === 'exec_overview') {
+      const recs = SGB.select('accounting_receipts');
+      const vchs = SGB.select('expense_vouchers').filter(v => v.status === 'Paid');
+      const procs = SGB.select('procurement_committee').filter(p => p.status === 'Paid');
+      const pays = SGB.select('staff_payroll').filter(p => p.status === 'Paid');
       const users = SGB.select('users_profile');
-      const pending = users.filter(u => u.status === 'pending').length;
+
+      const totalIn = recs.reduce((s, r) => s + Number(r.amount_paid), 0);
+      const totalOut = vchs.reduce((s, v) => s + Number(v.amount), 0) + procs.reduce((s, p) => s + Number(p.estimated_budget), 0) + pays.reduce((s, p) => s + Number(p.net_pay), 0);
+
       area.innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+          <h3 style="margin:0; color:#1e1b4b;">Muhtasari wa Taasisi (Executive Dashboard)</h3>
+          <button class="btn btn-blue" onclick="SGB.liveRefresh(false)">🔄 Refresh Data</button>
+        </div>
         <div class="cards">
-          <div class="card"><h4>Watumiaji Wote</h4><div class="val">${users.length}</div></div>
-          <div class="card" style="border-color:#d97706;"><h4>Wanaosubiri Idhini</h4><div class="val">${pending}</div></div>
-          <div class="card" style="border-color:#059669;"><h4>Hali ya Seva</h4><div class="val" style="color:#059669;">99.9% Online</div></div>
+          <div class="card"><h4>Jumla ya Mapato</h4><div class="val" style="color:#059669;">TZS ${totalIn.toLocaleString()}</div></div>
+          <div class="card" style="border-color:#dc2626;"><h4>Jumla ya Matumizi</h4><div class="val" style="color:#dc2626;">TZS ${totalOut.toLocaleString()}</div></div>
+          <div class="card" style="border-color:#1d4ed8;"><h4>Salio Halisi</h4><div class="val" style="color:#1d4ed8;">TZS ${(totalIn - totalOut).toLocaleString()}</div></div>
+          <div class="card" style="border-color:#d97706;"><h4>Watumiaji Wote</h4><div class="val">${users.length}</div></div>
         </div>
         <div class="panel">
-          <h3>Sajili Mtumiaji Mpya Moja kwa Moja (Direct Staff / Student Creation)</h3>
-          <form onsubmit="createDirectUser(event)" style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:10px; margin-bottom:15px;">
-            <input type="text" id="duName" required placeholder="Majina Kamili">
-            <select id="duRole">
-              <option value="teacher">Mwalimu (Teacher)</option>
+          <h3>Miamala ya Mapokezi ya Hivi Karibuni</h3>
+          <table><tr><th>Risiti Na.</th><th>Mwanafunzi</th><th>Mchango</th><th>Chanzo</th><th>Kiasi (TZS)</th><th>Tarehe</th></tr>
+          ${recs.slice(0, 12).map(r => `<tr><td><b>${r.receipt_number}</b></td><td>${r.student_name}</td><td>${r.payment_category}</td><td>${r.source_fund || 'Kutwa'}</td><td><b>${Number(r.amount_paid).toLocaleString()}</b></td><td>${r.created_at}</td></tr>`).join('') || '<tr><td colspan="6">Hakuna miamala bado.</td></tr>'}
+          </table>
+        </div>`;
+      return;
+    }
+
+    if (tab === 'verify_receipt') {
+      const recentRcpts = SGB.select('accounting_receipts');
+      area.innerHTML = `
+        <div class="panel">
+          <h3>Uhakiki wa Uhalali wa Risiti (Andika Namba Pekee — SGB- Inajijaza Yenyewe)</h3>
+          <p style="font-size:12px; color:#64748b;">Mfumo umeweka <b>SGB-</b> tayari. Andika tarakimu za risiti pekee (Mfano: <b>482910</b>) kisha bofya Hakiki.</p>
+          <div style="display:flex; gap:8px; max-width:480px; align-items:center;">
+            <span style="background:#1e1b4b; color:#fff; padding:9px 14px; border-radius:6px; font-weight:bold; font-size:13.5px; letter-spacing:1px;">SGB-</span>
+            <input type="text" id="rcptCode" placeholder="Andika namba pekee (Mfano: 482910)" onkeyup="if(event.key==='Enter') verifyRcpt()">
+            <button class="btn btn-blue" onclick="verifyRcpt()">🔍 Hakiki</button>
+          </div>
+          <div id="rcptRes" style="margin-top:15px;"></div>
+        </div>
+        <div class="panel">
+          <h4>Risiti za Hivi Karibuni Zilizotolewa na Mfumo (Bofya Namba Kuhakiki Haraka)</h4>
+          <table><tr><th>Namba ya Risiti</th><th>Mwanafunzi</th><th>Mchango</th><th>Chanzo</th><th>Kiasi (TZS)</th><th>Tarehe</th></tr>
+          ${recentRcpts.slice(0, 15).map(r => {
+            const pureDigits = (r.receipt_number || '').replace(/^SGB-?/i, '');
+            return `<tr><td><a href="javascript:void(0)" onclick="document.getElementById('rcptCode').value='${pureDigits}'; verifyRcpt();"><b>${r.receipt_number}</b></a></td><td>${r.student_name}</td><td>${r.payment_category}</td><td>${r.source_fund || 'Kutwa'}</td><td><b>${Number(r.amount_paid).toLocaleString()}</b></td><td>${r.created_at}</td></tr>`;
+          }).join('') || '<tr><td colspan="6">Hakuna risiti bado.</td></tr>'}
+          </table>
+        </div>`;
+      return;
+    }
+    if (tab === 'users_mgmt') {
+      const users = SGB.select('users_profile');
+      area.innerHTML = `
+        <div class="panel">
+          <h3>1. Sajili Mtumiaji Mpya (Mwalimu, Mwanafunzi, Mzazi, Mhasibu, Mkuu)</h3>
+          <form onsubmit="addUserAccount(event)" style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:15px;">
+            <input type="text" id="uFull" required placeholder="Jina Kamili">
+            <select id="uRole">
               <option value="student">Mwanafunzi (Student)</option>
-              <option value="parent">Mzazi (Parent)</option>
-              <option value="accountant">Mhasibu (Accountant)</option>
+              <option value="parent">Mzazi / Mlezi (Parent)</option>
+              <option value="teacher">Mwalimu (Teacher)</option>
               <option value="academic">Mtaaluma (Academic)</option>
+              <option value="accountant">Mhasibu (Accountant)</option>
               <option value="headmaster">Mkuu wa Shule (Headmaster)</option>
-              <option value="director">Mkurugenzi (Director)</option>
-              <option value="librarian">Mkutubi (Librarian)</option>
-              <option value="matron_patron">Matron / Patron / Zahanati</option>
+              <option value="librarian">Maktaba (Librarian)</option>
+              <option value="matron">Bweni & Zahanati (Matron/Patron)</option>
+              <option value="super_admin">Super Admin / Mkurugenzi</option>
             </select>
-            <input type="text" id="duReg" required placeholder="Namba Usajili / Simu">
-            <input type="text" id="duPass" value="123456" required placeholder="Nenosiri">
-            <button type="submit" class="btn btn-green" style="grid-column: span 4;">➕ Sajili & Idhinisha Mara Moja</button>
+            <input type="text" id="uReg" placeholder="Namba ya Usajili / Cheo">
+            <input type="text" id="uPhone" placeholder="Namba ya Simu (07...)">
+            <input type="text" id="uUser" required placeholder="Username ya Kuingilia">
+            <input type="text" id="uPass" required placeholder="Nywila (Password)">
+            <button type="submit" class="btn btn-green" style="grid-column: span 3;">➕ Hifadhi Akaunti Mpya</button>
           </form>
 
-          <h3>Orodha ya Watumiaji Wote (Approve, Suspend & Reset Password)</h3>
-          <table><tr><th>Jina Kamili</th><th>Nafasi (Role)</th><th>Namba / Simu</th><th>Hali</th><th>Hatua za Udhibiti</th></tr>
-          ${users.map(u => `<tr><td><b>${u.full_name}</b></td><td>${u.role}</td><td>${u.reg_or_staff_no || ''} / ${u.phone_number || ''}</td><td><b>${u.status}</b></td>
-          <td>
-            <button class="btn btn-green" onclick="setStatus(${u.id}, 'approved')">Approve</button>
-            <button class="btn btn-amber" onclick="resetPass(${u.id}, '${u.full_name}')">🔑 Reset Pass</button>
-            <button class="btn btn-red" onclick="setStatus(${u.id}, 'suspended')">Suspend</button>
-          </td></tr>`).join('') || '<tr><td colspan="5">Hakuna akaunti zilizosajiliwa bado.</td></tr>'}
+          <h3>2. Orodha ya Watumiaji Wote (${users.length})</h3>
+          <table><tr><th>Jina Kamili</th><th>Cheo (Role)</th><th>Reg / Simu</th><th>Username</th><th>Password</th><th>Hatua</th></tr>
+          ${users.map(u => `<tr>
+            <td><b>${u.full_name}</b></td><td>${u.role}</td><td>${u.reg_or_staff_no || '-'} | ${u.phone_number || '-'}</td>
+            <td><code>${u.username}</code></td><td><code>${u.password}</code></td>
+            <td><button class="btn btn-amber" onclick="resetUserPass(${u.id})">🔑 Badili Nywila</button> <button class="btn btn-red" onclick="deleteUserAcc(${u.id})">🗑️ Futa</button></td>
+          </tr>`).join('') || '<tr><td colspan="6">Hakuna watumiaji waliosajiliwa bado.</td></tr>'}
           </table>
         </div>`;
+      return;
     }
 
-    if (tab === 'impersonate') {
-      area.innerHTML = `
-        <div class="panel">
-          <h3>Ingia Kama Mtumiaji Mwingine (Login As / Impersonation Support)</h3>
-          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:12px; margin-top:15px;">
-            <button class="btn btn-blue" style="padding:14px;" onclick="loginAs('director', 'Mkurugenzi wa Shule', 'director.html')">📊 Ingia Kama Mkurugenzi</button>
-            <button class="btn btn-blue" style="padding:14px;" onclick="loginAs('headmaster', 'Mkuu wa Shule (0784 755 173)', 'headmaster.html')">🏫 Ingia Kama Mkuu wa Shule</button>
-            <button class="btn btn-green" style="padding:14px;" onclick="loginAs('accountant', 'Mhasibu (0615 000 305)', 'accountant.html')">💰 Ingia Kama Mhasibu & Stoo</button>
-            <button class="btn btn-amber" style="padding:14px;" onclick="loginAs('academic', 'Mtaaluma (Academic)', 'academic.html')">🎓 Ingia Kama Mtaaluma</button>
-            <button class="btn btn-blue" style="padding:14px;" onclick="loginAs('librarian', 'Mkutubi wa Maktaba', 'library.html')">📚 Ingia Kama Mkutubi (Library)</button>
-            <button class="btn btn-green" style="padding:14px;" onclick="loginAs('matron_patron', 'Matron / Patron & Zahanati', 'matron_patron.html')">🏥 Ingia Kama Matron / Zahanati</button>
-            <button class="btn btn-blue" style="padding:14px;" onclick="loginAs('teacher', 'Mwalimu wa Somo', 'teacher.html')">📚 Ingia Kama Mwalimu</button>
-            <button class="btn btn-green" style="padding:14px;" onclick="loginAs('parent', 'Mzazi / Mlezi', 'parent.html')">👨‍👩‍👧 Ingia Kama Mzazi</button>
-            <button class="btn btn-amber" style="padding:14px;" onclick="loginAs('student', 'Mwanafunzi', 'student.html')">🎒 Ingia Kama Mwanafunzi</button>
-          </div>
-        </div>`;
-    }
-    if (tab === 'bulk_promo') {
-      const alumni = SGB.select('alumni_records');
-      area.innerHTML = `
-        <div class="panel">
-          <h3>1. Kupakia Wanafunzi / Watumishi kwa Wingi (Bulk Excel / CSV Import)</h3>
-          <textarea id="bulkText" rows="5" placeholder="Amina Hassan, S.2026/0010, Form 1A, student&#10;Juma Mwita, STF-005, 0755112233, teacher"></textarea><br><br>
-          <button class="btn btn-green" onclick="runBulkImport()">📥 Pakia Orodha Yote Sasa</button>
-        </div>
-        <div class="panel">
-          <h3>2. Kupandisha Madarasa kwa Mkupuo (Bulk Class Promotion & Alumni)</h3>
-          <button class="btn btn-amber" onclick="runPromotion()">🎓 Pandisha Madarasa Yote Sasa (Promote All)</button>
-          ${alumni.length ? `<p style="margin-top:10px; font-size:12px;">Idadi ya rekodi za wahitimu (Alumni): <b>${alumni.length}</b></p>` : ''}
-        </div>`;
-    }
-
-    if (tab === 'operations') {
-      const libs = SGB.select('library_loans');
-      const hostels = SGB.select('hostel_beds');
-      const visitors = SGB.select('gate_visitors');
-      area.innerHTML = `
-        <div class="panel">
-          <h3>1. Maktaba Halisi (Physical Library Book Loans)</h3>
-          <form onsubmit="addLibLoan(event)" style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:12px;">
-            <input type="text" id="lbSt" required placeholder="Jina la Mwanafunzi">
-            <input type="text" id="lbBook" required placeholder="Jina la Kitabu & Barcode">
-            <button type="submit" class="btn btn-blue">📚 Azimisha Kitabu</button>
-          </form>
-          <table><tr><th>Mwanafunzi</th><th>Kitabu</th><th>Hali</th><th>Hatua</th></tr>
-          ${libs.map(l => `<tr><td><b>${l.student_name}</b></td><td>${l.book}</td><td>${l.status}</td><td><button class="btn btn-green" onclick="SGB.update('library_loans', ${l.id}, {status:'Amerudisha (Returned)'}); openTab('operations')">✅ Amerudisha</button></td></tr>`).join('') || '<tr><td colspan="4">Hakuna kitabu kilichoazimwa.</td></tr>'}
-          </table>
-        </div>
-        <div class="panel">
-          <h3>2. Usimamizi wa Mabweni (Hostel & Bed Allocation)</h3>
-          <form onsubmit="addHostel(event)" style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:12px;">
-            <input type="text" id="hsSt" required placeholder="Jina la Mwanafunzi (Bweni)">
-            <input type="text" id="hsRoom" required placeholder="Bweni & Kitanda (Mfano: Kilimanjaro - Bed 04)">
-            <button type="submit" class="btn btn-green">🛏️ Panga Kitanda</button>
-          </form>
-          <table><tr><th>Mwanafunzi</th><th>Bweni & Kitanda</th></tr>
-          ${hostels.map(h => `<tr><td><b>${h.student_name}</b></td><td>${h.room_bed}</td></tr>`).join('')}
-          </table>
-        </div>
-        <div class="panel">
-          <h3>3. Ulinzi wa Getini (Gate Visitor Log)</h3>
-          <form onsubmit="addVisitor(event)" style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:12px;">
-            <input type="text" id="vsName" required placeholder="Jina la Mgeni & Simu">
-            <input type="text" id="vsPurpose" required placeholder="Sababu ya Kutembelea Shule">
-            <button type="submit" class="btn btn-amber">🚧 Rekodi Mgeni Getini</button>
-          </form>
-          <table><tr><th>Mgeni</th><th>Sababu</th><th>Muda wa Kuingia</th></tr>
-          ${visitors.map(v => `<tr><td><b>${v.name}</b></td><td>${v.purpose}</td><td>${v.created_at}</td></tr>`).join('')}
-          </table>
-        </div>`;
-    }
-    if (tab === 'audit_secret') {
-      const logs = SGB.select('audit_logs');
-      const notes = SGB.select('secret_reports');
-      area.innerHTML = `
-        <div class="panel">
-          <h3>1. Sanduku la Maoni la Siri (Whistleblower Reports)</h3>
-          <table><tr><th>Tarehe</th><th>Ujumbe wa Siri</th></tr>
-          ${notes.map(n => `<tr><td>${n.created_at}</td><td>${n.message}</td></tr>`).join('') || '<tr><td colspan="2">Hakuna taarifa za siri zilizotumwa bado.</td></tr>'}
-          </table>
-        </div>
-        <div class="panel">
-          <h3>2. Kumbukumbu za Usalama za Mfumo Mzima (Immutable Live Audit Logs)</h3>
-          <table><tr><th>Muda</th><th>Mtumiaji</th><th>Tukio Lililofanyika</th></tr>
-          ${logs.slice(0, 40).map(l => `<tr><td>${l.time}</td><td><b>${l.actor}</b></td><td>${l.action}</td></tr>`).join('')}
-          </table>
-        </div>`;
-    }
-
-    if (tab === 'sys_tools') {
+    if (tab === 'sys_config') {
       const cfg = SGB.getConfig();
+      const locks = SGB.select('account_locks');
       area.innerHTML = `
         <div class="panel">
-          <h3>1. Mipangilio ya Mwaka wa Masomo & Taarifa za Shule</h3>
-          <form onsubmit="saveSchoolCfg(event)" style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px;">
-            <input type="text" id="cfgYear" value="${cfg.year}" required placeholder="Mwaka wa Masomo (2026)">
-            <select id="cfgTerm"><option ${cfg.term==='Term I'?'selected':''}>Term I</option><option ${cfg.term==='Term II'?'selected':''}>Term II</option></select>
+          <h3>1. Mipangilio ya Shule & Akaunti ya Benki</h3>
+          <form onsubmit="saveSchoolCfg(event)" style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:15px;">
+            <input type="text" id="cfgYear" value="${cfg.year}" required placeholder="Mwaka wa Masomo">
+            <input type="text" id="cfgTerm" value="${cfg.term}" required placeholder="Muhula (Term)">
             <input type="text" id="cfgCrdb" value="${cfg.crdb}" required placeholder="Akaunti ya CRDB">
-            <button type="submit" class="btn btn-green" style="grid-column: span 3;">💾 Hifadhi Mipangilio ya Shule</button>
+            <button type="submit" class="btn btn-blue" style="grid-column: span 3;">💾 Hifadhi Mipangilio</button>
           </form>
         </div>
         <div class="panel">
-          <h3>2. Uhakiki wa Uhalali wa Risiti / Nyaraka (QR & Receipt Verifier)</h3>
-          <div style="display:flex; gap:10px; max-width:450px;">
-            <input type="text" id="qrSearch" placeholder="Weka Namba ya Risiti (Mfano: SGB-123456)...">
-            <button class="btn btn-blue" onclick="verifyDoc()">🔍 Hakiki Sasa</button>
-          </div>
-          <div id="qrResult" style="margin-top:10px;"></div>
-        </div>
-        <div class="panel">
-          <h3>3. Usafishaji wa Data za Majaribio (Master Data Cleanup)</h3>
-          <div style="display:flex; gap:8px; flex-wrap:wrap;">
-            <button class="btn btn-amber" onclick="inspectTable('exam_results')">Kagua Alama</button>
-            <button class="btn btn-amber" onclick="inspectTable('accounting_receipts')">Kagua Risiti</button>
-            <button class="btn btn-amber" onclick="inspectTable('store_inventory')">Kagua Stoo</button>
-            <button class="btn btn-red" onclick="localStorage.removeItem('sgb_lock_until'); alert('✅ Akaunti zote zilizofungwa zimefunguliwa!');">🔓 Fungua Akaunti</button>
-          </div>
-          <div id="cleanupArea" style="margin-top:12px;"></div>
+          <h3>2. Udhibiti wa Hesabu Zilizofungwa (Admin Unlock Override)</h3>
+          <table><tr><th>Kipindi</th><th>Mapato / Matumizi / Salio</th><th>Hali</th><th>Hatua ya Admin</th></tr>
+          ${locks.map(l => `<tr>
+            <td><b>${l.label}</b> (${l.start_date} - ${l.end_date})</td>
+            <td>In: ${Number(l.period_in||0).toLocaleString()} | Out: ${Number(l.period_out||0).toLocaleString()} | Bal: ${Number(l.period_bal||0).toLocaleString()}</td>
+            <td><b>${l.status}</b></td>
+            <td>${l.status === 'Locked' ? `<button class="btn btn-green" onclick="SGB.update('account_locks', ${l.id}, {status:'Unlocked', unlock_requested:false}); openTab('sys_config')">🔓 Fungua (Admin Override)</button>` : 'Imefunguliwa'}</td>
+          </tr>`).join('') || '<tr><td colspan="4">Hakuna kipindi kilichofungwa.</td></tr>'}
+          </table>
         </div>`;
+      return;
     }
 
-    if (tab === 'id_demo') {
-      const maint = localStorage.getItem('sgb_maintenance') === 'true';
+    if (tab === 'audit_logs') {
+      const logs = SGB.select('audit_logs');
       area.innerHTML = `
         <div class="panel">
-          <h3>1. Jenereta ya Vitambulisho vya Shule (Student & Staff ID Cards + Photo & QR)</h3>
-          <div style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:10px; margin-bottom:12px;">
-            <input type="text" id="idName" placeholder="Majina Kamili (Mfano: Amina Hassan)">
-            <input type="text" id="idNo" placeholder="Namba Usajili / Mtumishi (S.2026/0010)">
-            <input type="text" id="idClass" placeholder="Kidato / Nafasi (Form 4A)">
-            <input type="file" id="idPhoto" accept="image/*" title="Chagua Picha ya Mwanafunzi">
-            <button class="btn btn-blue" style="grid-column: span 4;" onclick="generateIDCard()">🪪 Hifadhi Picha & Tengeneza Kitambulisho</button>
-          </div>
-          <div id="idCardOutput"></div>
-        </div>
-        <div class="panel">
-          <h3>2. Data za Majaribio (One-Click Demo Data Seeder)</h3>
-          <button class="btn btn-green" onclick="seedDemoData()">🌱 Jaza Data za Majaribio Sasa</button>
-          <button class="btn btn-red" onclick="clearAllDemoData()">🧹 Futa Data Zote (Reset Clean System)</button>
-        </div>
-        <div class="panel">
-          <h3>3. Hali ya Matengenezo ya Mfumo (Maintenance Mode)</h3>
-          <button class="btn ${maint ? 'btn-green' : 'btn-amber'}" onclick="toggleMaintenance()">${maint ? '✅ Zima Maintenance Mode' : '⚙️ Washa Maintenance Mode'}</button>
+          <h3>Kumbukumbu za Usalama na Mienendo ya Mfumo (Audit Trail)</h3>
+          <table><tr><th>Muda</th><th>Mtumiaji</th><th>Tukio / Hatua</th></tr>
+          ${logs.map(l => `<tr><td>${l.time}</td><td><b>${l.actor}</b></td><td>${l.action}</td></tr>`).join('') || '<tr><td colspan="3">Hakuna kumbukumbu bado.</td></tr>'}
+          </table>
+        </div>`;
+      return;
+    }
+  }
+  async function verifyRcpt() {
+    await SGB.pullFromCloud(true);
+    let raw = (document.getElementById('rcptCode').value || '').trim().toUpperCase();
+    if (!raw) { alert('⚠️ Ingiza namba ya risiti kwanza.'); return; }
+
+    // Ondoa herufi zozote za SGB- kama mtumiaji aliziandika, kisha iunge mara moja kwa usahihi
+    const digitsOnly = raw.replace(/^SGB-?/i, '').trim();
+    const fullCode = 'SGB-' + digitsOnly;
+
+    const matches = SGB.select('accounting_receipts').filter(r => {
+      const dbCode = (r.receipt_number || '').trim().toUpperCase();
+      return dbCode === fullCode || dbCode === digitsOnly || dbCode.endsWith('-' + digitsOnly);
+    });
+
+    if (matches.length > 0) {
+      const first = matches;
+      const totalAmt = matches.reduce((s, x) => s + Number(x.amount_paid), 0);
+      const itemsList = matches.map(x => `• <b>${x.payment_category}</b> (${x.source_fund || 'Kutwa'}): TZS ${Number(x.amount_paid).toLocaleString()}/=`).join('<br>');
+
+      document.getElementById('rcptRes').innerHTML = `
+        <div style="background:#ecfdf5; border:2px solid #059669; padding:16px; border-radius:8px; max-width:600px;">
+          <h4 style="margin:0 0 8px; color:#059669;">✅ RISITI HII NI HALALI KABISA! (${first.receipt_number})</h4>
+          <b>Jina la Mwanafunzi:</b> ${first.student_name} (${first.student_reg_no || '-'})<br>
+          <b>Njia ya Malipo:</b> ${first.payment_method} (Ref: ${first.bank_ref_no || '-'})<br>
+          <b>Tarehe ya Malipo:</b> ${first.tx_date || first.created_at}<hr>
+          <b>Mchanganuo wa Michango Iliyolipwa:</b><br>${itemsList}<hr>
+          <b style="font-size:15px; color:#064e3b;">JUMLA KUU ILIYOLIPWA: TZS ${totalAmt.toLocaleString()}/=</b>
+        </div>`;
+    } else {
+      document.getElementById('rcptRes').innerHTML = `
+        <div style="background:#fef2f2; border:2px solid #dc2626; padding:16px; border-radius:8px; max-width:600px;">
+          <b style="color:#dc2626;">❌ RISITI NAMBA "${fullCode}" HAIKUPATIKANA KWENYE MFUMO!</b><br>
+          <small>Hakikisha umeandika tarakimu sahihi za risiti au bofya 🔄 Refresh kuvuta data mpya kutoka hewani.</small>
         </div>`;
     }
   }
-  function createDirectUser(e) {
+
+  function addUserAccount(e) {
     e.preventDefault();
     SGB.insert('users_profile', {
-      full_name: document.getElementById('duName').value.trim(),
-      role: document.getElementById('duRole').value,
-      reg_or_staff_no: document.getElementById('duReg').value.trim(),
-      phone_number: document.getElementById('duReg').value.trim(),
-      password_hash: document.getElementById('duPass').value.trim(),
-      status: 'approved'
+      full_name: document.getElementById('uFull').value.trim(),
+      role: document.getElementById('uRole').value,
+      reg_or_staff_no: document.getElementById('uReg').value.trim(),
+      phone_number: document.getElementById('uPhone').value.trim(),
+      username: document.getElementById('uUser').value.trim(),
+      password: document.getElementById('uPass').value.trim()
     });
-    alert('✅ Mtumiaji amesajiliwa na kuidhinishwa mara moja!');
-    openTab('users');
+    alert('✅ Akaunti mpya imeundwa na kupandishwa hewani!');
+    openTab('users_mgmt');
   }
 
-  function setStatus(id, status) {
-    SGB.update('users_profile', id, { status });
-    openTab('users');
+  function resetUserPass(id) {
+    const np = prompt('Ingiza nywila (password) mpya:');
+    if (np && np.trim()) { SGB.update('users_profile', id, { password: np.trim() }); openTab('users_mgmt'); }
   }
 
-  function resetPass(id, name) {
-    const np = prompt(`Weka nenosiri jipya kwa ajili ya ${name}:`, '123456');
-    if (np) { SGB.update('users_profile', id, { password_hash: np.trim() }); alert(`✅ Nenosiri la ${name} limebadilishwa kuwa: ${np}`); }
+  function deleteUserAcc(id) {
+    if (!confirm('Una uhakika unataka kufuta mtumiaji huyu?')) return;
+    localStorage.setItem('sgb_users_profile', JSON.stringify(SGB.select('users_profile').filter(x => x.id !== id)));
+    SGB.pushToCloud('users_profile');
+    openTab('users_mgmt');
   }
-
-  function loginAs(role, name, page) {
-    SGB.logAction(`Super Admin ameingia kama ${name} (Impersonation)`);
-    sessionStorage.setItem('sgb_active_user', JSON.stringify({ full_name: name + ' [Via Admin]', role }));
-    window.location.href = page;
-  }
-
-  function runBulkImport() {
-    const lines = document.getElementById('bulkText').value.trim().split('\n').filter(Boolean);
-    if (!lines.length) return;
-    lines.forEach(line => {
-      const [full_name, reg_or_staff_no, extra, roleRaw] = line.split(',').map(s => s.trim());
-      const role = ['student', 'teacher', 'parent', 'accountant', 'academic'].includes((roleRaw || '').toLowerCase()) ? roleRaw.toLowerCase() : 'student';
-      if (full_name) SGB.insert('users_profile', { full_name, role, reg_or_staff_no: reg_or_staff_no || '-', phone_number: extra || '-', password_hash: '123456', status: 'approved' });
-    });
-    alert(`✅ Rekodi ${lines.length} zimepakiwa kikamilifu!`);
-    document.getElementById('bulkText').value = '';
-  }
-
-  function runPromotion() {
-    if (confirm('Pandisha madarasa yote kwa mwaka mpya wa masomo?')) {
-      SGB.insert('alumni_records', { promoted_on: new Date().toLocaleDateString('sw-TZ'), note: 'Madarasa yote yamepandishwa' });
-      alert('✅ Madarasa yote yamepandishwa!');
-      openTab('bulk_promo');
-    }
-  }
-
-  function addLibLoan(e) { e.preventDefault(); SGB.insert('library_loans', { student_name: document.getElementById('lbSt').value, book: document.getElementById('lbBook').value, status: 'Ameazima (Borrowed)' }); openTab('operations'); }
-  function addHostel(e) { e.preventDefault(); SGB.insert('hostel_beds', { student_name: document.getElementById('hsSt').value, room_bed: document.getElementById('hsRoom').value }); openTab('operations'); }
-  function addVisitor(e) { e.preventDefault(); SGB.insert('gate_visitors', { name: document.getElementById('vsName').value, purpose: document.getElementById('vsPurpose').value }); openTab('operations'); }
 
   function saveSchoolCfg(e) {
     e.preventDefault();
-    const cfg = { year: document.getElementById('cfgYear').value, term: document.getElementById('cfgTerm').value, crdb: document.getElementById('cfgCrdb').value };
+    const cfg = { year: document.getElementById('cfgYear').value.trim(), term: document.getElementById('cfgTerm').value.trim(), crdb: document.getElementById('cfgCrdb').value.trim() };
     localStorage.setItem('sgb_school_config', JSON.stringify(cfg));
-    alert('✅ Mipangilio ya shule imehifadhiwa!');
+    SGB.pushToCloud('school_config');
+    alert('✅ Mipangilio imehifadhiwa!');
   }
 
-  function verifyDoc() {
-    const q = document.getElementById('qrSearch').value.trim().toUpperCase();
-    const rec = SGB.select('accounting_receipts').find(r => r.receipt_number.toUpperCase() === q);
-    document.getElementById('qrResult').innerHTML = rec
-      ? `<div style="padding:10px; background:#dcfce7; color:#166534; border-radius:6px;">✅ <b>NYARAKA HALALI:</b> Risiti <b>${rec.receipt_number}</b> ya <b>${rec.student_name}</b> (TZS ${Number(rec.amount_paid).toLocaleString()}) imethibitishwa!</div>`
-      : `<div style="padding:10px; background:#fee2e2; color:#991b1b; border-radius:6px;">❌ <b>ONYO:</b> Namba hii haipo kwenye kumbukumbu za Sangabuye Secondary School!</div>`;
-  }
-
-  function inspectTable(tbl) {
-    const rows = SGB.select(tbl);
-    document.getElementById('cleanupArea').innerHTML = `<table><tr><th>ID</th><th>Maelezo</th><th>Tarehe</th><th>Hatua</th></tr>
-      ${rows.map(r => `<tr><td>${r.id}</td><td>${r.student_name || r.item_name || '-'}</td><td>${r.created_at}</td><td><button class="btn btn-red" onclick="deleteRec('${tbl}', ${r.id})">🗑️ Futa</button></td></tr>`).join('') || '<tr><td colspan="4">Jedwali liko tupu.</td></tr>'}</table>`;
-  }
-
-  function deleteRec(tbl, id) {
-    if (!confirm('Futa rekodi hii?')) return;
-    localStorage.setItem('sgb_' + tbl, JSON.stringify(SGB.select(tbl).filter(x => x.id !== id)));
-    inspectTable(tbl);
-  }
-  function generateIDCard() {
-    const name = document.getElementById('idName').value.trim();
-    const no = document.getElementById('idNo').value.trim();
-    const cls = document.getElementById('idClass').value.trim();
-    const fileInput = document.getElementById('idPhoto');
-    if (!name || !no) return;
-
-    const renderCard = (photoDataUrl) => {
-      if (photoDataUrl) {
-        const photos = JSON.parse(localStorage.getItem('sgb_student_photos') || '{}');
-        photos[name.toLowerCase()] = photoDataUrl;
-        localStorage.setItem('sgb_student_photos', JSON.stringify(photos));
-      }
-      const qr = SGB.qrImg(`SANGABUYE-ID:${no}|${name}`);
-      document.getElementById('idCardOutput').innerHTML = `
-        <div id="idPrintArea" style="width:350px; border:2px solid #0f294a; border-radius:12px; overflow:hidden; background:#fff; font-family:sans-serif;">
-          <div style="background:#0f294a; color:#fff; padding:10px; text-align:center;">
-            <b style="font-size:13px; color:#fbbf24;">SANGABUYE SECONDARY SCHOOL</b><br>
-            <small style="font-size:10px;">S.L.P 11898, Ilemela - Mwanza | Simu: 0784 755 173</small>
-          </div>
-          <div style="padding:12px; display:flex; justify-content:space-between; align-items:center; gap:8px;">
-            ${photoDataUrl ? `<img src="${photoDataUrl}" style="width:65px; height:75px; object-fit:cover; border-radius:6px; border:1px solid #0f294a;">` : ''}
-            <div style="font-size:11.5px; line-height:1.5; flex:1;">
-              <b>JINA:</b> ${name.toUpperCase()}<br>
-              <b>NAMBA:</b> ${no}<br>
-              <b>KIDATO:</b> ${cls}<br>
-              <b>MWAKA:</b> 2026
-            </div>
-            <img src="${qr}" alt="QR" style="width:65px; height:65px;">
-          </div>
-          <div style="background:#f1f5f9; padding:5px; text-align:center; font-size:10px; color:#334155;">
-            Kitambulisho hiki ni mali ya Sangabuye Sec. School
-          </div>
-        </div><br>
-        <button class="btn btn-green" onclick="printIDCard()">🖨️ Chapisha Kitambulisho (Print / PDF)</button>`;
-    };
-
-    if (fileInput && fileInput.files && fileInput.files) {
-      SGB.compressPhoto(fileInput.files, renderCard);
-    } else {
-      const existing = JSON.parse(localStorage.getItem('sgb_student_photos') || '{}')[name.toLowerCase()] || '';
-      renderCard(existing);
-    }
-  }
-
-  function printIDCard() {
-    const html = document.getElementById('idPrintArea').outerHTML;
-    const w = window.open('', '', 'width=420,height=350');
-    w.document.write('<html><head><title>ID Card</title></head><body style="padding:20px;">' + html + '</body></html>');
-    w.document.close(); w.focus();
-    setTimeout(() => { w.print(); w.close(); }, 300);
-  }
-
-  function seedDemoData() {
-    const sampleStudents = [
-      { full_name: 'Amina Hassan Mwita', role: 'student', reg_or_staff_no: 'S.2026/0001', phone_number: '0711000001', password_hash: '123456', status: 'approved' },
-      { full_name: 'Baraka John Maganga', role: 'student', reg_or_staff_no: 'S.2026/0002', phone_number: '0711000002', password_hash: '123456', status: 'approved' }
-    ];
-    sampleStudents.forEach(s => SGB.insert('users_profile', s));
-    SGB.insert('accounting_receipts', { receipt_number: 'SGB-901001', student_name: 'Amina Hassan Mwita', student_reg_no: 'S.2026/0001', payment_category: 'Ada ya Shule', payment_method: 'CRDB_Bank', bank_ref_no: 'CRDB-88412', amount_paid: 250000, waiver: 0 });
-    SGB.insert('exam_results', { teacher: 'Mwalimu wa Somo', class_name: 'Form 4A', subject_name: 'Mathematics', student_name: 'Amina Hassan Mwita', ca_score: 26, final_score: 58, total_score: 84, grade: 'A', points: 1 });
-    alert('🌱 Data za majaribio zimejazwa!');
-  }
-
-  function clearAllDemoData() {
-    if (!confirm('⚠️ Futa data zote za majaribio?')) return;
-    Object.keys(localStorage).forEach(k => { if (k.startsWith('sgb_') && k !== 'sgb_lang') localStorage.removeItem(k); });
-    alert('🧹 Mfumo umesafishwa!');
-    openTab('id_demo');
-  }
-
-  function toggleMaintenance() {
-    const next = !(localStorage.getItem('sgb_maintenance') === 'true');
-    localStorage.setItem('sgb_maintenance', String(next));
-    openTab('id_demo');
-  }
-
-  openTab('users', document.querySelector('.menu-btn'));
+  openTab('exec_overview', document.querySelector('.menu-btn'));
 </script>
 </body>
 </html>
