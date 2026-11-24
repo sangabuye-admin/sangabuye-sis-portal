@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mkurugenzi & Super Admin | Sangabuye SIS Portal</title>
-  <script src="core.js?v=6.8"></script>
+  <script src="core.js?v=6.9"></script>
   <style>
     * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
     body { margin: 0; background: #f1f5f9; display: flex; min-height: 100vh; color: #1e293b; }
@@ -40,7 +40,7 @@
   <button class="menu-btn active" onclick="openTab('exec_overview', this)">🏛️ 1. Muhtasari Mkuu & Vyanzo</button>
   <button class="menu-btn" onclick="openTab('verify_receipt', this)">🧾 2. Uhakiki wa Risiti (SGB-)</button>
   <button class="menu-btn" onclick="openTab('users_mgmt', this)">👥 3. Usimamizi wa Watumiaji & Nywila</button>
-  <button class="menu-btn" onclick="openTab('sys_config', this)">⚙️ 4. Mipangilio ya Shule & Hesabu</button>
+  <button class="menu-btn" onclick="openTab('sys_config', this)">⚙️ 4. Matengenezo, Shule & Hesabu</button>
   <button class="menu-btn" onclick="openTab('audit_logs', this)">🛡️ 5. Kumbukumbu za Usalama (Audit Logs)</button>
   <button class="logout-btn" onclick="SGB.logout()">🚪 Toka (Logout)</button>
 </div>
@@ -67,11 +67,16 @@
       const procs = SGB.select('procurement_committee').filter(p => p.status === 'Paid');
       const pays = SGB.select('staff_payroll').filter(p => p.status === 'Paid');
       const users = SGB.select('users_profile');
+      const isMaint = localStorage.getItem('sgb_maintenance') === 'true' || localStorage.getItem('sgb_maintenance_mode') === 'true' || SGB.getConfig().maintenance === true;
 
       const totalIn = recs.reduce((s, r) => s + Number(r.amount_paid), 0);
       const totalOut = vchs.reduce((s, v) => s + Number(v.amount), 0) + procs.reduce((s, p) => s + Number(p.estimated_budget), 0) + pays.reduce((s, p) => s + Number(p.net_pay), 0);
 
       area.innerHTML = `
+        ${isMaint ? `<div style="background:#fef2f2;border:2px solid #dc2626;padding:12px;border-radius:8px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;">
+          <b style="color:#dc2626;">⚙️ ONYO: Mfumo uko kwenye MATENGENEZO (Maintenance Mode). Watumiaji wengine hawawezi kuingia!</b>
+          <button class="btn btn-green" onclick="setMaintenanceMode(false)">🟢 Zima Matengenezo Sasa</button>
+        </div>` : ''}
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
           <h3 style="margin:0; color:#1e1b4b;">Muhtasari wa Taasisi (Executive Dashboard)</h3>
           <button class="btn btn-blue" onclick="SGB.liveRefresh(false)">🔄 Refresh Data</button>
@@ -155,7 +160,17 @@
     if (tab === 'sys_config') {
       const cfg = SGB.getConfig();
       const locks = SGB.select('account_locks');
+      const isMaint = localStorage.getItem('sgb_maintenance') === 'true' || localStorage.getItem('sgb_maintenance_mode') === 'true' || cfg.maintenance === true;
       area.innerHTML = `
+        <div class="panel" style="border-left:5px solid ${isMaint ? '#dc2626' : '#059669'};">
+          <h3>0. Hali ya Uendeshaji wa Mfumo (Washa / Zima Maintenance Mode)</h3>
+          <p>Hali ya Sasa: <b style="color:${isMaint ? '#dc2626' : '#059669'};">${isMaint ? '⚙️ UKO KWENYE MATENGENEZO (Watumiaji Wengine Wamezuiwa)' : '🟢 MFUMO UKO HEWANI (Watumiaji Wote Wanaruhusiwa)'}</b></p>
+          <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <button type="button" class="btn btn-green" onclick="setMaintenanceMode(false)">🟢 Zima Matengenezo (Rejesha Mfumo Hewani)</button>
+            <button type="button" class="btn btn-red" onclick="setMaintenanceMode(true)">⚙️ Weka Kwenye Matengenezo (Maintenance Mode)</button>
+          </div>
+        </div>
+
         <div class="panel">
           <h3>1. Mipangilio ya Shule & Akaunti ya Benki</h3>
           <form onsubmit="saveSchoolCfg(event)" style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:15px;">
@@ -165,6 +180,7 @@
             <button type="submit" class="btn btn-blue" style="grid-column: span 3;">💾 Hifadhi Mipangilio</button>
           </form>
         </div>
+
         <div class="panel">
           <h3>2. Udhibiti wa Hesabu Zilizofungwa (Admin Unlock Override)</h3>
           <table><tr><th>Kipindi</th><th>Mapato / Matumizi / Salio</th><th>Hali</th><th>Hatua ya Admin</th></tr>
@@ -178,7 +194,6 @@
         </div>`;
       return;
     }
-
     if (tab === 'audit_logs') {
       const logs = SGB.select('audit_logs');
       area.innerHTML = `
@@ -191,12 +206,12 @@
       return;
     }
   }
+
   async function verifyRcpt() {
     await SGB.pullFromCloud(true);
     let raw = (document.getElementById('rcptCode').value || '').trim().toUpperCase();
     if (!raw) { alert('⚠️ Ingiza namba ya risiti kwanza.'); return; }
 
-    // Ondoa herufi zozote za SGB- kama mtumiaji aliziandika, kisha iunge mara moja kwa usahihi
     const digitsOnly = raw.replace(/^SGB-?/i, '').trim();
     const fullCode = 'SGB-' + digitsOnly;
 
@@ -227,6 +242,18 @@
         </div>`;
     }
   }
+  function setMaintenanceMode(state) {
+    localStorage.setItem('sgb_maintenance', state ? 'true' : 'false');
+    localStorage.setItem('sgb_maintenance_mode', state ? 'true' : 'false');
+    const cfg = SGB.getConfig();
+    cfg.maintenance = state;
+    localStorage.setItem('sgb_school_config', JSON.stringify(cfg));
+    SGB.pushToCloud('maintenance');
+    SGB.pushToCloud('maintenance_mode');
+    SGB.pushToCloud('school_config');
+    alert(state ? '⚙️ Mfumo umewekwa kwenye Matengenezo (Maintenance Mode)!' : '🟢 Matengenezo yamezimwa! Watumiaji wote sasa wanaweza kuingia.');
+    openTab('sys_config');
+  }
 
   function addUserAccount(e) {
     e.preventDefault();
@@ -256,7 +283,10 @@
 
   function saveSchoolCfg(e) {
     e.preventDefault();
-    const cfg = { year: document.getElementById('cfgYear').value.trim(), term: document.getElementById('cfgTerm').value.trim(), crdb: document.getElementById('cfgCrdb').value.trim() };
+    const cfg = SGB.getConfig();
+    cfg.year = document.getElementById('cfgYear').value.trim();
+    cfg.term = document.getElementById('cfgTerm').value.trim();
+    cfg.crdb = document.getElementById('cfgCrdb').value.trim();
     localStorage.setItem('sgb_school_config', JSON.stringify(cfg));
     SGB.pushToCloud('school_config');
     alert('✅ Mipangilio imehifadhiwa!');
