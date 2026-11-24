@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ofisi ya Mtaaluma (Academic Master v9.0) | Sangabuye SIS</title>
+  <title>Ofisi ya Mtaaluma (Academic Master v9.1 — Form 1-6) | Sangabuye SIS</title>
   <script src="core.js?v=7.5"></script>
   <style>
     * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
@@ -11,8 +11,8 @@
     .sidebar { width: 265px; background: #0f294a; color: white; display: flex; flex-direction: column; padding: 12px 10px; overflow-y: auto; }
     .sidebar h2 { font-size: 15.5px; margin: 0 0 2px; color: #38bdf8; text-align: center; }
     .sidebar p { font-size: 11px; text-align: center; color: #94a3b8; margin: 0 0 10px; }
-    .grp-lbl { font-size: 10px; color: #94a3b8; text-transform: uppercase; margin: 8px 6px 3px; font-weight: bold; }
-    .menu-btn { background: transparent; border: none; color: #cbd5e1; text-align: left; padding: 7px 10px; border-radius: 7px; cursor: pointer; font-size: 12px; margin-bottom: 2px; }
+    .grp-lbl { font-size: 10px; color: #94a3b8; text-transform: uppercase; margin: 7px 6px 3px; font-weight: bold; }
+    .menu-btn { background: transparent; border: none; color: #cbd5e1; text-align: left; padding: 6.5px 10px; border-radius: 7px; cursor: pointer; font-size: 12px; margin-bottom: 2px; }
     .menu-btn:hover, .menu-btn.active { background: #1d4ed8; color: white; font-weight: bold; }
     .main { flex: 1; display: flex; flex-direction: column; }
     .topbar { background: white; padding: 11px 18px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
@@ -46,11 +46,11 @@
 <body>
 <div class="sidebar">
   <h2>OFISI YA MTAALUMA</h2>
-  <p>Academic Master | Sangabuye Sec</p>
+  <p>Form 1–6 | Sangabuye Sec</p>
 
   <div class="grp-lbl">A. Wanafunzi & Walimu</div>
   <button class="menu-btn active" onclick="openTab('overview', this)">📊 1. Muhtasari wa Taaluma</button>
-  <button class="menu-btn" onclick="openTab('students_prem', this)">🏫 2. Wanafunzi, PREM & Jinsia</button>
+  <button class="menu-btn" onclick="openTab('students_prem', this)">🏫 2. Wanafunzi, PREM & Tahasusi</button>
   <button class="menu-btn" onclick="openTab('allocations', this)">👨‍🏫 3. Mgawanyo wa Masomo</button>
 
   <div class="grp-lbl">B. Score Sheets & Alama</div>
@@ -59,14 +59,16 @@
   <button class="menu-btn" onclick="openTab('exam_publish', this)">📢 6. Dirisha & Tangaza Matokeo</button>
 
   <div class="grp-lbl">C. Matokeo & Ripoti A4</div>
-  <button class="menu-btn" onclick="openTab('merit', this)">🏆 7. Broadsheet, Divisions & Jinsia</button>
-  <button class="menu-btn" onclick="openTab('term_reports', this)">📜 8. Ripoti ya Mwanafunzi (A4 Batch)</button>
-  <button class="menu-btn" onclick="openTab('hall_cards', this)">🪪 9. Vibali vya Mtihani & Vyeti</button>
+  <button class="menu-btn" onclick="openTab('merit', this)">🏆 7. Broadsheet & Divisions (F1–6)</button>
+  <button class="menu-btn" onclick="openTab('subject_rank', this)">📈 8. Msimamo wa Kila Somo</button>
+  <button class="menu-btn" onclick="openTab('term_reports', this)">📜 9. Ripoti ya Muhula (A4 Batch)</button>
+  <button class="menu-btn" onclick="openTab('hall_cards', this)">🪪 10. Vibali vya Mtihani (Permits)</button>
+  <button class="menu-btn" onclick="openTab('leaving_cert', this)">🎓 11. Cheti cha Kuhitimu (A4)</button>
 
   <div class="grp-lbl">D. Ratiba, Silabasi & Maktaba</div>
-  <button class="menu-btn" onclick="openTab('timetable', this)">📅 10. Ratiba & Silabasi</button>
-  <button class="menu-btn" onclick="openTab('promotion', this)">🔄 11. Pandisha Madarasa (Promotion)</button>
-  <button class="menu-btn" onclick="openTab('acad_library', this)">📚 12. Maktaba & Vikao vya Taaluma</button>
+  <button class="menu-btn" onclick="openTab('timetable', this)">📅 12. Ratiba & Silabasi</button>
+  <button class="menu-btn" onclick="openTab('promotion', this)">🔄 13. Pandisha Madarasa (F1–6)</button>
+  <button class="menu-btn" onclick="openTab('acad_library', this)">📚 14. Maktaba & Vikao vya Taaluma</button>
 </div>
 
 <div class="main">
@@ -80,8 +82,22 @@
   const user = SGB.requireRole(['academic', 'headmaster', 'super_admin', 'admin']);
   SGB.startSessionTimer();
 
-  function gradeFromScore(sc) {
+  function isALevelClass(cls) {
+    const c = (cls || '').toLowerCase();
+    return c.includes('5') || c.includes('6') || c.includes('v') || c.includes('vi');
+  }
+
+  function gradeFromScore(sc, isALevel = false) {
     const s = Number(sc);
+    if (isALevel) {
+      if (s >= 80) return 'A';
+      if (s >= 70) return 'B';
+      if (s >= 60) return 'C';
+      if (s >= 50) return 'D';
+      if (s >= 40) return 'E';
+      if (s >= 35) return 'S';
+      return 'F';
+    }
     if (s >= 75) return 'A';
     if (s >= 65) return 'B';
     if (s >= 45) return 'C';
@@ -94,17 +110,14 @@
     if (g === 'B') return 'Vizuri (Very Good)';
     if (g === 'C') return 'Wastani (Good)';
     if (g === 'D') return 'Inaridhisha (Satisfactory)';
+    if (g === 'E' || g === 'S') return 'Subsidiary / Pass';
     return 'Feli - Ongeza Bidii (Fail)';
   }
 
   function computeStudentSummaries(filterClass = 'ALL', includeUnverified = true) {
     let results = SGB.select('exam_results');
-    if (!includeUnverified) {
-      results = results.filter(r => r.verified_status !== 'Returned');
-    }
-    if (filterClass !== 'ALL') {
-      results = results.filter(r => (r.class_name || '').toLowerCase() === filterClass.toLowerCase());
-    }
+    if (!includeUnverified) results = results.filter(r => r.verified_status !== 'Returned');
+    if (filterClass !== 'ALL') results = results.filter(r => (r.class_name || '').toLowerCase() === filterClass.toLowerCase());
 
     const regStudents = SGB.select('academic_students');
     const byStudent = {};
@@ -116,6 +129,7 @@
         byStudent[key] = {
           name: key,
           cls: r.class_name || (reg ? reg.class_name : '-'),
+          comb: reg ? (reg.combination || 'O-Level') : 'O-Level',
           prem: reg ? reg.prem_no : '-',
           gender: reg ? reg.gender : 'M',
           exam_no: reg ? reg.exam_no : '-',
@@ -130,22 +144,46 @@
     const ranked = Object.values(byStudent).map(st => {
       const count = st.subjects.length || 1;
       const avg = Number((st.total / count).toFixed(1));
-      const pts = st.subjects.map(s => {
-        const sc = Number(s.score || 0);
-        if (sc >= 75) return 1;
-        if (sc >= 65) return 2;
-        if (sc >= 45) return 3;
-        if (sc >= 30) return 4;
-        return 5;
-      }).sort((a, b) => a - b).slice(0, 7);
-      while (pts.length < 7) pts.push(5);
-      const totalPts = pts.reduce((a, b) => a + b, 0);
-      let div = 'Div 0';
-      if (totalPts <= 17) div = 'Div I';
-      else if (totalPts <= 21) div = 'Div II';
-      else if (totalPts <= 25) div = 'Div III';
-      else if (totalPts <= 33) div = 'Div IV';
-      return { ...st, count, avg, totalPts, div };
+      const aLevel = isALevelClass(st.cls);
+
+      if (aLevel) {
+        const principalSubs = st.subjects.filter(s => !['gs', 'general studies', 'bam', 'basic applied mathematics'].includes((s.subject || '').toLowerCase()));
+        const pts = (principalSubs.length ? principalSubs : st.subjects).map(s => {
+          const sc = Number(s.score || 0);
+          if (sc >= 80) return 1;
+          if (sc >= 70) return 2;
+          if (sc >= 60) return 3;
+          if (sc >= 50) return 4;
+          if (sc >= 40) return 5;
+          if (sc >= 35) return 6;
+          return 7;
+        }).sort((a, b) => a - b).slice(0, 3);
+        while (pts.length < 3) pts.push(7);
+        const totalPts = pts.reduce((a, b) => a + b, 0);
+        let div = 'Div 0';
+        if (totalPts <= 9) div = 'Div I';
+        else if (totalPts <= 12) div = 'Div II';
+        else if (totalPts <= 17) div = 'Div III';
+        else if (totalPts <= 19) div = 'Div IV';
+        return { ...st, count, avg, totalPts, div, levelTag: 'A-Level' };
+      } else {
+        const pts = st.subjects.map(s => {
+          const sc = Number(s.score || 0);
+          if (sc >= 75) return 1;
+          if (sc >= 65) return 2;
+          if (sc >= 45) return 3;
+          if (sc >= 30) return 4;
+          return 5;
+        }).sort((a, b) => a - b).slice(0, 7);
+        while (pts.length < 7) pts.push(5);
+        const totalPts = pts.reduce((a, b) => a + b, 0);
+        let div = 'Div 0';
+        if (totalPts <= 17) div = 'Div I';
+        else if (totalPts <= 21) div = 'Div II';
+        else if (totalPts <= 25) div = 'Div III';
+        else if (totalPts <= 33) div = 'Div IV';
+        return { ...st, count, avg, totalPts, div, levelTag: 'O-Level' };
+      }
     }).sort((a, b) => b.avg - a.avg);
 
     return ranked.map((item, idx) => ({ ...item, rank: idx + 1, outOf: ranked.length }));
@@ -166,19 +204,19 @@
 
       area.innerHTML = `
         <div class="cards">
-          <div class="card"><h4>Wanafunzi (PREM Registry)</h4><div class="val">${students.length}</div></div>
+          <div class="card"><h4>Wanafunzi (Form 1–6)</h4><div class="val">${students.length}</div></div>
           <div class="card" style="border-color:#059669;"><h4>Wastani wa Shule</h4><div class="val">${schoolAvg}%</div></div>
           <div class="card" style="border-color:#d97706;"><h4>Score Sheets Zinazosubiri</h4><div class="val">${pendingSheets}</div></div>
-          <div class="card" style="border-color:#7c3aed;"><h4>Division I (NECTA)</h4><div class="val">${divI}</div></div>
+          <div class="card" style="border-color:#7c3aed;"><h4>Division I (O & A-Level)</h4><div class="val">${divI}</div></div>
         </div>
 
         <div class="panel">
-          <h3>🏅 Wanafunzi 10 Bora Shuleni (Top 10 Performers)</h3>
+          <h3>🏅 Wanafunzi 10 Bora Shuleni (Form 1–6 Top Performers)</h3>
           <table>
-            <thead><tr><th>Nafasi</th><th>Jina la Mwanafunzi</th><th>PREM</th><th>Kidato</th><th>Jumla</th><th>Wastani</th><th>Points</th><th>Division</th></tr></thead>
+            <thead><tr><th>Nafasi</th><th>Jina la Mwanafunzi</th><th>Kidato</th><th>Tahasusi</th><th>Jumla</th><th>Wastani</th><th>Points</th><th>Division</th></tr></thead>
             <tbody>
             ${summaries.slice(0, 10).map(s => `<tr>
-              <td><b>#${s.rank}</b></td><td><b>${s.name}</b></td><td>${s.prem}</td><td>${s.cls}</td>
+              <td><b>#${s.rank}</b></td><td><b>${s.name}</b></td><td>${s.cls}</td><td>${s.comb}</td>
               <td>${s.total}</td><td><b>${s.avg}%</b></td><td>${s.totalPts}</td><td><b>${s.div}</b></td>
             </tr>`).join('') || '<tr><td colspan="8">Hakuna alama zilizoingizwa bado.</td></tr>'}
             </tbody>
@@ -191,13 +229,19 @@
       const students = SGB.select('academic_students');
       area.innerHTML = `
         <div class="panel">
-          <h3>🏫 Sajili Mwanafunzi & Namba ya PREM / Mtihani</h3>
-          <form onsubmit="addAcadStudent(event)" style="display:grid; grid-template-columns:2fr 0.7fr 1fr 1.2fr 1.2fr auto; gap:8px; margin-bottom:12px;">
+          <h3>🏫 Sajili Mwanafunzi (Form 1–6), PREM & Tahasusi (A-Level Combinations)</h3>
+          <form onsubmit="addAcadStudent(event)" style="display:grid; grid-template-columns:1.8fr 0.6fr 0.9fr 0.9fr 1fr 1fr auto; gap:7px; margin-bottom:12px;">
             <input type="text" id="stFull" required placeholder="Jina Kamili (Majina Matatu)">
-            <select id="stGender"><option value="M">M (Mvulana)</option><option value="F">F (Msichana)</option></select>
-            <input type="text" id="stClass" required placeholder="Kidato (mf. Form 4A)">
-            <input type="text" id="stPrem" placeholder="PREM No (NECTA)">
-            <input type="text" id="stExamNo" placeholder="Exam No (mf. S.1234/0001)">
+            <select id="stGender"><option value="M">M</option><option value="F">F</option></select>
+            <input type="text" id="stClass" required placeholder="Kidato (mf. Form 5 PCM / Form 4A)">
+            <select id="stComb">
+              <option value="O-Level">O-Level (F1–F4)</option>
+              <option value="PCM">PCM</option><option value="PCB">PCB</option><option value="PGM">PGM</option>
+              <option value="CBG">CBG</option><option value="EGM">EGM</option><option value="ECA">ECA</option>
+              <option value="HGL">HGL</option><option value="HKL">HKL</option><option value="HGK">HGK</option><option value="PMC">PMC</option>
+            </select>
+            <input type="text" id="stPrem" placeholder="PREM No">
+            <input type="text" id="stExamNo" placeholder="Exam No">
             <button type="submit" class="btn btn-green">✅ Sajili</button>
           </form>
 
@@ -209,13 +253,13 @@
           </div>
 
           <table>
-            <thead><tr><th>PREM No</th><th>Exam No</th><th>Jina Kamili</th><th>Jinsia</th><th>Kidato</th><th>Kitendo</th></tr></thead>
+            <thead><tr><th>PREM No</th><th>Exam No</th><th>Jina Kamili</th><th>Jinsia</th><th>Kidato</th><th>Tahasusi</th><th>Kitendo</th></tr></thead>
             <tbody>
             ${students.map(s => `<tr>
               <td><b>${s.prem_no || '-'}</b></td><td>${s.exam_no || '-'}</td><td><b>${s.full_name}</b></td>
-              <td>${s.gender}</td><td><b>${s.class_name}</b></td>
+              <td>${s.gender}</td><td><b>${s.class_name}</b></td><td>${s.combination || 'O-Level'}</td>
               <td><button class="btn btn-red" onclick="deleteAcadStudent('${s.id}')">Futa</button></td>
-            </tr>`).join('') || '<tr><td colspan="6">Hakuna wanafunzi waliosajiliwa bado.</td></tr>'}
+            </tr>`).join('') || '<tr><td colspan="7">Hakuna wanafunzi waliosajiliwa bado.</td></tr>'}
             </tbody>
           </table>
         </div>`;
@@ -227,12 +271,12 @@
       const teachers = SGB.select('users_profile').filter(u => ['teacher', 'academic', 'headmaster'].includes((u.role || '').toLowerCase()));
       area.innerHTML = `
         <div class="panel">
-          <h3>👨‍🏫 Panga Mgawanyo wa Masomo Kwa Walimu</h3>
+          <h3>👨‍🏫 Panga Mgawanyo wa Masomo Kwa Walimu (Form 1–6)</h3>
           <form onsubmit="addSubjectAllocation(event)" style="display:grid; grid-template-columns:1.5fr 1fr 1.2fr 0.8fr auto; gap:8px; margin-bottom:12px;">
             <input type="text" id="alTeacher" list="tcList" required placeholder="Jina la Mwalimu">
-            <input type="text" id="alClass" required placeholder="Kidato (mf. Form 4A)">
-            <input type="text" id="alSubj" required placeholder="Somo (mf. Chemistry)">
-            <input type="number" id="alPeriods" value="4" min="1" required>
+            <input type="text" id="alClass" required placeholder="Kidato (mf. Form 6 PCB)">
+            <input type="text" id="alSubj" required placeholder="Somo (mf. Advanced Chemistry)">
+            <input type="number" id="alPeriods" value="6" min="1" required>
             <button type="submit" class="btn btn-green">✅ Pangia</button>
           </form>
           <datalist id="tcList">${teachers.map(t => `<option value="${t.full_name}">`).join('')}</datalist>
@@ -247,15 +291,11 @@
     }
     if (tab === 'score_sheets') {
       const results = SGB.select('exam_results');
-      // Panga Score Sheets kwa Mwalimu + Somo + Kidato + Mtihani
       const sheetsMap = {};
       results.forEach(r => {
         const key = `${r.teacher_name || 'Mwalimu'}|${r.class_name}|${r.subject}|${r.exam_type}`;
         if (!sheetsMap[key]) {
-          sheetsMap[key] = {
-            key, teacher: r.teacher_name || 'Mwalimu', cls: r.class_name, subj: r.subject,
-            exam: r.exam_type, count: 0, sum: 0, status: r.verified_status || 'Approved'
-          };
+          sheetsMap[key] = { key, teacher: r.teacher_name || 'Mwalimu', cls: r.class_name, subj: r.subject, exam: r.exam_type, count: 0, sum: 0, status: r.verified_status || 'Approved' };
         }
         sheetsMap[key].count++;
         sheetsMap[key].sum += Number(r.score || 0);
@@ -289,13 +329,13 @@
       const classes = Array.from(new Set(students.map(s => s.class_name).filter(Boolean)));
       area.innerHTML = `
         <div class="panel">
-          <h3>✍️ Jaza Alama za Somo Lolote Kwa Darasa Zima (Master Score Entry)</h3>
+          <h3>✍️ Jaza Alama za Somo Lolote Kwa Darasa Zima (Form 1–6 Master Grid)</h3>
           <div style="display:grid; grid-template-columns:1fr 1.2fr 1fr auto; gap:8px; margin-bottom:12px;">
             <select id="meClass" onchange="loadMasterEntryGrid()">
               <option value="">-- Chagua Kidato --</option>
               ${classes.map(c => `<option value="${c}">${c}</option>`).join('')}
             </select>
-            <input type="text" id="meSubject" placeholder="Andika Somo (mf. Biology)">
+            <input type="text" id="meSubject" placeholder="Andika Somo (mf. Physics / General Studies)">
             <select id="meExam">
               <option value="Midterm">Midterm</option>
               <option value="Terminal">Terminal</option>
@@ -305,6 +345,13 @@
             <button type="button" class="btn btn-blue" onclick="loadMasterEntryGrid()">📋 Fungua Jedwali</button>
           </div>
           <div id="masterGridBox"></div>
+
+          <div style="background:#f8fafc; padding:10px; border:1px dashed #94a3b8; border-radius:7px; margin-top:14px; display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+            <b>📥 Au Pakia Alama kwa Excel/CSV:</b>
+            <button type="button" class="btn btn-blue" onclick="downloadMarksCsvTemplate()">⬇️ Template ya Alama (CSV)</button>
+            <input type="file" id="marksCsvFile" accept=".csv" style="max-width:240px;">
+            <button type="button" class="btn btn-green" onclick="uploadMarksCsv()">⬆️ Pakia Alama Zote</button>
+          </div>
         </div>`;
       return;
     }
@@ -342,15 +389,41 @@
           </div>
           <div id="meritPrintArea" style="margin-top:10px;">
             <table>
-              <thead><tr><th>Nafasi</th><th>Mwanafunzi</th><th>Jinsia</th><th>Kidato</th><th>Masomo</th><th>Jumla</th><th>Wastani</th><th>Points</th><th>Division</th></tr></thead>
+              <thead><tr><th>Nafasi</th><th>Mwanafunzi</th><th>Jinsia</th><th>Kidato</th><th>Ngazi</th><th>Jumla</th><th>Wastani</th><th>Points</th><th>Division</th></tr></thead>
               <tbody>
               ${summaries.map(s => `<tr>
                 <td><b>#${s.rank}</b></td><td><b>${s.name}</b></td><td>${s.gender}</td><td>${s.cls}</td>
-                <td>${s.count}</td><td>${s.total}</td><td><b>${s.avg}%</b></td><td>${s.totalPts}</td><td><b>${s.div}</b></td>
+                <td>${s.levelTag}</td><td>${s.total}</td><td><b>${s.avg}%</b></td><td>${s.totalPts}</td><td><b>${s.div}</b></td>
               </tr>`).join('') || '<tr><td colspan="9">Hakuna matokeo bado.</td></tr>'}
               </tbody>
             </table>
           </div>
+        </div>`;
+      return;
+    }
+
+    if (tab === 'subject_rank') {
+      const results = SGB.select('exam_results');
+      const bySubj = {};
+      results.forEach(r => {
+        const s = (r.subject || 'Somo').trim();
+        if (!bySubj[s]) bySubj[s] = { subject: s, total: 0, count: 0, A: 0, B: 0, C: 0, D: 0, E: 0, S: 0, F: 0 };
+        const sc = Number(r.score || 0);
+        const g = r.grade || gradeFromScore(sc, isALevelClass(r.class_name));
+        bySubj[s].total += sc; bySubj[s].count++;
+        if (bySubj[s][g] !== undefined) bySubj[s][g]++;
+      });
+      const rankedSubj = Object.values(bySubj).map(x => ({ ...x, avg: x.count ? (x.total / x.count).toFixed(1) : '0.0' })).sort((a, b) => Number(b.avg) - Number(a.avg));
+
+      area.innerHTML = `
+        <div class="panel">
+          <h3>📈 Msimamo wa Ufaulu wa Kila Somo (O-Level & A-Level)</h3>
+          <table>
+            <thead><tr><th>Nafasi</th><th>Somo</th><th>Watahiniwa</th><th>Wastani (%)</th><th>A</th><th>B</th><th>C</th><th>D</th><th>E</th><th>S</th><th>F</th></tr></thead>
+            <tbody>
+            ${rankedSubj.map((x, i) => `<tr><td><b>#${i + 1}</b></td><td><b>${x.subject}</b></td><td>${x.count}</td><td><b>${x.avg}%</b></td><td>${x.A}</td><td>${x.B}</td><td>${x.C}</td><td>${x.D}</td><td>${x.E}</td><td>${x.S}</td><td style="color:#dc2626;">${x.F}</td></tr>`).join('') || '<tr><td colspan="11">Hakuna takwimu za masomo bado.</td></tr>'}
+            </tbody>
+          </table>
         </div>`;
       return;
     }
@@ -364,12 +437,12 @@
           <div style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:8px; margin-bottom:10px;">
             <div><label style="font-size:11px;font-weight:bold;">Tarehe ya Kufunga Shule:</label><input type="date" id="repCloseDate" value="2026-12-04"></div>
             <div><label style="font-size:11px;font-weight:bold;">Tarehe ya Kufungua Shule:</label><input type="date" id="repOpenDate" value="2027-01-11"></div>
-            <div><label style="font-size:11px;font-weight:bold;">Tabia & Nidhamu (Default):</label><input type="text" id="repConduct" value="Nzuri Sana (Very Good)"></div>
+            <div><label style="font-size:11px;font-weight:bold;">Tabia & Nidhamu:</label><input type="text" id="repConduct" value="Nzuri Sana (Very Good)"></div>
             <div><label style="font-size:11px;font-weight:bold;">Muhula / Mwaka:</label><input type="text" id="repTermLbl" value="Muhula wa Pili — 2026"></div>
           </div>
           <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-bottom:12px;">
             <input type="text" id="repClassTeacherRem" value="Ana bidii darasani na ushirikiano mzuri na wenzake." placeholder="Maoni ya Mwalimu wa Darasa">
-            <input type="text" id="repAcadRem" value="Matokeo yanaridhisha; aongeze juhudi katika masomo ya sayansi." placeholder="Maoni ya Mtaaluma">
+            <input type="text" id="repAcadRem" value="Matokeo yanaridhisha; aongeze juhudi katika masomo yake." placeholder="Maoni ya Mtaaluma">
             <input type="text" id="repHmRem" value="Hongera kwa juhudi zako. Mzazi hakikisha anakamilisha mahitaji ya muhula ujao." placeholder="Maoni ya Mkuu wa Shule">
           </div>
 
@@ -405,7 +478,7 @@
               <b style="font-size:11px;">SHULE YA SEKONDARI SANGABUYE</b><br>
               <span style="background:#1d4ed8; color:#fff; padding:2px 6px; border-radius:4px; font-size:10px;">KIBALI CHA MTIHANI (EXAM PERMIT)</span><br>
               <div style="text-align:left; font-size:11.5px; margin:6px 0;">
-                <b>Jina:</b> ${s.full_name}<br><b>Exam No:</b> ${s.exam_no || s.prem_no || '-'}<br><b>Kidato:</b> ${s.class_name}
+                <b>Jina:</b> ${s.full_name}<br><b>Exam No:</b> ${s.exam_no || s.prem_no || '-'}<br><b>Kidato:</b> ${s.class_name} (${s.combination || 'O-Level'})
               </div>
               <img src="${SGB.qrImg('EXAM-PERMIT:' + s.full_name + '|' + s.class_name)}" style="height:55px;">
             </div>`).join('') || '<p>Sajili wanafunzi kwanza kwenye Kichupo cha 2.</p>'}
@@ -414,15 +487,35 @@
       return;
     }
 
-    if (tab === 'timetable') {
-      const tt = SGB.select('school_timetable');
+    if (tab === 'leaving_cert') {
+      const students = SGB.select('academic_students');
       area.innerHTML = `
         <div class="panel">
-          <h3>📅 Ratiba Kuu ya Vipindi & Silabasi</h3>
+          <h3>🎓 Cheti cha Kuhitimu Shule (School Leaving Certificate — A4)</h3>
+          <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px;">
+            <select id="lcStudentPick" style="max-width:300px;">
+              <option value="">-- Chagua Mwanafunzi --</option>
+              ${students.map(s => `<option value="${s.full_name}|${s.prem_no}|${s.class_name}">${s.full_name} (${s.class_name})</option>`).join('')}
+            </select>
+            <input type="text" id="lcBehavior" value="Nzuri Sana na Mwenye Bidii" style="max-width:260px;" placeholder="Tabia & Mwenendo">
+            <button class="btn btn-blue" onclick="renderLeavingCert()">📄 Tengeneza Cheti</button>
+            <button class="btn btn-green" onclick="printA4Sheets('lcPrintArea')">🖨️ Chapisha Cheti (A4)</button>
+          </div>
+          <div id="lcPrintArea"></div>
+        </div>`;
+      return;
+    }
+
+    if (tab === 'timetable') {
+      const tt = SGB.select('school_timetable');
+      const syl = SGB.select('syllabus_tracker');
+      area.innerHTML = `
+        <div class="panel">
+          <h3>📅 1. Ratiba Kuu ya Vipindi & Mitihani (Form 1–6)</h3>
           <form onsubmit="addTimetableSlot(event)" style="display:grid; grid-template-columns:1fr 1fr 1fr 1.2fr 1.2fr auto; gap:8px; margin-bottom:12px;">
             <select id="ttDay"><option value="Jumatatu">Jumatatu</option><option value="Jumanne">Jumanne</option><option value="Jumatano">Jumatano</option><option value="Alhamisi">Alhamisi</option><option value="Ijumaa">Ijumaa</option></select>
             <input type="text" id="ttTime" required placeholder="Muda (mf. 08:00 - 09:20)">
-            <input type="text" id="ttCls" required placeholder="Kidato">
+            <input type="text" id="ttCls" required placeholder="Kidato (mf. Form 5 PCM)">
             <input type="text" id="ttSubj" required placeholder="Somo">
             <input type="text" id="ttTeacher" required placeholder="Mwalimu">
             <button type="submit" class="btn btn-green">➕ Weka</button>
@@ -433,6 +526,21 @@
             ${tt.map(x => `<tr><td><b>${x.day_name}</b></td><td>${x.time_slot}</td><td><b>${x.class_name}</b></td><td>${x.subject}</td><td>${x.teacher_name}</td></tr>`).join('') || '<tr><td colspan="5">Hakuna ratiba bado.</td></tr>'}
             </tbody>
           </table>
+        </div>
+
+        <div class="panel">
+          <h3>📖 2. Ufuatiliaji wa Silabasi (Syllabus Coverage Tracker)</h3>
+          <form onsubmit="addSyllabusLog(event)" style="display:grid; grid-template-columns:1fr 1.2fr 1.2fr 0.8fr auto; gap:8px; margin-bottom:10px;">
+            <input type="text" id="syCls" required placeholder="Kidato">
+            <input type="text" id="sySubj" required placeholder="Somo">
+            <input type="text" id="syTeacher" required placeholder="Mwalimu">
+            <input type="number" id="syPct" min="0" max="100" required placeholder="Asilimia %">
+            <button type="submit" class="btn btn-blue">💾 Hifadhi %</button>
+          </form>
+          <table><thead><tr><th>Kidato</th><th>Somo</th><th>Mwalimu</th><th>Silabasi (%)</th></tr></thead>
+          <tbody>
+          ${syl.map(s => `<tr><td><b>${s.class_name}</b></td><td>${s.subject}</td><td>${s.teacher_name}</td><td><b>${s.percent}%</b></td></tr>`).join('') || '<tr><td colspan="4">Hakuna rekodi za silabasi bado.</td></tr>'}
+          </tbody></table>
         </div>`;
       return;
     }
@@ -441,17 +549,29 @@
       const students = SGB.select('academic_students');
       area.innerHTML = `
         <div class="panel" style="border-left:4px solid #d97706;">
-          <h3>🔄 Kupandisha Wanafunzi Madarasa Mwisho wa Mwaka (Class Promotion)</h3>
-          <p style="font-size:13px;">Hatua hii itapandisha wanafunzi wote: <b>Form 1 ➔ Form 2</b>, <b>Form 2 ➔ Form 3</b>, <b>Form 3 ➔ Form 4</b>, na <b>Form 4 ➔ Wahitimu (Alumni)</b>. Jumla ya wanafunzi waliopo: <b>${students.length}</b>.</p>
+          <h3>🔄 Kupandisha Wanafunzi Madarasa Mwisho wa Mwaka (Form 1–6 Promotion)</h3>
+          <p style="font-size:13px;">Hatua hii itapandisha wanafunzi wote: <b>Form 1 ➔ Form 2</b>, <b>Form 2 ➔ Form 3</b>, <b>Form 3 ➔ Form 4</b>, <b>Form 4 ➔ Wahitimu O-Level</b>, <b>Form 5 ➔ Form 6</b>, na <b>Form 6 ➔ Wahitimu A-Level</b>. Jumla: <b>${students.length}</b>.</p>
           <button class="btn btn-amber" style="padding:10px 16px; font-size:13px;" onclick="promoteAllStudents()">🚀 Pandisha Madarasa Wote Sasa</button>
         </div>`;
       return;
     }
 
     const books = SGB.select('library_books');
+    const mins = SGB.select('academic_minutes');
     area.innerHTML = `
       <div class="panel">
-        <h3>📚 Maktaba & Vitabu vya Kiada Vilivyopo</h3>
+        <h3>📋 1. Kumbukumbu za Vikao vya Kamati ya Taaluma</h3>
+        <form onsubmit="addAcadMinute(event)" style="display:grid; grid-template-columns:1.5fr 2.5fr auto; gap:8px; margin-bottom:12px;">
+          <input type="text" id="mnTitle" required placeholder="Kichwa cha Kikao (mf. Kikao cha Maandalizi ya Mock)">
+          <input type="text" id="mnBody" required placeholder="Maazimio Makuu ya Kikao">
+          <button type="submit" class="btn btn-green">💾 Hifadhi</button>
+        </form>
+        <table><thead><tr><th>Tarehe</th><th>Kikao</th><th>Maazimio</th></tr></thead>
+        <tbody>${mins.map(m => `<tr><td>${m.created_at}</td><td><b>${m.title}</b></td><td>${m.summary}</td></tr>`).join('') || '<tr><td colspan="3">Hakuna kumbukumbu za vikao bado.</td></tr>'}</tbody></table>
+      </div>
+
+      <div class="panel">
+        <h3>📚 2. Vitabu vya Kiada Vilivyopo Maktaba (O-Level & A-Level)</h3>
         <table>
           <thead><tr><th>Barcode</th><th>Jina la Kitabu</th><th>Kategoria</th><th>Rafu</th><th>Zilizopo</th></tr></thead>
           <tbody>
@@ -478,7 +598,7 @@
         <table style="margin-top:0; margin-bottom:8px; font-size:11px;">
           <tr>
             <td><b>Jina la Mwanafunzi:</b> ${st.name.toUpperCase()}</td>
-            <td><b>Kidato:</b> ${st.cls}</td>
+            <td><b>Kidato:</b> ${st.cls} (${st.comb})</td>
             <td><b>Jinsia:</b> ${st.gender}</td>
           </tr>
           <tr>
@@ -488,14 +608,14 @@
           </tr>
         </table>
 
-        <b style="font-size:11.5px;">1. MAENDELEO YA KITAALUMA (ACADEMIC PERFORMANCE):</b>
+        <b style="font-size:11.5px;">1. MAENDELEO YA KITAALUMA (ACADEMIC PERFORMANCE — ${st.levelTag}):</b>
         <table style="margin-top:3px; margin-bottom:8px; font-size:11px;">
           <thead><tr><th>Somo (Subject)</th><th>Mtihani</th><th>Alama (%)</th><th>Daraja</th><th>Maoni ya Somo</th><th>Mwalimu</th></tr></thead>
           <tbody>
-          ${st.subjects.map(sub => `<tr>
-            <td><b>${sub.subject}</b></td><td>${sub.exam_type || '-'}</td><td><b>${sub.score}</b></td>
-            <td><b>${sub.grade || gradeFromScore(sub.score)}</b></td><td>${remarkFromGrade(sub.grade || gradeFromScore(sub.score))}</td><td>${sub.teacher_name || '-'}</td>
-          </tr>`).join('')}
+          ${st.subjects.map(sub => {
+            const g = sub.grade || gradeFromScore(sub.score, isALevelClass(st.cls));
+            return `<tr><td><b>${sub.subject}</b></td><td>${sub.exam_type || '-'}</td><td><b>${sub.score}</b></td><td><b>${g}</b></td><td>${remarkFromGrade(g)}</td><td>${sub.teacher_name || '-'}</td></tr>`;
+          }).join('')}
           </tbody>
         </table>
 
@@ -527,6 +647,7 @@
         </div>
       </div>`;
   }
+
   function generateA4Reports(mode) {
     const opts = {
       closeDate: document.getElementById('repCloseDate')?.value || '2026-12-04',
@@ -537,7 +658,6 @@
       acRem: document.getElementById('repAcadRem')?.value || '',
       hmRem: document.getElementById('repHmRem')?.value || ''
     };
-
     const all = computeStudentSummaries();
     let targets = new Array();
     if (mode === 'SINGLE') {
@@ -549,15 +669,41 @@
       targets = cls === 'ALL' ? all : all.filter(s => s.cls === cls);
       if (targets.length === 0) { alert('⚠️ Hakuna matokeo ya darasa hilo bado.'); return; }
     }
-
     document.getElementById('a4ReportsContainer').innerHTML = targets.map(st => buildSingleA4ReportHtml(st, opts)).join('');
+  }
+
+  function renderLeavingCert() {
+    const raw = document.getElementById('lcStudentPick')?.value;
+    if (!raw) { alert('⚠️ Chagua mwanafunzi kwanza.'); return; }
+    const [name, prem, cls] = raw.split('|');
+    const beh = document.getElementById('lcBehavior')?.value || 'Nzuri Sana';
+    const qr = SGB.qrImg(`LEAVING-CERT:${name}|PREM:${prem}`);
+    document.getElementById('lcPrintArea').innerHTML = `
+      <div class="a4-sheet">
+        <div style="text-align:center; border-bottom:2.5px solid #0f294a; padding-bottom:8px; margin-bottom:14px;">
+          <img src="https://wikimedia.org" style="height:60px;"><br>
+          <b>JAMHURI YA MUUNGANO WA TANZANIA</b><br>
+          <h2 style="margin:2px 0; color:#1d4ed8;">SHULE YA SEKONDARI SANGABUYE</h2>
+          <small>S.L.P 11898, Ilemela - Mwanza | “Elimu Kwa Ukombozi”</small><br><br>
+          <b style="font-size:15px; text-decoration:underline;">CHETI CHA KUHITIMU SHULE (SCHOOL LEAVING CERTIFICATE)</b>
+        </div>
+        <p style="font-size:13px; line-height:1.9;">
+          Hii ni kuthibitisha kwamba <b>${name.toUpperCase()}</b> (Namba ya PREM: <b>${prem}</b>) amesoma katika Shule ya Sekondari Sangabuye hadi kidato cha <b>${cls}</b>.<br>
+          Katika kipindi chote alichokuwa hapa shuleni, tabia na mwenendo wake vilikuwa: <b>${beh}</b>.
+        </p>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:40px; font-size:12px;">
+          <div><b>Mkuu wa Shule:</b><br><br>_______________________<br>Sahihi & Tarehe</div>
+          <img src="${qr}" style="height:68px;">
+          <div class="school-stamp">MKUU WA SHULE<br>SHULE YA SEK.<br>SANGABUYE<br>ILEMELA - MWANZA</div>
+        </div>
+      </div>`;
   }
 
   function printA4Sheets(containerId) {
     const html = document.getElementById(containerId)?.innerHTML;
     if (!html || !html.trim()) { alert('⚠️ Tengeneza ripoti kwanza kabla ya kuchapisha.'); return; }
     const w = window.open('', '', 'width=900,height=700');
-    w.document.write(`<html><head><title>Sangabuye A4 Student Reports</title><style>
+    w.document.write(`<html><head><title>Sangabuye A4 Print</title><style>
       @page { size: A4 portrait; margin: 8mm; }
       body { font-family: 'Segoe UI', Tahoma, sans-serif; margin: 0; padding: 0; }
       .a4-sheet { border: 2px solid #0f294a; padding: 14px 18px; page-break-after: always; font-size: 11px; line-height: 1.38; }
@@ -574,6 +720,7 @@
       full_name: document.getElementById('stFull').value.trim(),
       gender: document.getElementById('stGender').value,
       class_name: document.getElementById('stClass').value.trim(),
+      combination: document.getElementById('stComb').value,
       prem_no: document.getElementById('stPrem').value.trim() || '-',
       exam_no: document.getElementById('stExamNo').value.trim() || '-'
     });
@@ -588,8 +735,8 @@
   }
 
   function downloadStTemplate() {
-    const csv = "Jina Kamili,Jinsia (M/F),Kidato,PREM No,Exam No\nAsha Juma Mwita,F,Form 4A,2026001122,S.1234/0001";
-    const a = document.createElement('a'); a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv); a.download = 'Template_Wanafunzi_Taaluma.csv'; a.click();
+    const csv = "Jina Kamili,Jinsia (M/F),Kidato,Tahasusi,PREM No,Exam No\nAsha Juma Mwita,F,Form 5 PCM,PCM,2026001122,S.1234/0501";
+    const a = document.createElement('a'); a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv); a.download = 'Template_Wanafunzi_Form1_6.csv'; a.click();
   }
 
   function uploadStCsv() {
@@ -601,7 +748,7 @@
       ev.target.result.split(/\r?\n/).slice(1).forEach(line => {
         const c = line.split(',');
         if (c.length >= 2 && c.at(0).trim()) {
-          SGB.insert('academic_students', { full_name: c.at(0).trim(), gender: (c.at(1) || 'M').trim(), class_name: (c.at(2) || 'Form 1A').trim(), prem_no: (c.at(3) || '-').trim(), exam_no: (c.at(4) || '-').trim() });
+          SGB.insert('academic_students', { full_name: c.at(0).trim(), gender: (c.at(1) || 'M').trim(), class_name: (c.at(2) || 'Form 1A').trim(), combination: (c.at(3) || 'O-Level').trim(), prem_no: (c.at(4) || '-').trim(), exam_no: (c.at(5) || '-').trim() });
         }
       });
       openTab('students_prem');
@@ -621,6 +768,7 @@
     SGB.pushToCloud('subject_allocations');
     openTab('allocations');
   }
+
   function verifyScoreSheet(cls, subj, exam, newStatus) {
     const all = SGB.select('exam_results').map(r => (r.class_name === cls && r.subject === subj && r.exam_type === exam) ? { ...r, verified_status: newStatus } : r);
     localStorage.setItem('sgb_exam_results', JSON.stringify(all));
@@ -644,17 +792,42 @@
         <button type="submit" class="btn btn-green" style="margin-top:10px;">💾 Hifadhi Alama Zote za ${subj}</button>
       </form>`;
   }
-
   function saveMasterGridScores(e, cls, subj, exam) {
     e.preventDefault();
+    const aLevel = isALevelClass(cls);
     document.querySelectorAll('.mg-score').forEach(inp => {
       if (inp.value !== '') {
         const sc = Number(inp.value);
-        SGB.insert('exam_results', { student_name: inp.dataset.name, class_name: cls, subject: subj, exam_type: exam, score: sc, grade: gradeFromScore(sc), teacher_name: 'Ofisi ya Mtaaluma', verified_status: 'Approved' });
+        SGB.insert('exam_results', { student_name: inp.dataset.name, class_name: cls, subject: subj, exam_type: exam, score: sc, grade: gradeFromScore(sc, aLevel), teacher_name: 'Ofisi ya Mtaaluma', verified_status: 'Approved' });
       }
     });
     alert('✅ Alama zote zimehifadhiwa!');
     openTab('merit');
+  }
+
+  function downloadMarksCsvTemplate() {
+    const csv = "Jina la Mwanafunzi,Kidato,Somo,Mtihani,Alama\nAsha Juma Mwita,Form 5 PCM,Physics,Terminal,82";
+    const a = document.createElement('a'); a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv); a.download = 'Template_Alama_Masomo.csv'; a.click();
+  }
+
+  function uploadMarksCsv() {
+    const inp = document.getElementById('marksCsvFile');
+    const file = inp && inp.files ? inp.files.item(0) : null;
+    if (!file) { alert('⚠️ Chagua faili la CSV kwanza.'); return; }
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      ev.target.result.split(/\r?\n/).slice(1).forEach(line => {
+        const c = line.split(',');
+        if (c.length >= 5 && c.at(0).trim()) {
+          const cls = c.at(1).trim();
+          const sc = Number(c.at(4) || 0);
+          SGB.insert('exam_results', { student_name: c.at(0).trim(), class_name: cls, subject: c.at(2).trim(), exam_type: c.at(3).trim(), score: sc, grade: gradeFromScore(sc, isALevelClass(cls)), teacher_name: 'Ofisi ya Mtaaluma (CSV)', verified_status: 'Approved' });
+        }
+      });
+      alert('✅ Alama zote kutoka CSV zimepakiwa!');
+      openTab('merit');
+    };
+    reader.readAsText(file);
   }
 
   function updateExamPublishState(open, published) {
@@ -670,28 +843,42 @@
     openTab('timetable');
   }
 
+  function addSyllabusLog(e) {
+    e.preventDefault();
+    SGB.insert('syllabus_tracker', { class_name: document.getElementById('syCls').value.trim(), subject: document.getElementById('sySubj').value.trim(), teacher_name: document.getElementById('syTeacher').value.trim(), percent: Number(document.getElementById('syPct').value || 0) });
+    openTab('timetable');
+  }
+
+  function addAcadMinute(e) {
+    e.preventDefault();
+    SGB.insert('academic_minutes', { title: document.getElementById('mnTitle').value.trim(), summary: document.getElementById('mnBody').value.trim() });
+    openTab('acad_library');
+  }
+
   function promoteAllStudents() {
-    if (!confirm('Je, una uhakika unataka kupandisha wanafunzi wote darasa linalofuata?')) return;
+    if (!confirm('Je, una uhakika unataka kupandisha wanafunzi wote (Form 1–6) darasa linalofuata?')) return;
     const upgraded = SGB.select('academic_students').map(s => {
       const c = (s.class_name || '').toLowerCase();
       let next = s.class_name;
       if (c.includes('1')) next = s.class_name.replace(/1/g, '2');
       else if (c.includes('2')) next = s.class_name.replace(/2/g, '3');
       else if (c.includes('3')) next = s.class_name.replace(/3/g, '4');
-      else if (c.includes('4')) next = 'Alumni (Mhitimu)';
+      else if (c.includes('4')) next = 'Alumni O-Level (Mhitimu F4)';
+      else if (c.includes('5')) next = s.class_name.replace(/5/g, '6');
+      else if (c.includes('6')) next = 'Alumni A-Level (Mhitimu F6)';
       return { ...s, class_name: next };
     });
     localStorage.setItem('sgb_academic_students', JSON.stringify(upgraded));
     SGB.pushToCloud('academic_students');
-    alert('✅ Wanafunzi wote wamepandishwa madarasa!');
+    alert('✅ Wanafunzi wote (Form 1–6) wamepandishwa madarasa!');
     openTab('students_prem');
   }
 
   function downloadMeritCsv() {
     const list = computeStudentSummaries();
-    let csv = "Nafasi,Mwanafunzi,Jinsia,Kidato,Masomo,Jumla,Wastani,Points,Division\n";
-    list.forEach(s => { csv += `${s.rank},"${s.name}","${s.gender}","${s.cls}",${s.count},${s.total},${s.avg},${s.totalPts},"${s.div}"\n`; });
-    const a = document.createElement('a'); a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv); a.download = 'Broadsheet_Taaluma_Sangabuye.csv'; a.click();
+    let csv = "Nafasi,Mwanafunzi,Jinsia,Kidato,Ngazi,Jumla,Wastani,Points,Division\n";
+    list.forEach(s => { csv += `${s.rank},"${s.name}","${s.gender}","${s.cls}","${s.levelTag}",${s.total},${s.avg},${s.totalPts},"${s.div}"\n`; });
+    const a = document.createElement('a'); a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv); a.download = 'Broadsheet_Form1_6_Sangabuye.csv'; a.click();
   }
 
   openTab('overview', document.querySelector('.menu-btn'));
