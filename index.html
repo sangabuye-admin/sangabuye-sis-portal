@@ -3,202 +3,293 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sangabuye SIS Portal | Lango Kuu la Kuingia</title>
-  <script src="core.js"></script>
+  <title>Mfumo wa Taarifa za Shule | Sangabuye SIS Portal</title>
+  <script src="core.js?v=7.5"></script>
   <style>
-    * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
-    body { margin: 0; background: linear-gradient(135deg, #0f294a 0%, #1e3a8a 100%); min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 18px; color: #1e293b; }
-    .box { background: white; width: 100%; max-width: 440px; border-radius: 16px; padding: 26px; box-shadow: 0 12px 30px rgba(0,0,0,0.28); }
-    .header { text-align: center; margin-bottom: 18px; border-bottom: 2px solid #f1f5f9; padding-bottom: 14px; }
-    .header h2 { margin: 0; color: #0f294a; font-size: 18px; }
-    .header p { margin: 4px 0 0; font-size: 12px; color: #64748b; }
-    .tabs { display: flex; gap: 8px; margin-bottom: 16px; }
-    .tab-btn { flex: 1; padding: 10px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 13px; background: #f1f5f9; color: #475569; }
-    .tab-btn.active { background: #1d4ed8; color: white; }
-    label { display: block; font-size: 12px; font-weight: bold; margin: 10px 0 4px; color: #334155; }
-    input, select { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 13.5px; }
-    .submit-btn { width: 100%; padding: 12px; background: #059669; color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: bold; cursor: pointer; margin-top: 16px; }
-    .submit-btn:hover { background: #047857; }
-    .info-bar { background: #eff6ff; border: 1px solid #bfdbfe; padding: 10px; border-radius: 8px; font-size: 11.5px; color: #1e3a8a; margin-top: 14px; text-align: center; }
-    .maint-banner { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; padding: 10px; border-radius: 8px; font-size: 12px; margin-bottom: 12px; text-align: center; font-weight: bold; }
+    * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    body {
+      margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(135deg, #0b1f3a 0%, #103766 55%, #064e3b 100%);
+      padding: 16px; color: #1e293b;
+    }
+    .gov-card {
+      background: #ffffff; width: 100%; max-width: 440px; border-radius: 12px;
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35); overflow: hidden;
+      border-top: 5px solid #d97706;
+    }
+    .gov-header {
+      background: #f8fafc; padding: 18px 22px 12px; text-align: center;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .gov-header img { height: 52px; margin-bottom: 5px; }
+    .gov-header .sub { font-size: 11px; font-weight: 700; color: #475569; letter-spacing: 0.6px; text-transform: uppercase; }
+    .gov-header h1 { margin: 3px 0 0; font-size: 18px; color: #0b1f3a; letter-spacing: 0.3px; }
+    .hm-notice {
+      background: #fffbeb; border-bottom: 1px solid #fde68a; padding: 9px 16px;
+      font-size: 12px; color: #92400e; line-height: 1.4;
+    }
+    .hm-notice b { color: #b45309; }
+    .gov-body { padding: 20px 24px; }
+    .form-grp { margin-bottom: 13px; }
+    .form-grp label { display: block; font-size: 12px; font-weight: 600; color: #334155; margin-bottom: 4px; }
+    .inp-wrap { position: relative; }
+    input, select {
+      width: 100%; padding: 10px 12px; border: 1.5px solid #cbd5e1; border-radius: 7px;
+      font-size: 13.5px; transition: border-color 0.2s; background: #fff;
+    }
+    input:focus, select:focus { outline: none; border-color: #1d4ed8; }
+    .eye-btn {
+      position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+      background: none; border: none; cursor: pointer; font-size: 15px; color: #64748b;
+    }
+    .btn-primary {
+      width: 100%; padding: 11px; background: #0b1f3a; color: #fff; border: none;
+      border-radius: 7px; font-size: 14px; font-weight: bold; cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-primary:hover { background: #1d4ed8; }
+    .btn-green { background: #059669; }
+    .btn-green:hover { background: #047857; }
+    .switch-link { text-align: center; margin-top: 13px; font-size: 12.5px; color: #475569; }
+    .switch-link a { color: #1d4ed8; font-weight: bold; text-decoration: none; cursor: pointer; }
+    .switch-link a:hover { text-decoration: underline; }
+    .gov-footer {
+      background: #f1f5f9; padding: 11px 18px; border-top: 1px solid #e2e8f0;
+      display: flex; justify-content: space-between; align-items: center; font-size: 11.5px; color: #475569;
+    }
+    .mini-btn {
+      background: #e2e8f0; border: none; padding: 4px 8px; border-radius: 5px;
+      font-size: 11px; font-weight: bold; color: #1e293b; cursor: pointer;
+    }
+    .mini-btn:hover { background: #cbd5e1; }
+    .alert-box { padding: 9px 11px; border-radius: 6px; font-size: 12px; margin-bottom: 12px; display: none; }
   </style>
 </head>
 <body>
-<div class="box">
-  <div class="header">
-    <h2>SANGABUYE SECONDARY SCHOOL</h2>
-    <p>S.L.P 11898, Ilemela - Mwanza | SIS Portal v5.6</p>
+<div class="gov-card">
+  <div class="gov-header">
+    <img src="https://wikimedia.org" alt="Nembo ya Taifa">
+    <div class="sub">Jamhuri ya Muungano wa Tanzania</div>
+    <h1>SANGABUYE SIS PORTAL</h1>
   </div>
 
-  <div id="maintNotice"></div>
+  <!-- TANGAZO KUTOKA KWA MKUU WA SHULE (LIVE FROM CLOUD) -->
+  <div id="hmNoticeBar" class="hm-notice" style="display:none;"></div>
 
-  <div class="tabs">
-    <button class="tab-btn active" id="btnTabLogin" onclick="switchAuthTab('login')">🔐 Ingia (Sign In)</button>
-    <button class="tab-btn" id="btnTabReg" onclick="switchAuthTab('register')">📝 Jisajili (Register)</button>
+  <div class="gov-body">
+    <div id="msgBox" class="alert-box"></div>
+
+    <!-- FOMU YA KUINGIA (BILA KUCHAGUA NAFASI) -->
+    <form id="loginForm" onsubmit="handleAutoRoleLogin(event)">
+      <div class="form-grp">
+        <label>Jina la Mtumiaji / Namba ya Usajili (Username)</label>
+        <input type="text" id="lgUser" required autocomplete="username" placeholder="Ingiza username yako">
+      </div>
+      <div class="form-grp">
+        <label>Nenosiri (Password)</label>
+        <div class="inp-wrap">
+          <input type="password" id="lgPass" required autocomplete="current-password" placeholder="••••••••">
+          <button type="button" class="eye-btn" onclick="togglePass('lgPass')">👁️</button>
+        </div>
+      </div>
+      <button type="submit" class="btn-primary">🔐 INGIA KWENYE MFUMO</button>
+      <div class="switch-link">
+        Huna akaunti bado? <a onclick="switchAuthView('register')">Jisajili Hapa (Self-Registration)</a>
+      </div>
+    </form>
+    <!-- FOMU YA KUJISAJILI MWENYEWE (INASUBIRI UTHIBITISHO WA ADMIN) -->
+    <form id="registerForm" onsubmit="handleSelfRegister(event)" style="display:none;">
+      <div class="form-grp">
+        <label>Jina Kamili (Majina Matatu)</label>
+        <input type="text" id="rgName" required placeholder="Mfano: Asha Juma Mwita">
+      </div>
+      <div class="form-grp">
+        <label>Nafasi Unayoomba Kwenye Mfumo</label>
+        <select id="rgRole" required>
+          <option value="student">Mwanafunzi (Student)</option>
+          <option value="parent">Mzazi / Mlezi (Parent)</option>
+          <option value="teacher">Mwalimu (Teacher)</option>
+          <option value="librarian">Mkutubi (Librarian)</option>
+          <option value="accountant">Mhasibu (Accountant)</option>
+          <option value="academic">Mtaaluma (Academic)</option>
+          <option value="matron">Mlezi wa Bweni / Zahanati</option>
+          <option value="headmaster">Mkuu wa Shule (Headmaster)</option>
+        </select>
+      </div>
+      <div class="form-grp">
+        <label>Namba ya Simu</label>
+        <input type="tel" id="rgPhone" required placeholder="07XXXXXXXX">
+      </div>
+      <div class="form-grp">
+        <label>Jina la Kuingia (Username Unayochagua)</label>
+        <input type="text" id="rgUser" required placeholder="Mfano: asha.mwita">
+      </div>
+      <div class="form-grp">
+        <label>Tengeneza Nenosiri (Password)</label>
+        <div class="inp-wrap">
+          <input type="password" id="rgPass" required minlength="4" placeholder="Weka nenosiri imara">
+          <button type="button" class="eye-btn" onclick="togglePass('rgPass')">👁️</button>
+        </div>
+      </div>
+      <button type="submit" class="btn-primary btn-green">📝 Tuma Maombi ya Usajili</button>
+      <div class="switch-link">
+        Tayari una akaunti? <a onclick="switchAuthView('login')">Rudi Kwenye Kuingia (Login)</a>
+      </div>
+    </form>
   </div>
 
-  <form id="loginForm" onsubmit="handleLogin(event)">
-    <label>Chagua Nafasi Yako (Select Role):</label>
-    <select id="loginRole" required>
-      <option value="teacher">Mwalimu (Teacher)</option>
-      <option value="student">Mwanafunzi (Student)</option>
-      <option value="parent">Mzazi / Mlezi (Parent)</option>
-      <option value="accountant">Mhasibu (Accountant - 0615 000 305)</option>
-      <option value="academic">Mtaaluma (Academic Master)</option>
-      <option value="headmaster">Mkuu wa Shule (Headmaster - 0784 755 173)</option>
-      <option value="director">Mkurugenzi (School Director)</option>
-      <option value="librarian">Mkutubi (Librarian / Maktaba)</option>
-      <option value="matron_patron">Matron / Patron / Zahanati</option>
-      <option value="super_admin">IT & Super Admin</option>
-    </select>
-
-    <label>Jina Kamili / Namba ya Usajili / Simu:</label>
-    <input type="text" id="loginId" required placeholder="Mfano: admin au S.2026/0001">
-
-    <label>Nenosiri (Password):</label>
-    <input type="password" id="loginPass" required placeholder="Weka nenosiri lako...">
-
-    <button type="submit" class="submit-btn">🚀 Ingia Kwenye Dashibodi</button>
-  </form>
-
-  <form id="regForm" onsubmit="handleRegister(event)" style="display:none;">
-    <label>Majina Kamili (Full Name):</label>
-    <input type="text" id="regName" required placeholder="Mfano: Asha Juma Kassim">
-
-    <label>Nafasi Unayoomba (Role):</label>
-    <select id="regRole" required>
-      <option value="student">Mwanafunzi (Student)</option>
-      <option value="parent">Mzazi / Mlezi (Parent)</option>
-      <option value="teacher">Mwalimu (Teacher)</option>
-      <option value="librarian">Mkutubi (Librarian / Maktaba)</option>
-      <option value="matron_patron">Matron / Patron / Zahanati</option>
-    </select>
-
-    <label>Namba ya Usajili / Namba ya Simu:</label>
-    <input type="text" id="regNo" required placeholder="Mfano: S.2026/0045 au 0755123456">
-
-    <label>Tengeneza Nenosiri (Password):</label>
-    <input type="password" id="regPass" required placeholder="Weka nenosiri jipya...">
-
-    <button type="submit" class="submit-btn" style="background:#1d4ed8;">📩 Tuma Maombi ya Usajili (OTP)</button>
-  </form>
-
-  <div class="info-bar">
-    <b>CRDB Bank:</b> SHULE YA SEKONDARI SANGABUYE E.K (<code>0150838972100</code>)<br>
-    Msaada wa Haraka: <b>0784 755 173</b> (Mkuu) | <b>0615 000 305</b> (Mhasibu)
+  <div class="gov-footer">
+    <span id="cloudBadge">☁️ Inaunganisha...</span>
+    <div style="display:flex; gap:6px;">
+      <button type="button" class="mini-btn" onclick="SGB.toggleLang()">🌐 SW | EN</button>
+      <button type="button" class="mini-btn" onclick="SGB.openHelpModal()">❓ Msaada</button>
+    </div>
   </div>
 </div>
 <script>
-  const roleRedirects = {
+  const ROLE_PAGES = {
     super_admin: 'admin.html',
-    director: 'director.html',
+    director: 'headmaster.html',
     headmaster: 'headmaster.html',
     accountant: 'accountant.html',
     academic: 'academic.html',
     teacher: 'teacher.html',
-    parent: 'parent.html',
-    student: 'student.html',
     librarian: 'library.html',
-    matron_patron: 'matron_patron.html'
+    matron: 'matron.html',
+    parent: 'parent.html',
+    student: 'student.html'
   };
 
-  if (localStorage.getItem('sgb_maintenance') === 'true') {
-    document.getElementById('maintNotice').innerHTML = `<div class="maint-banner">⚙️ MFUMO UKO KWENYE MATENGENEZO (MAINTENANCE MODE) — Super Admin Pekee Ndiye Anayeweza Kuingia.</div>`;
+  function showAuthMsg(text, isError = true) {
+    const box = document.getElementById('msgBox');
+    box.style.display = 'block';
+    box.style.background = isError ? '#fef2f2' : '#ecfdf5';
+    box.style.color = isError ? '#991b1b' : '#065f46';
+    box.style.border = isError ? '1px solid #fecaca' : '1px solid #a7f3d0';
+    box.innerText = text;
   }
 
-  function switchAuthTab(mode) {
+  function switchAuthView(mode) {
+    document.getElementById('msgBox').style.display = 'none';
     document.getElementById('loginForm').style.display = mode === 'login' ? 'block' : 'none';
-    document.getElementById('regForm').style.display = mode === 'register' ? 'block' : 'none';
-    document.getElementById('btnTabLogin').classList.toggle('active', mode === 'login');
-    document.getElementById('btnTabReg').classList.toggle('active', mode === 'register');
+    document.getElementById('registerForm').style.display = mode === 'register' ? 'block' : 'none';
   }
 
-  function handleLogin(e) {
+  function togglePass(id) {
+    const inp = document.getElementById(id);
+    inp.type = inp.type === 'password' ? 'text' : 'password';
+  }
+
+  function renderHeadmasterNotice() {
+    const bar = document.getElementById('hmNoticeBar');
+    if (!bar) return;
+    const news = SGB.select('school_announcements');
+    if (news.length > 0) {
+      const latest = news.at(0);
+      bar.style.display = 'block';
+      bar.innerHTML = `📢 <b>Tangazo Kutoka Kwa Mkuu wa Shule:</b> <u>${latest.title}</u> — ${latest.body} <small style="color:#78350f;">(${latest.created_at || ''})</small>`;
+    } else {
+      bar.style.display = 'block';
+      bar.innerHTML = `📢 <b>Tangazo Kutoka Kwa Mkuu wa Shule:</b> Karibu kwenye Mfumo wa Taarifa za Shule ya Sekondari Sangabuye.`;
+    }
+  }
+
+  function ensureDefaultAdmin() {
+    const users = SGB.select('users_profile');
+    if (!users.some(u => u.role === 'super_admin')) {
+      SGB.insert('users_profile', {
+        full_name: 'System Administrator',
+        username: 'admin',
+        password: '123',
+        role: 'super_admin',
+        status: 'Approved',
+        phone_number: '0784755173'
+      });
+    }
+  }
+  async function handleAutoRoleLogin(e) {
     e.preventDefault();
-    const lockUntil = Number(localStorage.getItem('sgb_lock_until') || 0);
-    if (Date.now() < lockUntil) {
-      alert('🔒 Akaunti imefungwa kwa muda kutokana na majaribio mengi yasiyo sahihi. Jaribu tena baada ya dakika chache.');
-      return;
-    }
+    const uname = document.getElementById('lgUser').value.trim().toLowerCase();
+    const pass = document.getElementById('lgPass').value.trim();
 
-    const role = document.getElementById('loginRole').value;
-    const idVal = document.getElementById('loginId').value.trim().toLowerCase();
-    const pass = document.getElementById('loginPass').value.trim();
+    await SGB.pullFromCloud(true);
+    ensureDefaultAdmin();
 
-    if (localStorage.getItem('sgb_maintenance') === 'true' && role !== 'super_admin') {
-      alert('⚙️ Mfumo uko kwenye matengenezo (Maintenance Mode). Tafadhali subiri.');
-      return;
-    }
-
-    // Akaunti Chaguo-msingi za Uongozi & IT (Default Master Accounts)
-    const defaults = [
-      { id: 'admin', pass: 'admin123', role: 'super_admin', name: 'IT & Super Admin' },
-      { id: 'director', pass: 'director123', role: 'director', name: 'Mkurugenzi wa Shule' },
-      { id: '0784755173', pass: 'head123', role: 'headmaster', name: 'Mkuu wa Shule (0784 755 173)' },
-      { id: '0615000305', pass: 'acc123', role: 'accountant', name: 'Mhasibu (0615 000 305)' },
-      { id: 'academic', pass: 'acad123', role: 'academic', name: 'Mtaaluma (Academic Master)' },
-      { id: 'library', pass: 'lib123', role: 'librarian', name: 'Mkutubi (Librarian)' },
-      { id: 'matron', pass: 'matron123', role: 'matron_patron', name: 'Matron / Patron & Zahanati' }
-    ];
-
-    const defMatch = defaults.find(d => d.role === role && (d.id === idVal || d.name.toLowerCase().includes(idVal)) && d.pass === pass);
-    if (defMatch) {
-      localStorage.removeItem('sgb_login_fails');
-      sessionStorage.setItem('sgb_active_user', JSON.stringify({ full_name: defMatch.name, role: defMatch.role }));
-      SGB.logAction(`Ameingia kwenye mfumo (${defMatch.role})`);
-      window.location.href = roleRedirects[defMatch.role];
-      return;
-    }
-
-    // Akaunti Zilizosajiliwa Kwenye Database (users_profile)
     const users = SGB.select('users_profile');
     const found = users.find(u =>
-      u.role === role &&
-      ((u.full_name || '').toLowerCase() === idVal || (u.reg_or_staff_no || '').toLowerCase() === idVal || (u.phone_number || '').toLowerCase() === idVal) &&
-      u.password_hash === pass
+      ((u.username || '').toLowerCase() === uname || (u.reg_or_staff_no || '').toLowerCase() === uname) &&
+      String(u.password) === String(pass)
     );
 
-    if (found) {
-      if (found.status !== 'approved') {
-        alert('⏳ Akaunti yako bado inasubiri idhini ya IT & Super Admin.');
-        return;
-      }
-      localStorage.removeItem('sgb_login_fails');
-      sessionStorage.setItem('sgb_active_user', JSON.stringify({ full_name: found.full_name, role: found.role }));
-      SGB.logAction(`Ameingia kwenye mfumo (${found.role})`);
-      window.location.href = roleRedirects[found.role];
+    if (!found) {
+      showAuthMsg('❌ Jina la mtumiaji au nenosiri si sahihi. Jaribu tena.');
       return;
     }
 
-    const fails = Number(localStorage.getItem('sgb_login_fails') || 0) + 1;
-    localStorage.setItem('sgb_login_fails', String(fails));
-    if (fails >= 5) {
-      localStorage.setItem('sgb_lock_until', String(Date.now() + 5 * 60000));
-      alert('🔒 Umeingiza taarifa zisizo sahihi mara 5. Mfumo umefungwa kwa dakika 5.');
-    } else {
-      alert(`❌ Taarifa za kuingia si sahihi (Jaribio ${fails}/5). Hakikisha umechagua Nafasi (Role) sahihi.`);
+    if (found.status && found.status !== 'Approved' && found.status !== 'Active') {
+      showAuthMsg('⏳ Akaunti yako bado inasubiri uthibitisho wa Admin (Pending Admin Approval).');
+      return;
     }
+
+    const maint = JSON.parse(localStorage.getItem('sgb_maintenance_mode') || '{"enabled":false}');
+    if (maint.enabled && found.role !== 'super_admin') {
+      showAuthMsg('🛠️ Mfumo upo kwenye matengenezo kwa muda. Tafadhali jaribu baadaye.');
+      return;
+    }
+
+    sessionStorage.setItem('sgb_active_user', JSON.stringify(found));
+    SGB.logAction(`Ameingia kwenye mfumo (${found.role})`);
+    const targetPage = ROLE_PAGES[found.role] || 'student.html';
+    window.location.href = targetPage;
   }
 
-  function handleRegister(e) {
+  async function handleSelfRegister(e) {
     e.preventDefault();
-    const otp = Math.floor(1000 + Math.random() * 9000);
-    const entered = prompt(`Namba yako ya uthibitisho (OTP) ni: ${otp}\nIngiza namba hiyo hapo chini kukamilisha usajili:`);
-    if (String(entered).trim() !== String(otp)) {
-      alert('❌ Namba ya OTP si sahihi. Usajili umesitishwa.');
+    const full_name = document.getElementById('rgName').value.trim();
+    const role = document.getElementById('rgRole').value;
+    const phone_number = document.getElementById('rgPhone').value.trim();
+    const username = document.getElementById('rgUser').value.trim().toLowerCase();
+    const password = document.getElementById('rgPass').value.trim();
+
+    await SGB.pullFromCloud(true);
+    const users = SGB.select('users_profile');
+    if (users.some(u => (u.username || '').toLowerCase() === username)) {
+      showAuthMsg('⚠️ Jina hilo la kuingia (Username) tayari linatumiwa na mtu mwingine. Chagua jingine.');
       return;
     }
+
     SGB.insert('users_profile', {
-      full_name: document.getElementById('regName').value.trim(),
-      role: document.getElementById('regRole').value,
-      reg_or_staff_no: document.getElementById('regNo').value.trim(),
-      phone_number: document.getElementById('regNo').value.trim(),
-      password_hash: document.getElementById('regPass').value.trim(),
-      status: 'pending'
+      full_name,
+      username,
+      password,
+      role,
+      phone_number,
+      status: 'Pending Admin Approval'
     });
-    alert('✅ Maombi yako ya usajili yametumwa! IT & Super Admin ataidhinisha akaunti yako hivi punde.');
-    switchAuthTab('login');
+
+    SGB.insert('direct_messages', {
+      sender: full_name,
+      recipient: 'Admin',
+      subject: `OMBI JIPYA LA USAJILI: ${full_name} (${role})`,
+      body: `Mtumiaji ${full_name} (${phone_number}) amejisajili kama ${role} na anasubiri uthibitisho wako.`
+    });
+
+    switchAuthView('login');
+    showAuthMsg('✅ Usajili wako umepokelewa! Subiri Admin athibitishe akaunti yako ndipo uingie.', false);
   }
+
+  window.addEventListener('DOMContentLoaded', async () => {
+    renderHeadmasterNotice();
+    await SGB.pullFromCloud(true);
+    ensureDefaultAdmin();
+    renderHeadmasterNotice();
+    const badge = document.getElementById('cloudBadge');
+    if (badge) {
+      badge.innerHTML = navigator.onLine
+        ? '<span style="color:#059669;font-weight:bold;">☁️ Cloud Online</span>'
+        : '<span style="color:#d97706;font-weight:bold;">🟠 Offline Mode</span>';
+    }
+  });
 </script>
 </body>
 </html>
