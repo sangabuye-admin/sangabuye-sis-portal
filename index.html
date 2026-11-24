@@ -3,299 +3,365 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mfumo wa Taarifa za Shule | Sangabuye SIS Portal</title>
+  <title>System Administrator (Admin Control v8.2) | Sangabuye SIS</title>
   <script src="core.js?v=7.5"></script>
   <style>
-    * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-    body {
-      margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center;
-      background: linear-gradient(135deg, #0b1f3a 0%, #103766 55%, #064e3b 100%);
-      padding: 16px; color: #1e293b;
-    }
-    .gov-card {
-      background: #ffffff; width: 100%; max-width: 440px; border-radius: 12px;
-      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35); overflow: hidden;
-      border-top: 5px solid #d97706;
-    }
-    .gov-header {
-      background: #f8fafc; padding: 18px 22px 12px; text-align: center;
-      border-bottom: 1px solid #e2e8f0;
-    }
-    .gov-header img { height: 52px; margin-bottom: 5px; }
-    .gov-header .sub { font-size: 11px; font-weight: 700; color: #475569; letter-spacing: 0.6px; text-transform: uppercase; }
-    .gov-header h1 { margin: 3px 0 0; font-size: 18px; color: #0b1f3a; letter-spacing: 0.3px; }
-    .hm-notice {
-      background: #fffbeb; border-bottom: 1px solid #fde68a; padding: 9px 16px;
-      font-size: 12px; color: #92400e; line-height: 1.4;
-    }
-    .hm-notice b { color: #b45309; }
-    .gov-body { padding: 20px 24px; }
-    .form-grp { margin-bottom: 13px; }
-    .form-grp label { display: block; font-size: 12px; font-weight: 600; color: #334155; margin-bottom: 4px; }
-    .inp-wrap { position: relative; }
-    input, select {
-      width: 100%; padding: 10px 12px; border: 1.5px solid #cbd5e1; border-radius: 7px;
-      font-size: 13.5px; transition: border-color 0.2s; background: #fff;
-    }
-    input:focus, select:focus { outline: none; border-color: #1d4ed8; }
-    .eye-btn {
-      position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
-      background: none; border: none; cursor: pointer; font-size: 15px; color: #64748b;
-    }
-    .btn-primary {
-      width: 100%; padding: 11px; background: #0b1f3a; color: #fff; border: none;
-      border-radius: 7px; font-size: 14px; font-weight: bold; cursor: pointer;
-      transition: background 0.2s;
-    }
-    .btn-primary:hover { background: #1d4ed8; }
-    .btn-green { background: #059669; }
-    .btn-green:hover { background: #047857; }
-    .switch-link { text-align: center; margin-top: 13px; font-size: 12.5px; color: #475569; }
-    .switch-link a { color: #1d4ed8; font-weight: bold; text-decoration: none; cursor: pointer; }
-    .switch-link a:hover { text-decoration: underline; }
-    .gov-footer {
-      background: #f1f5f9; padding: 11px 18px; border-top: 1px solid #e2e8f0;
-      display: flex; justify-content: space-between; align-items: center; font-size: 11.5px; color: #475569;
-    }
-    .mini-btn {
-      background: #e2e8f0; border: none; padding: 4px 8px; border-radius: 5px;
-      font-size: 11px; font-weight: bold; color: #1e293b; cursor: pointer;
-    }
-    .mini-btn:hover { background: #cbd5e1; }
-    .alert-box { padding: 9px 11px; border-radius: 6px; font-size: 12px; margin-bottom: 12px; display: none; }
+    * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
+    body { margin: 0; background: #f1f5f9; display: flex; min-height: 100vh; color: #1e293b; }
+    .sidebar { width: 260px; background: #0f172a; color: white; display: flex; flex-direction: column; padding: 14px 10px; overflow-y: auto; }
+    .sidebar h2 { font-size: 16px; margin: 0 0 2px; color: #38bdf8; text-align: center; }
+    .sidebar p { font-size: 11px; text-align: center; color: #94a3b8; margin: 0 0 12px; }
+    .menu-btn { background: transparent; border: none; color: #cbd5e1; text-align: left; padding: 8px 11px; border-radius: 7px; cursor: pointer; font-size: 12.5px; margin-bottom: 3px; }
+    .menu-btn:hover, .menu-btn.active { background: #1d4ed8; color: white; font-weight: bold; }
+    .main { flex: 1; display: flex; flex-direction: column; }
+    .topbar { background: white; padding: 11px 18px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
+    .content { padding: 18px; }
+    .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; margin-bottom: 16px; }
+    .card { background: white; padding: 14px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border-left: 4px solid #1d4ed8; }
+    .card h4 { margin: 0 0 5px; font-size: 11px; color: #64748b; text-transform: uppercase; }
+    .card .val { font-size: 18px; font-weight: bold; color: #0f172a; }
+    .panel { background: white; padding: 16px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 16px; }
+    input, select, textarea { padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12.5px; width: 100%; }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; }
+    th, td { padding: 7px 8px; border: 1px solid #e2e8f0; text-align: left; }
+    th { background: #f8fafc; color: #0f172a; }
+    .btn { padding: 7px 11px; border: none; border-radius: 6px; cursor: pointer; font-size: 11.5px; font-weight: bold; }
+    .btn-green { background: #059669; color: white; }
+    .btn-blue { background: #1d4ed8; color: white; }
+    .btn-amber { background: #d97706; color: white; }
+    .btn-red { background: #dc2626; color: white; }
+    .btn-dark { background: #334155; color: white; }
   </style>
 </head>
 <body>
-<div class="gov-card">
-  <div class="gov-header">
-    <img src="https://wikimedia.org" alt="Nembo ya Taifa">
-    <div class="sub">Jamhuri ya Muungano wa Tanzania</div>
-    <h1>SANGABUYE SIS PORTAL</h1>
+<div class="sidebar">
+  <h2>SYSTEM ADMIN (IT)</h2>
+  <p>Sangabuye SIS Control</p>
+  <button class="menu-btn active" onclick="openTab('users', this)">👥 1. Watumiaji & Uthibitisho</button>
+  <button class="menu-btn" onclick="openTab('maintenance', this)">🛠️ 2. Washa/Zima Mfumo & Mipangilio</button>
+  <button class="menu-btn" onclick="openTab('portals', this)">🚀 3. Ingia Kwenye Moduli Zote</button>
+  <button class="menu-btn" onclick="openTab('wipe_vault', this)">🔐 4. Futa Data za Majaribio (Vault)</button>
+  <button class="menu-btn" onclick="openTab('logs', this)">🛡️ 5. Kumbukumbu za Ukaguzi</button>
+</div>
+<div class="main">
+  <div class="topbar">
+    <div><strong id="tabTitle">👥 1. Watumiaji & Uthibitisho</strong> <span id="syncTime" style="font-size:11px; color:#059669;"></span></div>
+    <div></div>
   </div>
-
-  <!-- TANGAZO KUTOKA KWA MKUU WA SHULE (LIVE FROM CLOUD) -->
-  <div id="hmNoticeBar" class="hm-notice" style="display:none;"></div>
-
-  <div class="gov-body">
-    <div id="msgBox" class="alert-box"></div>
-
-    <!-- FOMU YA KUINGIA (BILA KUCHAGUA NAFASI) -->
-    <form id="loginForm" onsubmit="handleAutoRoleLogin(event)">
-      <div class="form-grp">
-        <label>Jina la Mtumiaji / Namba ya Usajili (Username)</label>
-        <input type="text" id="lgUser" required autocomplete="username" placeholder="Ingiza username yako">
-      </div>
-      <div class="form-grp">
-        <label>Nenosiri (Password)</label>
-        <div class="inp-wrap">
-          <input type="password" id="lgPass" required autocomplete="current-password" placeholder="••••••••">
-          <button type="button" class="eye-btn" onclick="togglePass('lgPass')">👁️</button>
-        </div>
-      </div>
-      <button type="submit" class="btn-primary">🔐 INGIA KWENYE MFUMO</button>
-      <div class="switch-link">
-        Huna akaunti bado? <a onclick="switchAuthView('register')">Jisajili Hapa (Self-Registration)</a>
-      </div>
-    </form>
-    <!-- FOMU YA KUJISAJILI MWENYEWE (INASUBIRI UTHIBITISHO WA ADMIN) -->
-    <form id="registerForm" onsubmit="handleSelfRegister(event)" style="display:none;">
-      <div class="form-grp">
-        <label>Jina Kamili (Majina Matatu)</label>
-        <input type="text" id="rgName" required placeholder="Mfano: Asha Juma Mwita">
-      </div>
-      <div class="form-grp">
-        <label>Nafasi Unayoomba Kwenye Mfumo</label>
-        <select id="rgRole" required>
-          <option value="student">Mwanafunzi (Student)</option>
-          <option value="parent">Mzazi / Mlezi (Parent)</option>
-          <option value="teacher">Mwalimu (Teacher)</option>
-          <option value="librarian">Mkutubi (Librarian)</option>
-          <option value="accountant">Mhasibu (Accountant)</option>
-          <option value="academic">Mtaaluma (Academic)</option>
-          <option value="matron">Mlezi wa Bweni / Zahanati</option>
-          <option value="headmaster">Mkuu wa Shule (Headmaster)</option>
-        </select>
-      </div>
-      <div class="form-grp">
-        <label>Namba ya Simu</label>
-        <input type="tel" id="rgPhone" required placeholder="07XXXXXXXX">
-      </div>
-      <div class="form-grp">
-        <label>Jina la Kuingia (Username Unayochagua)</label>
-        <input type="text" id="rgUser" required placeholder="Mfano: asha.mwita">
-      </div>
-      <div class="form-grp">
-        <label>Tengeneza Nenosiri (Password)</label>
-        <div class="inp-wrap">
-          <input type="password" id="rgPass" required minlength="4" placeholder="Weka nenosiri imara">
-          <button type="button" class="eye-btn" onclick="togglePass('rgPass')">👁️</button>
-        </div>
-      </div>
-      <button type="submit" class="btn-primary btn-green">📝 Tuma Maombi ya Usajili</button>
-      <div class="switch-link">
-        Tayari una akaunti? <a onclick="switchAuthView('login')">Rudi Kwenye Kuingia (Login)</a>
-      </div>
-    </form>
-  </div>
-
-  <div class="gov-footer">
-    <span id="cloudBadge">☁️ Inaunganisha...</span>
-    <div style="display:flex; gap:6px;">
-      <button type="button" class="mini-btn" onclick="SGB.toggleLang()">🌐 SW | EN</button>
-      <button type="button" class="mini-btn" onclick="SGB.openHelpModal()">❓ Msaada</button>
-    </div>
-  </div>
+  <div class="content" id="viewArea"></div>
 </div>
 <script>
-  const ROLE_PAGES = {
-    super_admin: 'admin.html',
-    director: 'headmaster.html',
-    headmaster: 'headmaster.html',
-    accountant: 'accountant.html',
-    academic: 'academic.html',
-    teacher: 'teacher.html',
-    librarian: 'library.html',
-    matron: 'matron.html',
-    parent: 'parent.html',
-    student: 'student.html'
-  };
+  const user = SGB.requireRole(['super_admin']);
+  SGB.startSessionTimer();
+  let wipePadlockOpen = false;
 
-  function showAuthMsg(text, isError = true) {
-    const box = document.getElementById('msgBox');
-    box.style.display = 'block';
-    box.style.background = isError ? '#fef2f2' : '#ecfdf5';
-    box.style.color = isError ? '#991b1b' : '#065f46';
-    box.style.border = isError ? '1px solid #fecaca' : '1px solid #a7f3d0';
-    box.innerText = text;
+  function filterUsersTbl() {
+    const q = (document.getElementById('usrSearch')?.value || '').toLowerCase();
+    document.querySelectorAll('#allUsersTbl tbody tr').forEach(r => {
+      r.style.display = r.innerText.toLowerCase().includes(q) ? '' : 'none';
+    });
   }
 
-  function switchAuthView(mode) {
-    document.getElementById('msgBox').style.display = 'none';
-    document.getElementById('loginForm').style.display = mode === 'login' ? 'block' : 'none';
-    document.getElementById('registerForm').style.display = mode === 'register' ? 'block' : 'none';
+  function openTab(tab, btn) {
+    document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+    if (btn) document.getElementById('tabTitle').innerText = btn.innerText;
+    const area = document.getElementById('viewArea');
+
+    if (tab === 'users') {
+      const users = SGB.select('users_profile');
+      const pendingUsers = users.filter(u => u.status && u.status !== 'Approved' && u.status !== 'Active');
+
+      area.innerHTML = `
+        <div class="cards">
+          <div class="card"><h4>Watumiaji Wote</h4><div class="val">${users.length}</div></div>
+          <div class="card" style="border-color:#d97706;"><h4>Wanaosubiri Uthibitisho</h4><div class="val">${pendingUsers.length}</div></div>
+          <div class="card" style="border-color:#059669;"><h4>Waliothibitishwa (Active)</h4><div class="val">${users.length - pendingUsers.length}</div></div>
+        </div>
+
+        <div class="panel" style="border-left:4px solid #d97706;">
+          <h3>⏳ 1. Maombi Mapya ya Usajili (Waliojisajili Wenyewe Kwenye Login)</h3>
+          <table>
+            <thead><tr><th>Tarehe</th><th>Jina Kamili</th><th>Nafasi</th><th>Username</th><th>Simu</th><th>Hatua ya Admin</th></tr></thead>
+            <tbody>
+            ${pendingUsers.map(u => `<tr>
+              <td>${u.created_at || '-'}</td><td><b>${u.full_name}</b></td><td><b>${u.role}</b></td>
+              <td>${u.username}</td><td>${u.phone_number || '-'}</td>
+              <td>
+                <button class="btn btn-green" onclick="approveUserAccount('${u.id}')">✅ Thibitisha (Approve)</button>
+                <button class="btn btn-red" onclick="deleteUserAccount('${u.id}')">✕ Kataa</button>
+              </td>
+            </tr>`).join('') || '<tr><td colspan="6">Hakuna maombi mapya yanayosubiri uthibitisho sasa.</td></tr>'}
+            </tbody>
+          </table>
+        </div>
+
+        <div class="panel">
+          <h3>➕ 2. Sajili Mtumiaji Mpya Moja kwa Moja</h3>
+          <form onsubmit="adminCreateUser(event)" style="display:grid; grid-template-columns:1.5fr 1fr 1fr 1fr 1fr auto; gap:8px; margin-bottom:14px;">
+            <input type="text" id="adFull" required placeholder="Jina Kamili">
+            <select id="adRole">
+              <option value="accountant">Mhasibu (accountant)</option>
+              <option value="headmaster">Mkuu wa Shule (headmaster)</option>
+              <option value="academic">Mtaaluma (academic)</option>
+              <option value="teacher">Mwalimu (teacher)</option>
+              <option value="librarian">Mkutubi (librarian)</option>
+              <option value="matron">Bweni/Zahanati (matron)</option>
+              <option value="parent">Mzazi (parent)</option>
+              <option value="student">Mwanafunzi (student)</option>
+              <option value="super_admin">Admin (super_admin)</option>
+            </select>
+            <input type="text" id="adUser" required placeholder="Username">
+            <input type="text" id="adPass" required placeholder="Password">
+            <input type="text" id="adPhone" placeholder="Simu (07...)">
+            <button type="submit" class="btn btn-blue">✅ Sajili</button>
+          </form>
+
+          <h3>📋 3. Orodha ya Watumiaji Wote Kwenye Mfumo</h3>
+          <input type="text" id="usrSearch" onkeyup="filterUsersTbl()" placeholder="🔍 Tafuta mtumiaji kwa jina, username au nafasi..." style="margin-bottom:8px;">
+          <table id="allUsersTbl">
+            <thead><tr><th>Jina Kamili</th><th>Nafasi</th><th>Username</th><th>Password</th><th>Simu</th><th>Hali</th><th>Hatua</th></tr></thead>
+            <tbody>
+            ${users.map(u => `<tr>
+              <td><b>${u.full_name}</b></td><td>${u.role}</td><td><b>${u.username || '-'}</b></td>
+              <td><code>${u.password || u.password_hash || '-'}</code></td><td>${u.phone_number || '-'}</td>
+              <td><b style="color:${(u.status==='Approved'||u.status==='Active'||!u.status)?'#059669':'#d97706'};">${u.status || 'Approved'}</b></td>
+              <td>
+                <button class="btn btn-amber" onclick="resetUserPassword('${u.id}')">🔑 Badili Pass</button>
+                ${(u.username || '').toLowerCase() !== 'admin' ? `<button class="btn btn-red" onclick="deleteUserAccount('${u.id}')">Futa</button>` : ''}
+              </td>
+            </tr>`).join('')}
+            </tbody>
+          </table>
+        </div>`;
+      return;
+    }
+    if (tab === 'maintenance') {
+      const cfg = SGB.getConfig();
+      const maint = JSON.parse(localStorage.getItem('sgb_maintenance_mode') || '{"enabled":false,"reason":"Mfumo upo kwenye matengenezo ya kiufundi."}');
+      area.innerHTML = `
+        <div class="panel" style="border-left:5px solid ${maint.enabled ? '#dc2626' : '#059669'};">
+          <h3>🛠️ 1. Kuwasha au Kuzima Mfumo (System Power & Maintenance Switch)</h3>
+          <p>Hali ya Sasa ya Mfumo: <b style="font-size:14px; color:${maint.enabled ? '#dc2626' : '#059669'};">${maint.enabled ? '🔴 UMEZIMWA (Maintenance Mode ON — Watumiaji wamezuiwa)' : '🟢 UMEWASHWA (System LIVE — Watumiaji wote wanaingia)'}</b></p>
+          <div style="display:grid; grid-template-columns:2fr auto; gap:10px; align-items:center;">
+            <input type="text" id="maintReason" value="${maint.reason || 'Mfumo upo kwenye matengenezo ya kiufundi.'}" placeholder="Ujumbe utakaotokea mfumo ukizimwa...">
+            ${maint.enabled
+              ? `<button class="btn btn-green" style="padding:11px 18px; font-size:13px;" onclick="setSystemPower(false)">🟢 WASHA MFUMO SASA (TURN SYSTEM ON)</button>`
+              : `<button class="btn btn-red" style="padding:11px 18px; font-size:13px;" onclick="setSystemPower(true)">🔴 ZIMA MFUMO KWA MATENGENEZO (TURN OFF)</button>`}
+          </div>
+        </div>
+
+        <div class="panel">
+          <h3>🏫 2. Mipangilio Mikuu ya Shule & Akaunti ya Benki</h3>
+          <form onsubmit="saveSchoolConfig(event)" style="display:grid; grid-template-columns:1fr 1fr 1.5fr auto; gap:10px;">
+            <input type="text" id="cfgYear" value="${cfg.year || '2026'}" required placeholder="Mwaka wa Masomo">
+            <input type="text" id="cfgTerm" value="${cfg.term || 'Term I'}" required placeholder="Muhula">
+            <input type="text" id="cfgCrdb" value="${cfg.crdb || '0150838972100'}" required placeholder="Akaunti ya CRDB">
+            <button type="submit" class="btn btn-blue">💾 Hifadhi Mipangilio</button>
+          </form>
+        </div>`;
+      return;
+    }
+
+    if (tab === 'portals') {
+      const portals = new Array(
+        { name: '💰 Ofisi ya Mhasibu (Finance & FFARS)', url: 'accountant.html', color: '#059669' },
+        { name: '🏛️ Ofisi ya Mkuu wa Shule (Headmaster)', url: 'headmaster.html', color: '#0f294a' },
+        { name: '🎓 Ofisi ya Mtaaluma (Academic)', url: 'academic.html', color: '#1d4ed8' },
+        { name: '👨‍🏫 Dashibodi ya Mwalimu (Teacher)', url: 'teacher.html', color: '#0284c7' },
+        { name: '📚 Maktaba ya Shule (Library)', url: 'library.html', color: '#7c3aed' },
+        { name: '🏥 Bweni & Zahanati (Matron)', url: 'matron.html', color: '#d97706' },
+        { name: '👪 Tovuti ya Mzazi (Parent)', url: 'parent.html', color: '#0d9488' },
+        { name: '🎒 Tovuti ya Mwanafunzi (Student)', url: 'student.html', color: '#475569' }
+      );
+      area.innerHTML = `
+        <div class="panel">
+          <h3>🚀 Ingia Moja Kwa Moja Kwenye Moduli Yoyote (Admin Super Access)</h3>
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(230px, 1fr)); gap:12px;">
+            ${portals.map(p => `<button class="btn" style="background:${p.color}; color:#fff; padding:14px; font-size:13px; text-align:left;" onclick="window.open('${p.url}', '_blank')">${p.name} ➔</button>`).join('')}
+          </div>
+        </div>`;
+      return;
+    }
+    if (tab === 'wipe_vault') {
+      area.innerHTML = `
+        <div class="panel" style="border:2px solid #dc2626; background:#fffafa;">
+          <h3 style="color:#991b1b; margin-top:0;">🔐 KUFULI LA KUFUTA DATA ZA MAJARIBIO (FACTORY RESET VAULT)</h3>
+          <p style="font-size:13px; color:#7f1d1d;">
+            Sehemu hii hutumika baada ya kukamilisha majaribio ili kufuta taarifa zote za majaribio na kuanza kutumia mfumo kwa data halisi.
+            Kwa usalama, kitufe kimefungwa kwa <b>Kufuli (Padlock)</b> na kinahitaji <b>Sababu Rasmi</b> pamoja na <b>Uthibitisho Mara 3</b>.
+          </p>
+
+          <div style="margin-bottom:14px;">
+            <button type="button" class="btn ${wipePadlockOpen ? 'btn-amber' : 'btn-dark'}" style="padding:10px 16px; font-size:13px;" onclick="toggleWipePadlock()">
+              ${wipePadlockOpen ? '🔓 Kufuli Limefunguliwa (Bofya Kufunga Tena)' : '🔒 Kufuli Limefungwa (Bofya Hapa Kufungua Kufuli)'}
+            </button>
+          </div>
+
+          ${wipePadlockOpen ? `
+            <div style="background:#fef2f2; border:1px solid #fecaca; padding:14px; border-radius:8px;">
+              <label style="font-size:12px; font-weight:bold; color:#991b1b;">1. Andika Sababu ya Kufuta Data Zote (Lazima):</label>
+              <textarea id="wipeReasonTxt" rows="2" placeholder="Mfano: Tumekamilisha majaribio ya mfumo na sasa tunaanza kuingiza data halisi za shule..." style="margin:6px 0 12px;"></textarea>
+
+              <label style="font-size:12px; font-weight:bold; color:#991b1b;">2. Chagua Aina ya Ufutaji:</label>
+              <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:8px;">
+                <button type="button" class="btn btn-red" style="padding:11px 16px; font-size:13px;" onclick="executeThreeStepReset('ALL_EXCEPT_ADMIN')">
+                  💣 FUTA DATA ZOTE ZA MAJARIBIO (Utajibu Maswali 3)
+                </button>
+                <button type="button" class="btn btn-amber" onclick="executeThreeStepReset('FINANCE_ONLY')">
+                  💸 Futa Data za Fedha & Stoo Pekee
+                </button>
+                <button type="button" class="btn btn-blue" onclick="executeThreeStepReset('LIBRARY_ONLY')">
+                  📚 Futa Data za Maktaba Pekee
+                </button>
+              </div>
+            </div>
+          ` : '<p style="color:#64748b; font-size:12px;"><i>* Fungua kufuli hapo juu ili kuona vitufe vya kufuta data.</i></p>'}
+        </div>`;
+      return;
+    }
+
+    const logs = SGB.select('audit_logs');
+    area.innerHTML = `
+      <div class="panel">
+        <h3>🛡️ Kumbukumbu za Ukaguzi wa Mfumo (System Audit Logs)</h3>
+        <table><thead><tr><th>Muda</th><th>Mtumiaji</th><th>Kitendo</th></tr></thead>
+        <tbody>
+        ${logs.slice(0, 60).map(l => `<tr><td>${l.time}</td><td><b>${l.actor}</b></td><td>${l.action}</td></tr>`).join('') || '<tr><td colspan="3">Hakuna kumbukumbu bado.</td></tr>'}
+        </tbody></table>
+      </div>`;
+  }
+  function toggleWipePadlock() {
+    if (!wipePadlockOpen) {
+      const pass = prompt('🔐 Ingiza Nenosiri la Admin ili kufungua kufuli:');
+      if (!pass) return;
+      const valid = (pass === '123' || pass === 'admin123' || (user && String(user.password) === pass));
+      if (!valid) { alert('❌ Nenosiri si sahihi! Kufuli limebaki limefungwa.'); return; }
+    }
+    wipePadlockOpen = !wipePadlockOpen;
+    openTab('wipe_vault');
   }
 
-  function togglePass(id) {
-    const inp = document.getElementById(id);
-    inp.type = inp.type === 'password' ? 'text' : 'password';
-  }
+  async function executeThreeStepReset(scope) {
+    const reason = (document.getElementById('wipeReasonTxt')?.value || '').trim();
+    if (reason.length < 10) {
+      alert('⚠️ Lazima uandike sababu kamili (angalau herufi 10) kabla ya kufuta data!');
+      return;
+    }
 
-  function renderHeadmasterNotice() {
-    const bar = document.getElementById('hmNoticeBar');
-    if (!bar) return;
-    const news = SGB.select('school_announcements');
-    if (news.length > 0) {
-      const latest = news.at(0);
-      bar.style.display = 'block';
-      bar.innerHTML = `📢 <b>Tangazo Kutoka Kwa Mkuu wa Shule:</b> <u>${latest.title}</u> — ${latest.body} <small style="color:#78350f;">(${latest.created_at || ''})</small>`;
+    // SWALI LA 1 LA UTHIBITISHO
+    if (!confirm(`⚠️ UTHIBITISHO WA 1 KATI YA 3:\nJe, una uhakika unataka kufuta data (${scope})?\nSababu: "${reason}"`)) return;
+
+    // SWALI LA 2 LA UTHIBITISHO
+    if (!confirm(`🚨 UTHIBITISHO WA 2 KATI YA 3:\nData zitakazofutwa haziwezi kurudishwa bila faili la Backup! Je, uendelee?`)) return;
+
+    // SWALI LA 3 LA UTHIBITISHO (KUANDIKA NENO FUTA)
+    const finalWord = prompt(`🛑 UTHIBITISHO WA 3 KATI YA 3 (MWISHO):\nAndika neno "FUTA" kwa herufi kubwa ili kuthibitisha:`);
+    if (finalWord !== 'FUTA') {
+      alert('✅ Zoezi limesitishwa. Hakuna data iliyofutwa.');
+      return;
+    }
+
+    // Hifadhi kwanza nakala ya Backup kabla ya kufuta
+    SGB.exportBackup();
+
+    const financeKeys = new Array('sgb_accounting_receipts', 'sgb_expense_vouchers', 'sgb_procurement_committee', 'sgb_staff_payroll', 'sgb_staff_imprest', 'sgb_petty_cash_logs', 'sgb_capitation_grants', 'sgb_annual_budgets', 'sgb_store_inventory', 'sgb_store_usage_logs', 'sgb_fixed_assets', 'sgb_account_locks', 'sgb_fee_structures', 'sgb_camp_students', 'sgb_school_bus_routes');
+    const libraryKeys = new Array('sgb_library_books', 'sgb_library_members', 'sgb_library_loans', 'sgb_library_reservations', 'sgb_library_suggestions', 'sgb_library_attendance', 'sgb_library_ebooks', 'sgb_library_ict', 'sgb_library_settings');
+
+    let keysToClear = new Array();
+    if (scope === 'FINANCE_ONLY') {
+      keysToClear = financeKeys;
+    } else if (scope === 'LIBRARY_ONLY') {
+      keysToClear = libraryKeys;
     } else {
-      bar.style.display = 'block';
-      bar.innerHTML = `📢 <b>Tangazo Kutoka Kwa Mkuu wa Shule:</b> Karibu kwenye Mfumo wa Taarifa za Shule ya Sekondari Sangabuye.`;
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (k && k.startsWith('sgb_') && k !== 'sgb_users_profile' && k !== 'sgb_school_config') {
+          keysToClear.push(k);
+        }
+      }
+      // Bakiza akaunti ya Admin pekee kwenye users_profile
+      const adminsOnly = SGB.select('users_profile').filter(u => u.role === 'super_admin' || (u.username || '').toLowerCase() === 'admin');
+      localStorage.setItem('sgb_users_profile', JSON.stringify(adminsOnly));
+      await SGB.pushToCloud('users_profile');
     }
+
+    for (const k of keysToClear) {
+      localStorage.removeItem(k);
+      if (navigator.onLine) {
+        await fetch(`${FIREBASE_DB_URL}/${k}.json`, { method: 'DELETE' }).catch(() => {});
+      }
+    }
+
+    SGB.logAction(`AMEFUTA DATA (${scope}) — Sababu: ${reason}`);
+    wipePadlockOpen = false;
+    alert('✅ Data zote za majaribio zimefutwa kikamilifu hewani na kwenye kompyuta! Mfumo uko safi kuanza kazi rasmi.');
+    openTab('users');
   }
 
-  function ensureDefaultAdmin() {
-    const users = SGB.select('users_profile');
-    if (!users.some(u => (u.username || '').toLowerCase() === 'admin' || u.role === 'super_admin')) {
-      SGB.insert('users_profile', {
-        full_name: 'System Administrator (IT)',
-        username: 'admin',
-        password: '123',
-        role: 'super_admin',
-        status: 'Approved',
-        phone_number: '0784755173'
-      });
-    }
+  function setSystemPower(turnOff) {
+    const reason = (document.getElementById('maintReason')?.value || '').trim() || 'Mfumo upo kwenye matengenezo.';
+    localStorage.setItem('sgb_maintenance_mode', JSON.stringify({ enabled: turnOff, reason }));
+    SGB.pushToCloud('maintenance_mode');
+    SGB.logAction(turnOff ? `Amezima mfumo (Maintenance Mode ON): ${reason}` : 'Amewasha mfumo (System LIVE)');
+    alert(turnOff ? '🔴 Mfumo umezimwa kwa matengenezo!' : '🟢 Mfumo umewashwa na uko hewani kwa watumiaji wote!');
+    openTab('maintenance');
   }
 
-  async function handleAutoRoleLogin(e) {
+  function approveUserAccount(id) {
+    SGB.update('users_profile', id, { status: 'Approved' });
+    alert('✅ Akaunti imethibitishwa! Mtumiaji sasa anaweza kuingia kwenye mfumo.');
+    openTab('users');
+  }
+
+  function adminCreateUser(e) {
     e.preventDefault();
-    const typed = document.getElementById('lgUser').value.trim().toLowerCase();
-    const pass = document.getElementById('lgPass').value.trim();
-
-    await SGB.pullFromCloud(true);
-    ensureDefaultAdmin();
-
-    const users = SGB.select('users_profile');
-
-    // Ruhusu kuingia kwa Username, Jina Kamili (Full Name), au Namba ya Usajili (Reg/Staff No)
-    const found = users.find(u => {
-      const matchId = [u.username, u.full_name, u.reg_or_staff_no, u.phone_number]
-        .some(val => val && String(val).trim().toLowerCase() === typed);
-      const savedPass = String(u.password || u.password_hash || '');
-      const matchPass = savedPass === pass || (typed === 'admin' && (pass === '123' || pass === 'admin123'));
-      return matchId && matchPass;
-    });
-
-    if (!found) {
-      showAuthMsg('❌ Jina la mtumiaji au nenosiri si sahihi. Jaribu tena (Admin: admin / 123).');
+    const username = document.getElementById('adUser').value.trim().toLowerCase();
+    if (SGB.select('users_profile').some(u => (u.username || '').toLowerCase() === username)) {
+      alert('⚠️ Username hiyo tayari ipo.');
       return;
     }
-
-    if (found.status && found.status === 'Pending Admin Approval') {
-      showAuthMsg('⏳ Akaunti yako bado inasubiri uthibitisho wa Admin (Pending Admin Approval).');
-      return;
-    }
-
-    const maint = JSON.parse(localStorage.getItem('sgb_maintenance_mode') || '{"enabled":false}');
-    if (maint.enabled && found.role !== 'super_admin') {
-      showAuthMsg('🛠️ Mfumo upo kwenye matengenezo kwa muda. Tafadhali jaribu baadaye.');
-      return;
-    }
-
-    sessionStorage.setItem('sgb_active_user', JSON.stringify(found));
-    SGB.logAction(`Ameingia kwenye mfumo (${found.role})`);
-    const targetPage = ROLE_PAGES[found.role] || 'student.html';
-    window.location.href = targetPage;
-  }
-
-  async function handleSelfRegister(e) {
-    e.preventDefault();
-    const full_name = document.getElementById('rgName').value.trim();
-    const role = document.getElementById('rgRole').value;
-    const phone_number = document.getElementById('rgPhone').value.trim();
-    const username = document.getElementById('rgUser').value.trim().toLowerCase();
-    const password = document.getElementById('rgPass').value.trim();
-
-    await SGB.pullFromCloud(true);
-    const users = SGB.select('users_profile');
-    if (users.some(u => (u.username || '').toLowerCase() === username)) {
-      showAuthMsg('⚠️ Jina hilo la kuingia (Username) tayari linatumiwa na mtu mwingine. Chagua jingine.');
-      return;
-    }
-
     SGB.insert('users_profile', {
-      full_name,
+      full_name: document.getElementById('adFull').value.trim(),
+      role: document.getElementById('adRole').value,
       username,
-      password,
-      role,
-      phone_number,
-      status: 'Pending Admin Approval'
+      password: document.getElementById('adPass').value.trim(),
+      phone_number: document.getElementById('adPhone').value.trim(),
+      status: 'Approved'
     });
-
-    SGB.insert('direct_messages', {
-      sender: full_name,
-      recipient: 'Admin',
-      subject: `OMBI JIPYA LA USAJILI: ${full_name} (${role})`,
-      body: `Mtumiaji ${full_name} (${phone_number}) amejisajili kama ${role} na anasubiri uthibitisho wako.`
-    });
-
-    switchAuthView('login');
-    showAuthMsg('✅ Usajili wako umepokelewa! Subiri Admin athibitishe akaunti yako ndipo uingie.', false);
+    openTab('users');
   }
 
-  window.addEventListener('DOMContentLoaded', async () => {
-    renderHeadmasterNotice();
-    await SGB.pullFromCloud(true);
-    ensureDefaultAdmin();
-    renderHeadmasterNotice();
-    const badge = document.getElementById('cloudBadge');
-    if (badge) {
-      badge.innerHTML = navigator.onLine
-        ? '<span style="color:#059669;font-weight:bold;">☁️ Cloud Online</span>'
-        : '<span style="color:#d97706;font-weight:bold;">🟠 Offline Mode</span>';
-    }
-  });
+  function resetUserPassword(id) {
+    const newPass = prompt('Ingiza nenosiri jipya (New Password):');
+    if (!newPass || !newPass.trim()) return;
+    SGB.update('users_profile', id, { password: newPass.trim() });
+    alert('✅ Nenosiri limebadilishwa!');
+    openTab('users');
+  }
+
+  function deleteUserAccount(id) {
+    if (!confirm('Je, una uhakika unataka kufuta akaunti hii?')) return;
+    const list = SGB.select('users_profile').filter(u => String(u.id) !== String(id));
+    localStorage.setItem('sgb_users_profile', JSON.stringify(list));
+    SGB.pushToCloud('users_profile');
+    openTab('users');
+  }
+
+  function saveSchoolConfig(e) {
+    e.preventDefault();
+    const cfg = {
+      year: document.getElementById('cfgYear').value.trim(),
+      term: document.getElementById('cfgTerm').value.trim(),
+      crdb: document.getElementById('cfgCrdb').value.trim()
+    };
+    localStorage.setItem('sgb_school_config', JSON.stringify(cfg));
+    SGB.pushToCloud('school_config');
+    alert('✅ Mipangilio ya shule imehifadhiwa!');
+    openTab('maintenance');
+  }
+
+  openTab('users', document.querySelector('.menu-btn'));
 </script>
 </body>
 </html>
