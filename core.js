@@ -428,34 +428,37 @@ window.addEventListener('DOMContentLoaded', () => {
     document.head.appendChild(link);
   }
 
-  // MUONEKANO WA KUSHOTO (SIDEBAR) WENYE UWEZO WA KUFICHA NA KURUDISHA KWENYE PC NA SIMU
-  const drawerStyle = document.createElement('style');
-  drawerStyle.innerHTML = `
-    .sidebar { transition: all 0.25s ease; flex-shrink: 0; }
+  // MUONEKANO WA ZAMANI KABISA KWENYE PC + UWEZO WA KUFICHA MENYU + DROO YA KUSHOTO KWENYE SIMU
+  const layoutStyle = document.createElement('style');
+  layoutStyle.innerHTML = `
     body.sb-hidden .sidebar { display: none !important; }
     .sb-toggle-btn {
-      background: #0f294a; color: #fff; border: none; padding: 7px 11px;
-      border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold;
-      margin-right: 10px; display: inline-flex; align-items: center; gap: 5px;
+      background: #0f294a; color: #fff; border: none; padding: 6px 10px;
+      border-radius: 5px; cursor: pointer; font-size: 13px; font-weight: bold;
+      margin-right: 8px;
     }
     .sb-toggle-btn:hover { background: #1d4ed8; }
+
+    /* KWENYE SIMU PEKEE (<= 768px): MENYU ISIZIBE SCREEN YOTE NA FOMU ZIJIPANGE VIZURI */
     @media (max-width: 768px) {
       .sidebar {
         position: fixed !important; left: 0; top: 0; bottom: 0; z-index: 9998;
-        width: 260px !important; box-shadow: 4px 0 18px rgba(0,0,0,0.35);
+        width: 245px !important; max-width: 78vw !important;
+        box-shadow: 4px 0 20px rgba(0,0,0,0.45);
       }
       body.sb-hidden .sidebar { display: none !important; }
       .main { width: 100% !important; }
-      .content { padding: 12px !important; }
+      .topbar { flex-wrap: wrap !important; gap: 6px !important; padding: 10px 12px !important; }
+      .content { padding: 10px !important; }
       .panel { padding: 12px !important; }
       form, div[style*="grid-template-columns"] { grid-template-columns: 1fr !important; }
       form button, div[style*="grid-template-columns"] button { grid-column: span 1 !important; }
       table { display: block !important; overflow-x: auto !important; white-space: nowrap !important; }
     }
   `;
-  document.head.appendChild(drawerStyle);
+  document.head.appendChild(layoutStyle);
 
-  // Kwenye simu, ficha menyu mara baada ya kubofya kipengele ili uwanda wa fomu uwe mpana
+  // Kwenye simu, anza menyu ikiwa imefichwa ili fomu zionekane vizuri, na ifiche ukibofya kipengele
   if (window.innerWidth <= 768) {
     document.body.classList.add('sb-hidden');
   }
@@ -467,30 +470,29 @@ window.addEventListener('DOMContentLoaded', () => {
 
   const topbar = document.querySelector('.topbar');
   if (topbar) {
-    // Ongeza kitufe cha Kuficha / Kurudisha Dashibodi (☰ Menyu) upande wa kushoto wa Topbar
     const leftDiv = topbar.firstElementChild;
     if (leftDiv && !document.getElementById('sbToggleBtn')) {
       const toggleBtn = document.createElement('button');
       toggleBtn.id = 'sbToggleBtn';
       toggleBtn.type = 'button';
       toggleBtn.className = 'sb-toggle-btn';
-      toggleBtn.innerHTML = '☰ Menyu';
-      toggleBtn.title = 'Ficha au Rudisha Dashibodi ya Kushoto';
+      toggleBtn.innerHTML = '☰';
+      toggleBtn.title = 'Ficha / Onyesha Menyu ya Kushoto';
       toggleBtn.onclick = () => document.body.classList.toggle('sb-hidden');
       leftDiv.insertBefore(toggleBtn, leftDiv.firstChild);
     }
 
     const netStatus = navigator.onLine
-      ? '<span style="color:#059669;font-size:11px;font-weight:bold;">☁️ Cloud Online</span>'
-      : '<span style="color:#d97706;font-size:11px;font-weight:bold;">🟠 Offline Mode</span>';
+      ? '<span style="color:#059669;font-size:11px;font-weight:bold;">☁️ Online</span>'
+      : '<span style="color:#d97706;font-size:11px;font-weight:bold;">🟠 Offline</span>';
     const tools = document.createElement('div');
-    tools.style.cssText = 'display:flex; gap:6px; flex-wrap:wrap; align-items:center;';
+    tools.style.cssText = 'display:flex; gap:5px; flex-wrap:wrap; align-items:center;';
     tools.innerHTML = `
       ${netStatus}
       <button class="btn" style="background:#0f294a;color:#fff;" onclick="SGB.openHelpModal()">❓ Msaada</button>
       <button class="btn" style="background:#7c3aed;color:#fff;" onclick="SGB.openInboxModal()">💬 Ujumbe</button>
       <button class="btn" style="background:#0284c7;color:#fff;" onclick="SGB.liveRefresh(false)">🔄 Refresh</button>
-      <button class="btn" style="background:#d97706;color:#fff;" onclick="SGB.toggleLang()">🌐 SW | EN</button>
+      <button class="btn" style="background:#d97706;color:#fff;" onclick="SGB.toggleLang()">🌐 SW|EN</button>
       <button class="btn" style="background:#059669;color:#fff;" onclick="SGB.exportBackup()">💾 Backup</button>
       <button class="btn" style="background:#475569;color:#fff;" onclick="SGB.importBackup()">📂 Restore</button>
       <button class="btn" style="background:#dc2626;color:#fff;" onclick="SGB.logout()">🚪 Logout</button>
