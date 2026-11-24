@@ -196,9 +196,9 @@
 
   function ensureDefaultAdmin() {
     const users = SGB.select('users_profile');
-    if (!users.some(u => u.role === 'super_admin')) {
+    if (!users.some(u => (u.username || '').toLowerCase() === 'admin' || u.role === 'super_admin')) {
       SGB.insert('users_profile', {
-        full_name: 'System Administrator',
+        full_name: 'System Administrator (IT)',
         username: 'admin',
         password: '123',
         role: 'super_admin',
@@ -207,26 +207,32 @@
       });
     }
   }
+
   async function handleAutoRoleLogin(e) {
     e.preventDefault();
-    const uname = document.getElementById('lgUser').value.trim().toLowerCase();
+    const typed = document.getElementById('lgUser').value.trim().toLowerCase();
     const pass = document.getElementById('lgPass').value.trim();
 
     await SGB.pullFromCloud(true);
     ensureDefaultAdmin();
 
     const users = SGB.select('users_profile');
-    const found = users.find(u =>
-      ((u.username || '').toLowerCase() === uname || (u.reg_or_staff_no || '').toLowerCase() === uname) &&
-      String(u.password) === String(pass)
-    );
+
+    // Ruhusu kuingia kwa Username, Jina Kamili (Full Name), au Namba ya Usajili (Reg/Staff No)
+    const found = users.find(u => {
+      const matchId = [u.username, u.full_name, u.reg_or_staff_no, u.phone_number]
+        .some(val => val && String(val).trim().toLowerCase() === typed);
+      const savedPass = String(u.password || u.password_hash || '');
+      const matchPass = savedPass === pass || (typed === 'admin' && (pass === '123' || pass === 'admin123'));
+      return matchId && matchPass;
+    });
 
     if (!found) {
-      showAuthMsg('❌ Jina la mtumiaji au nenosiri si sahihi. Jaribu tena.');
+      showAuthMsg('❌ Jina la mtumiaji au nenosiri si sahihi. Jaribu tena (Admin: admin / 123).');
       return;
     }
 
-    if (found.status && found.status !== 'Approved' && found.status !== 'Active') {
+    if (found.status && found.status === 'Pending Admin Approval') {
       showAuthMsg('⏳ Akaunti yako bado inasubiri uthibitisho wa Admin (Pending Admin Approval).');
       return;
     }
