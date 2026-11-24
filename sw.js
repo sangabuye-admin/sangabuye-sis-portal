@@ -1,27 +1,27 @@
-const CACHE_NAME = 'sangabuye-sis-v6.7';
-const ASSETS = [
-  './',
-  './index.html',
-  './core.js',
-  './manifest.json',
-  './admin.html',
-  './director.html',
-  './headmaster.html',
-  './accountant.html',
-  './academic.html',
-  './teacher.html',
-  './parent.html',
-  './student.html',
-  './library.html',
-  './matron_patron.html'
-];
+const CACHE_NAME = 'sangabuye-sis-v7.5';
 
 self.addEventListener('install', (e) => {
-  e.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS)));
+  self.skipWaiting();
+});
+
+self.addEventListener('activate', (e) => {
+  e.waitUntil(
+    caches.keys().then((keys) =>
+      Promise.all(keys.map((k) => (k !== CACHE_NAME ? caches.delete(k) : null)))
+    )
+  );
+  self.clients.claim();
 });
 
 self.addEventListener('fetch', (e) => {
+  if (e.request.url.includes('firebaseio.com')) return;
   e.respondWith(
-    fetch(e.request).catch(() => caches.match(e.request))
+    fetch(e.request)
+      .then((res) => {
+        const clone = res.clone();
+        caches.open(CACHE_NAME).then((c) => c.put(e.request, clone));
+        return res;
+      })
+      .catch(() => caches.match(e.request))
   );
 });
