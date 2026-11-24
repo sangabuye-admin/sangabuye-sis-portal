@@ -428,26 +428,58 @@ window.addEventListener('DOMContentLoaded', () => {
     document.head.appendChild(link);
   }
 
-  // MOBILE RESPONSIVE STYLE INJECTOR (FOMU NA JEDWALI ZIKAE VIZURI KWENYE SIMU)
-  const mobStyle = document.createElement('style');
-  mobStyle.innerHTML = `
-    @media (max-width: 820px) {
-      body { flex-direction: column !important; }
-      .sidebar { width: 100% !important; flex-direction: row !important; flex-wrap: wrap !important; gap: 5px !important; padding: 10px !important; }
-      .sidebar h2, .sidebar p, .menu-grp { width: 100% !important; text-align: left !important; margin: 2px 0 !important; }
-      .menu-btn { width: auto !important; flex: 1 1 46% !important; font-size: 11.5px !important; padding: 8px !important; background: rgba(255,255,255,0.08) !important; }
-      .topbar { flex-direction: column !important; align-items: flex-start !important; gap: 8px !important; padding: 10px 14px !important; }
-      .content { padding: 10px !important; }
-      .panel { padding: 12px !important; overflow-x: auto !important; }
-      form, div[style*="grid-template-columns"] { grid-template-columns: 1fr !important; display: grid !important; }
-      form button, div[style*="grid-template-columns"] button, form input, form select, form textarea { grid-column: span 1 !important; width: 100% !important; font-size: 14px !important; padding: 10px !important; }
+  // MUONEKANO WA KUSHOTO (SIDEBAR) WENYE UWEZO WA KUFICHA NA KURUDISHA KWENYE PC NA SIMU
+  const drawerStyle = document.createElement('style');
+  drawerStyle.innerHTML = `
+    .sidebar { transition: all 0.25s ease; flex-shrink: 0; }
+    body.sb-hidden .sidebar { display: none !important; }
+    .sb-toggle-btn {
+      background: #0f294a; color: #fff; border: none; padding: 7px 11px;
+      border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold;
+      margin-right: 10px; display: inline-flex; align-items: center; gap: 5px;
+    }
+    .sb-toggle-btn:hover { background: #1d4ed8; }
+    @media (max-width: 768px) {
+      .sidebar {
+        position: fixed !important; left: 0; top: 0; bottom: 0; z-index: 9998;
+        width: 260px !important; box-shadow: 4px 0 18px rgba(0,0,0,0.35);
+      }
+      body.sb-hidden .sidebar { display: none !important; }
+      .main { width: 100% !important; }
+      .content { padding: 12px !important; }
+      .panel { padding: 12px !important; }
+      form, div[style*="grid-template-columns"] { grid-template-columns: 1fr !important; }
+      form button, div[style*="grid-template-columns"] button { grid-column: span 1 !important; }
       table { display: block !important; overflow-x: auto !important; white-space: nowrap !important; }
     }
   `;
-  document.head.appendChild(mobStyle);
+  document.head.appendChild(drawerStyle);
+
+  // Kwenye simu, ficha menyu mara baada ya kubofya kipengele ili uwanda wa fomu uwe mpana
+  if (window.innerWidth <= 768) {
+    document.body.classList.add('sb-hidden');
+  }
+  document.querySelectorAll('.menu-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (window.innerWidth <= 768) document.body.classList.add('sb-hidden');
+    });
+  });
 
   const topbar = document.querySelector('.topbar');
   if (topbar) {
+    // Ongeza kitufe cha Kuficha / Kurudisha Dashibodi (☰ Menyu) upande wa kushoto wa Topbar
+    const leftDiv = topbar.firstElementChild;
+    if (leftDiv && !document.getElementById('sbToggleBtn')) {
+      const toggleBtn = document.createElement('button');
+      toggleBtn.id = 'sbToggleBtn';
+      toggleBtn.type = 'button';
+      toggleBtn.className = 'sb-toggle-btn';
+      toggleBtn.innerHTML = '☰ Menyu';
+      toggleBtn.title = 'Ficha au Rudisha Dashibodi ya Kushoto';
+      toggleBtn.onclick = () => document.body.classList.toggle('sb-hidden');
+      leftDiv.insertBefore(toggleBtn, leftDiv.firstChild);
+    }
+
     const netStatus = navigator.onLine
       ? '<span style="color:#059669;font-size:11px;font-weight:bold;">☁️ Cloud Online</span>'
       : '<span style="color:#d97706;font-size:11px;font-weight:bold;">🟠 Offline Mode</span>';
