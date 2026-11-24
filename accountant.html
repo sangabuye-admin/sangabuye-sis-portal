@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ofisi ya Mhasibu (FFARS & Enterprise Finance v7.0) | Sangabuye SIS</title>
-  <script src="core.js?v=7.0"></script>
+  <title>Ofisi ya Mhasibu (FFARS & Enterprise Finance v7.1) | Sangabuye SIS</title>
+  <script src="core.js?v=7.1"></script>
   <style>
     * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
     body { margin: 0; background: #f1f5f9; display: flex; min-height: 100vh; color: #1e293b; }
@@ -41,7 +41,7 @@
   <div class="menu-grp">A. Mapato & Wanafunzi</div>
   <button class="menu-btn active" onclick="openTab('overview', this)">📊 1. Muhtasari (Fedha & Stoo)</button>
   <button class="menu-btn" onclick="openTab('receipts', this)">🛒 2. Mapokezi (Kapu la Michango)</button>
-  <button class="menu-btn" onclick="openTab('parent_stmt', this)">📄 3. Taarifa Kwa Mzazi & Wadaiwa</button>
+  <button class="menu-btn" onclick="openTab('parent_stmt', this)">📄 3. Taarifa Kwa Mzazi & Waliolipa</button>
   <button class="menu-btn" onclick="openTab('fee_camp_bus', this)">🏷️ 4. Viwango vya Ada, Kambi & Basi</button>
 
   <div class="menu-grp">B. Matumizi & Mishahara</div>
@@ -275,8 +275,24 @@
           <div id="parentStmtBox"></div>
         </div>
 
+        <div class="panel" style="border-left:4px solid #1d4ed8;">
+          <h3>2. Orodha ya Wanafunzi Waliotoa Michango (Paid Contributors — Filter & A4 PDF)</h3>
+          <div style="display:grid; grid-template-columns:1fr 1fr 1fr auto; gap:8px; margin-bottom:10px;">
+            <select id="paidFilterSource" onchange="renderPaidStudentsList()">
+              <option value="ALL">Kategoria Zote (Kutwa, Hostel, Kambi)</option>
+              <option value="Kutwa">Kutwa Pekee</option>
+              <option value="Hostel">Hostel Pekee</option>
+              <option value="Kambi ya Masomo">Kambi ya Masomo Pekee</option>
+            </select>
+            <input type="text" id="paidFilterCat" onkeyup="renderPaidStudentsList()" placeholder="Chuja kwa Mchango (Mfano: Ada, Chakula...)">
+            <input type="date" id="paidFilterDate" onchange="renderPaidStudentsList()">
+            <button class="btn btn-blue" onclick="printDiv('paidListPrintArea')">🖨️ Pakua / Print Orodha (A4 PDF)</button>
+          </div>
+          <div id="paidListPrintArea"></div>
+        </div>
+
         <div class="panel">
-          <h3>2. Orodha ya Wadaiwa & Vikumbusho Kwa Mkupuo (Bulk Debt Reminders)</h3>
+          <h3>3. Orodha ya Wadaiwa & Vikumbusho Kwa Mkupuo (Defaulters List)</h3>
           <table><tr><th>Mwanafunzi</th><th>Kategoria</th><th>Kinachotakiwa</th><th>Amelipa</th><th>Deni (TZS)</th><th>Kumbusha Mzazi</th></tr>
           ${students.map(st => {
             const stRecs = allRecs.filter(r => r.student_name.toLowerCase() === st.full_name.toLowerCase());
@@ -290,6 +306,7 @@
           }).join('') || '<tr><td colspan="6">Hakuna wanafunzi waliosajiliwa bado.</td></tr>'}
           </table>
         </div>`;
+      renderPaidStudentsList();
       return;
     }
     if (tab === 'fee_camp_bus') {
@@ -388,19 +405,27 @@
       const staff = SGB.select('staff_payroll');
       area.innerHTML = `
         <div class="panel">
-          <h3>Mishahara ya Watumishi (Pre-Audit, FFARS PV & Salary Slip)</h3>
+          <h3>Mishahara ya Watumishi (Pre-Audit, FFARS PV & Salary Pay Slip Thermal + A4)</h3>
           <form onsubmit="addStaffPayroll(event)" style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:10px; margin-bottom:12px;">
             <input type="text" id="pyName" required placeholder="Jina la Mtumishi"><input type="text" id="pyRole" required placeholder="Kazi">
             <select id="pySource"><option value="Kutwa">Chanzo: Kutwa</option><option value="Hostel">Chanzo: Hostel</option><option value="Kambi ya Masomo">Chanzo: Kambi ya Masomo</option></select>
             <input type="number" id="pyGross" required placeholder="Gross (TZS)"><input type="number" id="pyNssf" value="0" placeholder="NSSF"><input type="number" id="pyPaye" value="0" placeholder="PAYE">
             <button type="submit" class="btn btn-blue" style="grid-column: span 2;">➕ Ongeza</button>
           </form>
-          <button class="btn btn-amber" onclick="sendAllPayrollPreAudit()">📤 Tuma Kwa Pre-Audit</button>
-          <button class="btn btn-green" onclick="payAllApprovedStaff()">💵 Lipa Walioidhinishwa</button>
-          <button class="btn btn-blue" onclick="printPayrollPV()">🖨️ Print FFARS PV</button>
-          <table><tr><th>Mtumishi</th><th>Kazi</th><th>Chanzo</th><th>Net Pay</th><th>Hali</th><th>Hatua</th></tr>
+          <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px;">
+            <button class="btn btn-amber" onclick="sendAllPayrollPreAudit()">📤 Tuma Kwa Pre-Audit</button>
+            <button class="btn btn-green" onclick="payAllApprovedStaff()">💵 Lipa Walioidhinishwa</button>
+            <button class="btn btn-blue" onclick="printPayrollPV()">🖨️ Print FFARS PV</button>
+          </div>
+          <table><tr><th>Mtumishi</th><th>Kazi</th><th>Chanzo</th><th>Net Pay</th><th>Hali</th><th>Hatua & Salary Pay Slip</th></tr>
           ${staff.map(s => `<tr><td><b>${s.name}</b></td><td>${s.job_title||'-'}</td><td>${s.source_fund||'Kutwa'}</td><td><b>${Number(s.net_pay).toLocaleString()}</b></td><td>${s.status}</td>
-          <td>${s.status === 'Pre-Audited & Approved' ? `<button class="btn btn-green" onclick="paySingleStaff(${s.id})">💵 Lipa</button>` : ''} ${s.status === 'Paid' ? `<button class="btn btn-blue" onclick="printSalarySlip(${s.id}, 'A4')">📄 Slip A4</button>` : ''}</td></tr>`).join('')}
+          <td>
+            ${s.status === 'Pre-Audited & Approved' ? `<button class="btn btn-green" onclick="paySingleStaff(${s.id})">💵 Lipa</button>` : ''}
+            ${s.status === 'Paid' ? `
+              <button class="btn btn-amber" onclick="printSalarySlip(${s.id}, 'THERMAL')">🧾 Slip (Thermal)</button>
+              <button class="btn btn-blue" onclick="printSalarySlip(${s.id}, 'A4')">📄 Slip (A4 PDF)</button>
+            ` : ''}
+          </td></tr>`).join('')}
           </table><div id="slipPrintContainer" style="margin-top:12px;"></div>
         </div>`;
       return;
@@ -607,7 +632,6 @@
       else chosenCat = 'Kutwa';
     }
 
-    // Chuja michango inayomhusu mwanafunzi huyu pekee kulingana na kategoria yake (Kutwa / Hostel / Kambi)
     const fees = SGB.select('fee_structures').filter(f => (f.source_fund || 'Kutwa').toLowerCase() === chosenCat.toLowerCase());
     const cfg = SGB.getConfig();
     const qr = SGB.qrImg(`SANGABUYE-PARENT-STMT:${name}|${reg}|${chosenCat}`);
@@ -639,7 +663,7 @@
 
     document.getElementById('parentStmtBox').innerHTML = `
       <div id="parentStmtPrint" style="border:2px solid #064e3b; padding:18px 22px; background:#fff; max-width:760px; font-size:12px; line-height:1.45;">
-        <div style="text-align:center; border-bottom:2px solid #064e3b; padding-bottom:8px; margin-bottom:10px; position:relative;">
+        <div style="text-align:center; border-bottom:2px solid #064e3b; padding-bottom:8px; margin-bottom:10px;">
           <div style="font-size:12.5px; font-weight:bold; color:#0f294a;">HALMASHAURI YA MANISPAA YA ILEMELA</div>
           <h2 style="margin:2px 0; color:#064e3b; font-size:17px;">SHULE YA SEKONDARI SANGABUYE</h2>
           <div style="font-size:11px;">S.L.P 11898, Ilemela - Mwanza | Simu: 0784 755 173 / 0615 000 305</div>
@@ -675,20 +699,8 @@
         </div>
 
         <div style="display:flex; justify-content:space-between; margin-top:20px; font-size:11.5px; line-height:1.55;">
-          <div>
-            <b>Imeandaliwa na:</b><br>
-            ${accName}<br>
-            _________________________<br>
-            <b>Mhasibu wa Shule</b><br>
-            Tarehe: ${todayStr}
-          </div>
-          <div>
-            <b>Imethibitishwa na:</b><br>
-            ${hmName}<br>
-            _________________________<br>
-            <b>Mkuu wa Shule</b><br>
-            Tarehe: ${todayStr}
-          </div>
+          <div><b>Imeandaliwa na:</b><br>${accName}<br>_________________________<br><b>Mhasibu wa Shule</b><br>Tarehe: ${todayStr}</div>
+          <div><b>Imethibitishwa na:</b><br>${hmName}<br>_________________________<br><b>Mkuu wa Shule</b><br>Tarehe: ${todayStr}</div>
         </div>
         <div style="text-align:right; font-size:9.5px; color:#64748b; margin-top:8px;">Page 1 of 1 | Sangabuye SIS Portal</div>
       </div><br>
@@ -696,6 +708,40 @@
         <button class="btn btn-blue" onclick="printSinglePageA4('parentStmtPrint')">🖨️ Chapisha Taarifa (A4 Page 1 of 1)</button>
         <button class="btn btn-green" onclick="SGB.sendWhatsApp('${phone}', '${smsSummary}')">💬 Tuma WhatsApp</button>
         <button class="btn btn-amber" onclick="SGB.sendSMS('${phone}', '${smsSummary}')">📲 Tuma SMS</button>
+      </div>`;
+  }
+  function renderPaidStudentsList() {
+    const srcFilter = document.getElementById('paidFilterSource')?.value || 'ALL';
+    const catFilter = (document.getElementById('paidFilterCat')?.value || '').trim().toLowerCase();
+    const dateFilter = document.getElementById('paidFilterDate')?.value || '';
+
+    let recs = SGB.select('accounting_receipts');
+    if (srcFilter !== 'ALL') recs = recs.filter(r => (r.source_fund || 'Kutwa').toLowerCase() === srcFilter.toLowerCase());
+    if (catFilter) recs = recs.filter(r => (r.payment_category || '').toLowerCase().includes(catFilter));
+    if (dateFilter) recs = recs.filter(r => (r.tx_date || '').startsWith(dateFilter));
+
+    const totalSum = recs.reduce((s, r) => s + Number(r.amount_paid || 0), 0);
+    const qr = SGB.qrImg(`SANGABUYE-PAID-LIST:${srcFilter}|TZS:${totalSum}`);
+
+    document.getElementById('paidListPrintArea').innerHTML = `
+      <div style="border:1.5px solid #064e3b; padding:16px; background:#fff;">
+        <div style="text-align:center; border-bottom:1.5px solid #064e3b; padding-bottom:8px; margin-bottom:10px;">
+          <b>HALMASHAURI YA MANISPAA YA ILEMELA — SHULE YA SEKONDARI SANGABUYE</b><br>
+          <span style="font-size:12px;">ORODHA YA WANAFUNZI WALIOTOA MICHANGO (${srcFilter.toUpperCase()})</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; font-size:12px;">
+          <div><b>Jumla ya Miamala:</b> ${recs.length} &nbsp;|&nbsp; <b>Jumla ya Fedha Zilizokusanywa:</b> <span style="color:#059669;"><b>TZS ${totalSum.toLocaleString()}/=</b></span></div>
+          <img src="${qr}" style="height:48px;">
+        </div>
+        <table>
+          <tr><th>Na.</th><th>Risiti Na.</th><th>Jina la Mwanafunzi</th><th>Reg No.</th><th>Aina ya Mchango</th><th>Kategoria</th><th>Njia</th><th>Kiasi (TZS)</th><th>Tarehe</th></tr>
+          ${recs.map((r, i) => `<tr>
+            <td>${i + 1}</td><td><b>${r.receipt_number}</b></td><td><b>${r.student_name}</b></td><td>${r.student_reg_no || '-'}</td>
+            <td>${r.payment_category}</td><td>${r.source_fund || 'Kutwa'}</td><td>${r.payment_method}</td>
+            <td style="color:#059669;"><b>${Number(r.amount_paid).toLocaleString()}</b></td><td>${r.tx_date || r.created_at}</td>
+          </tr>`).join('') || '<tr><td colspan="9">Hakuna wanafunzi waliolipa kwenye kichujio hiki.</td></tr>'}
+          <tr style="background:#ecfdf5; font-weight:bold;"><td colspan="7">JUMLA KUU YA MICHANGO ILIYOLIPWA</td><td colspan="2">TZS ${totalSum.toLocaleString()}/=</td></tr>
+        </table>
       </div>`;
   }
   function addToReceiptCart() {
@@ -848,7 +894,7 @@
           <span>Facility Financial Accounting and Reporting System (Sangabuye SIS) | Printed on: ${new Date().toLocaleString('sw-TZ')}</span>
           <img src="${qr}" style="height:48px;">
         </div>
-      </div><br><button class="btn btn-green" onclick="printSinglePageA4('ffarsPrintBox')">🖨️ Pakua / Print FFARS Payment Voucher (A4 PDF)</button>`;
+      </div><br><button class="btn btn-green" onclick="printSinglePageA4('ffarsPrintBox')">🖨️ Pakua / Print  Payment Voucher (A4 PDF)</button>`;
   }
   function addProcItemDraft() {
     const name = document.getElementById('piName').value.trim();
@@ -907,16 +953,59 @@
   function payAllApprovedStaff() { SGB.select('staff_payroll').filter(s => s.status === 'Pre-Audited & Approved').forEach(s => SGB.update('staff_payroll', s.id, { status: 'Paid', paid_date: new Date().toLocaleDateString('sw-TZ') })); openTab('payroll'); }
 
   function printSalarySlip(id, mode) {
-    const s = SGB.select('staff_payroll').find(x => x.id === id);
+    const s = SGB.select('staff_payroll').find(x => String(x.id) === String(id));
     if (!s) return;
     const qr = SGB.qrImg(`SALARY-SLIP:${s.name}|NET:${s.net_pay}`);
-    document.getElementById('slipPrintContainer').innerHTML = `
-      <div id="slipBox" style="border:2px dashed #064e3b; padding:16px; background:#fff; max-width:600px;">
-        <center><b>HALMASHAURI YA MANISPAA YA ILEMELA — SHULE YA SEKONDARI SANGABUYE</b><br>SALARY SLIP (${mode})</center><hr>
-        <b>Mtumishi:</b> ${s.name} | <b>Kazi:</b> ${s.job_title || '-'} | <b>Chanzo:</b> ${s.source_fund || 'Kutwa'}<br>
-        <b>Gross:</b> TZS ${Number(s.gross).toLocaleString()} | <b>Makato:</b> TZS ${(Number(s.nssf||0)+Number(s.paye||0)).toLocaleString()} | <b>NET PAY: TZS ${Number(s.net_pay).toLocaleString()}/=</b><hr>
-        <center><img src="${qr}"></center>
-      </div><br><button class="btn btn-blue" onclick="printSinglePageA4('slipBox')">🖨️ Print Salary Slip</button>`;
+    const todayStr = s.paid_date || s.created_at || new Date().toLocaleDateString('sw-TZ');
+
+    if (mode === 'THERMAL') {
+      document.getElementById('slipPrintContainer').innerHTML = `
+        <div id="slipThermalBox" style="border:2px dashed #064e3b; padding:12px; max-width:290px; background:#fff; font-family:monospace; font-size:12px;">
+          <center><b>SANGABUYE SEC SCHOOL</b><br>S.L.P 11898, ILEMELA - MWANZA<br>----------------------------<br><b>SALARY PAY SLIP (58/80mm)</b></center><br>
+          <b>Mtumishi:</b> ${s.name}<br>
+          <b>Kazi:</b> ${s.job_title || '-'}<br>
+          <b>Chanzo:</b> ${s.source_fund || 'Kutwa'}<br>
+          <b>Tarehe:</b> ${todayStr}<br>
+          ----------------------------<br>
+          <b>Gross Pay:</b> TZS ${Number(s.gross).toLocaleString()}<br>
+          <b>NSSF:</b> TZS ${Number(s.nssf || 0).toLocaleString()}<br>
+          <b>PAYE:</b> TZS ${Number(s.paye || 0).toLocaleString()}<br>
+          ----------------------------<br>
+          <div style="font-size:14px;"><b>NET PAY: TZS ${Number(s.net_pay).toLocaleString()}/=</b></div>
+          ----------------------------<br>
+          <b>Sahihi Mtumishi:</b> ____________<br><br>
+          <center><img src="${qr}" style="height:60px;"><br><small>Scan kuthibitisha malipo</small></center>
+        </div><br>
+        <button class="btn btn-amber" onclick="printThermalBox('slipThermalBox')">🖨️ Print Kwenye Printa Isiyo na Wino (Thermal)</button>`;
+    } else {
+      document.getElementById('slipPrintContainer').innerHTML = `
+        <div id="slipA4Box" style="border:2px solid #064e3b; padding:22px; background:#fff; max-width:720px; font-size:13px; line-height:1.6;">
+          <div style="text-align:center; border-bottom:2px solid #064e3b; padding-bottom:8px; margin-bottom:12px;">
+            <b>HALMASHAURI YA MANISPAA YA ILEMELA</b><br>
+            <h3 style="margin:2px 0; color:#064e3b;">SHULE YA SEKONDARI SANGABUYE</h3>
+            <small>S.L.P 11898, Ilemela - Mwanza | Simu: 0784 755 173 / 0615 000 305</small><br>
+            <b style="text-decoration:underline; display:inline-block; margin-top:6px;">STAKABADHI YA MALIPO YA MTUMISHI (OFFICIAL SALARY PAY SLIP)</b>
+          </div>
+          <p>
+            <b>Jina la Mtumishi:</b> ${s.name.toUpperCase()} &nbsp;|&nbsp; <b>Kazi / Cheo:</b> ${s.job_title || '-'}<br>
+            <b>Chanzo cha Fedha:</b> ${s.source_fund || 'Kutwa'} &nbsp;|&nbsp; <b>Tarehe ya Malipo:</b> ${todayStr}
+          </p>
+          <table>
+            <tr><th>Maelezo ya Malipo / Makato</th><th>Kiasi (TZS)</th></tr>
+            <tr><td>Mshahara / Posho Ghafi (Gross Pay)</td><td>${Number(s.gross).toLocaleString()}.00</td></tr>
+            <tr><td>Makato ya Hifadhi ya Jamii (NSSF)</td><td>- ${Number(s.nssf || 0).toLocaleString()}.00</td></tr>
+            <tr><td>Kodi ya Mapato (PAYE)</td><td>- ${Number(s.paye || 0).toLocaleString()}.00</td></tr>
+            <tr style="background:#ecfdf5; font-size:14px;"><td><b>KIASI HALISI KILICHOLIPWA (NET PAY)</b></td><td><b>TZS ${Number(s.net_pay).toLocaleString()}.00</b></td></tr>
+          </table>
+          <p><b>Kiasi Kwa Maneno:</b> <u>${SGB.numberToWords(s.net_pay)}</u></p>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-top:24px; font-size:12px;">
+            <div><b>Mhasibu wa Shule:</b><br><br>____________________<br>Sahihi & Tarehe</div>
+            <img src="${qr}" style="height:60px;">
+            <div><b>Sahihi ya Mpokeaji (Mtumishi):</b><br><br>____________________<br>Sahihi & Tarehe</div>
+          </div>
+        </div><br>
+        <button class="btn btn-blue" onclick="printSinglePageA4('slipA4Box')">🖨️ Pakua / Print Salary Slip (A4 PDF)</button>`;
+    }
   }
 
   function printPayrollPV() {
@@ -930,7 +1019,6 @@
     w.document.write('<html><head><style>body{font-family:serif;padding:20px;}table{width:100%;border-collapse:collapse;}th,td{border:1px solid #000;padding:6px;}</style></head><body>' + html + '</body></html>');
     w.document.close(); w.focus(); setTimeout(() => { w.print(); w.close(); }, 300);
   }
-
   function addImprest(e) {
     e.preventDefault();
     SGB.insert('staff_imprest', { staff_name: document.getElementById('impStaff').value.trim(), purpose: document.getElementById('impPurpose').value.trim(), amount: Number(document.getElementById('impAmt').value), due_date: document.getElementById('impDue').value, status: 'Unretired' });
@@ -1032,7 +1120,6 @@
       usages = usages.filter(u => (u.tx_date || '') >= dFrom && (u.tx_date || '') <= dTo);
     }
 
-    const qr = SGB.qrImg(`SANGABUYE-STORE:${cat}`);
     document.getElementById('storePrintArea').innerHTML = `
       <div style="border:1px solid #cbd5e1; padding:16px; background:#fff;">
         <div style="text-align:center; border-bottom:1.5px solid #064e3b; padding-bottom:8px; margin-bottom:10px;">
@@ -1129,7 +1216,6 @@
       </div><br>
       <button class="btn btn-blue" onclick="printSinglePageA4('clrPrintA4')">🖨️ Print Cheti (A4 Page 1 of 1)</button>`;
   }
-
   function lockPeriodRange(e) {
     e.preventDefault();
     const label = document.getElementById('lkLabel').value.trim();
@@ -1151,7 +1237,6 @@
   function addBusStudent(e) { e.preventDefault(); SGB.insert('school_bus_routes', { student_name: document.getElementById('bsName').value.trim(), route: document.getElementById('bsRoute').value.trim(), paid: Number(document.getElementById('bsPaid').value) }); openTab('fee_camp_bus'); }
   function addFeeStruct(e) { e.preventDefault(); SGB.insert('fee_structures', { category: document.getElementById('fsCat').value.trim(), source_fund: document.getElementById('fsSource').value, amount: Number(document.getElementById('fsAmt').value) }); openTab('fee_camp_bus'); }
   function delFeeStruct(id) { localStorage.setItem('sgb_fee_structures', JSON.stringify(SGB.select('fee_structures').filter(x => x.id !== id))); SGB.pushToCloud('fee_structures'); openTab('fee_camp_bus'); }
-
   function printDiv(id) {
     const html = document.getElementById(id).innerHTML;
     const w = window.open('', '', 'width=850,height=650');
@@ -1163,6 +1248,13 @@
     const html = document.getElementById(id).innerHTML;
     const w = window.open('', '', 'width=850,height=650');
     w.document.write('<html><head><title>Sangabuye A4 Page 1 of 1</title><style>@page{size:A4 portrait;margin:10mm;}body{font-family:sans-serif;margin:0;padding:0;}table{width:100%;border-collapse:collapse;}th,td{border:1px solid #000;padding:5px 7px;font-size:11.5px;}</style></head><body>' + html + '</body></html>');
+    w.document.close(); w.focus(); setTimeout(() => { w.print(); w.close(); }, 300);
+  }
+
+  function printThermalBox(id) {
+    const html = document.getElementById(id).innerHTML;
+    const w = window.open('', '', 'width=380,height=600');
+    w.document.write('<html><head><title>Thermal Print</title></head><body style="margin:5px;">' + html + '</body></html>');
     w.document.close(); w.focus(); setTimeout(() => { w.print(); w.close(); }, 300);
   }
 
