@@ -374,6 +374,33 @@
   }
 
   openTab('approvals', document.querySelector('.menu-btn'));
+    function saveHmLibSettings(e) {
+    e.preventDefault();
+    const newCfg = {
+      fine_per_day: Number(document.getElementById('hmFineDay').value || 500),
+      max_books_student: Number(document.getElementById('hmMaxBk').value || 5),
+      days_student: Number(document.getElementById('hmDaysSt').value || 7),
+      days_teacher: Number(document.getElementById('hmDaysTc').value || 14),
+      occupied_seats: Number(document.getElementById('hmOccSeats').value || 0),
+      total_seats: Number(document.getElementById('hmTotSeats').value || 50)
+    };
+    localStorage.setItem('sgb_library_settings', JSON.stringify(newCfg));
+    SGB.pushToCloud('library_settings');
+    SGB.logAction('Mkuu wa Shule amesasisha mipangilio ya Maktaba');
+    alert('✅ Mipangilio ya Maktaba imehifadhiwa na kusambazwa hewani!');
+    openTab('lib_settings');
+  }
+
+  function sendLibOverdueReminders(count) {
+    if (count === 0) { alert('✅ Hakuna mwanafunzi wala mwalimu aliyechelewa kurudisha kitabu sasa.'); return; }
+    SGB.insert('direct_messages', {
+      sender: 'Mkuu wa Shule',
+      recipient: 'Mkutubi / Walimu',
+      subject: `UKUMBUSHO WA VITABU VILIVYOCHELEWESHWA (${count})`,
+      body: `Kuna wasomaji ${count} waliochelewesha vitabu vya maktaba. Tafadhali hakikisha vinarejeshwa mara moja.`
+    });
+    alert(`📧 Ukumbusho umetumwa kwa Mkutubi kwa ajili ya wasomaji ${count} waliochelewesha vitabu!`);
+  }
 </script>
 </body>
 </html>
