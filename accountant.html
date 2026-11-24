@@ -917,17 +917,77 @@
       <tr style="background:#ecfdf5;"><td colspan="4"><b>MAKADIRIO YA BAJETI</b></td><td colspan="2"><b>TZS ${grandTotal.toLocaleString()}</b></td></tr></table>`;
   }
 
-  function submitProcurement() {
-    const title = document.getElementById('prTitle').value.trim();
-    const dt = document.getElementById('prDate').value;
-    const src = document.getElementById('prSource').value;
-    const members = document.getElementById('prMembers').value.trim();
-    if (checkLockedDate(dt)) { alert('🔒 Hesabu za tarehe hiyo zimefungwa!'); return; }
-    if (!title || !procItemsDraft.length) { alert('⚠️ Weka kichwa cha kikao na angalau hitaji moja.'); return; }
-    const totalBudget = procItemsDraft.reduce((s, x) => s + x.total, 0);
-    SGB.insert('procurement_committee', { meeting_title: title, meeting_date: dt, source_fund: src, members, items: procItemsDraft, estimated_budget: totalBudget, minutes_summary: procItemsDraft.map(x => `${x.name} (${x.qty} ${x.unit})`).join(', '), status: 'Pending (Inasubiri Mkuu wa Shule)' });
-    procItemsDraft = []; alert('✅ Muhtasari umetumwa kwa Mkuu wa Shule!'); openTab('procurement');
+  function addProcItemDraft(silent = false) {
+    const name = (document.getElementById('piName')?.value || '').trim();
+    const unit = (document.getElementById('piUnit')?.value || '').trim() || 'Pcs';
+    const qty = Number(document.getElementById('piQty')?.value || 0);
+    const price = Number(document.getElementById('piPrice')?.value || 0);
+    if (!name || qty <= 0 || price <= 0) {
+      if (!silent) alert('⚠️ Jaza jina la hitaji, idadi, na bei ya kimoja kwanza.');
+      return false;
+    }
+    procItemsDraft.push({ name, unit, qty, price, total: qty * price, approved: false, rejected: false, hm_note: '' });
+    document.getElementById('piName').value = '';
+    document.getElementById('piUnit').value = '';
+    document.getElementById('piQty').value = '';
+    document.getElementById('piPrice').value = '';
+    renderProcDraft();
+    return true;
   }
+
+  function renderProcDraft() {
+    const el = document.getElementById('procDraftTable');
+    if (!el) return;
+    if (!procItemsDraft.length) { el.innerHTML = '<small style="color:#64748b;">Ongeza mahitaji ya manunuzi hapo juu.</small>'; return; }
+    const grandTotal = procItemsDraft.reduce((s, x) => s + x.total, 0);
+    el.innerHTML = `<table><tr><th>Hitaji</th><th>Kipimo</th><th>Idadi</th><th>Bei</th><th>Jumla (TZS)</th><th>Futa</th></tr>
+      ${procItemsDraft.map((it, i) => `<tr><td>${it.name}</td><td>${it.unit}</td><td>${it.qty}</td><td>${it.price.toLocaleString()}</td><td><b>${it.total.toLocaleString()}</b></td><td><button type="button" class="btn btn-red" onclick="procItemsDraft.splice(${i},1); renderProcDraft()">✕</button></td></tr>`).join('')}
+      <tr style="background:#ecfdf5;"><td colspan="4"><b>MAKADIRIO YA BAJETI</b></td><td colspan="2"><b>TZS ${grandTotal.toLocaleString()}</b></td></tr></table>`;
+  }
+
+  async function submitProcurement() {
+    // Kama mtumiaji alijaza hitaji kwenye visanduku bila kubofya "➕ Ongeza", liingize kwenye orodha moja kwa moja!
+    addProcItemDraft(true);
+
+    const title = (document.getElementById('prTitle')?.value || '').trim() || 'Kikao cha Kamati ya Manunuzi';
+    const dt = document.getElementById('prDate')?.value || new Date().toISOString().slice(0, 10);
+    const src = document.getElementById('prSource')?.value || 'Kutwa';
+    const members = (document.getElementById('prMembers')?.value || '').trim() || 'Kamati ya Manunuzi ya Shule';
+
+    if (checkLockedDate(dt)) { alert('🔒 Hesabu za tarehe hiyo zimefungwa!'); return; }
+    if (!procItemsDraft.length) {
+      alert('⚠️ Weka angalau hitaji moja (Jina la Hitaji, Idadi, na Bei ya Kimoja) kabla ya kutuma.');
+      return;
+    }
+
+    const totalBudget = procItemsDraft.reduce((s, x) => s + x.total, 0);
+    const summaryText = procItemsDraft.map(x => `${x.name} (${x.qty} ${x.unit})`).join(', ');
+
+    SGB.insert('procurement_committee', {
+      meeting_title: title,
+      meeting_date: dt,
+      source_fund: src,
+      members,
+      items: procItemsDraft,
+      estimated_budget: totalBudget,
+      minutes_summary: summaryText,
+      status: 'Pending (Inasubiri Mkuu wa Shule)'
+    });
+
+    // Tuma pia taarifa ya moja kwa moja kwenye kikasha cha Mkuu wa Shule
+    SGB.insert('direct_messages', {
+      sender: 'Mhasibu / Kamati ya Manunuzi',
+      recipient: 'Mkuu wa Shule',
+      subject: `MANUNUZI MAPYA: ${title} (TZS ${totalBudget.toLocaleString()})`,
+      body: `Mahitaji: ${summaryText}. Chanzo: ${src}. Tafadhali fungua kichupo cha Kamati ya Manunuzi kuidhinisha.`
+    });
+
+    await SGB.pushToCloud('procurement_committee');
+    procItemsDraft = [];
+    alert('✅ Muhtasari wa Kikao cha Kamati ya Manunuzi umetumwa kikamilifu kwa Mkuu wa Shule!');
+    openTab('procurement');
+  }
+
 
   function payApprovedProc(id) { SGB.update('procurement_committee', id, { status: 'Paid' }); alert('✅ Malipo yamekamilika!'); openTab('procurement'); }
 
