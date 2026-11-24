@@ -3,57 +3,60 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mkurugenzi & Super Admin | Sangabuye SIS Portal</title>
-  <script src="core.js?v=6.9"></script>
+  <title>System Administrator (Admin Portal v8.1) | Sangabuye SIS</title>
+  <script src="core.js?v=7.5"></script>
   <style>
     * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
     body { margin: 0; background: #f1f5f9; display: flex; min-height: 100vh; color: #1e293b; }
-    .sidebar { width: 270px; background: #1e1b4b; color: white; display: flex; flex-direction: column; padding: 18px 12px; }
-    .sidebar h2 { font-size: 15px; margin: 0 0 4px; color: #fbbf24; text-align: center; }
-    .sidebar p { font-size: 11px; text-align: center; color: #c7d2fe; margin: 0 0 18px; }
-    .menu-btn { background: transparent; border: none; color: #e0e7ff; text-align: left; padding: 9px 12px; border-radius: 8px; cursor: pointer; font-size: 12.5px; margin-bottom: 4px; }
-    .menu-btn:hover, .menu-btn.active { background: #4338ca; color: white; font-weight: bold; }
+    .sidebar { width: 255px; background: #0f172a; color: white; display: flex; flex-direction: column; padding: 14px 10px; overflow-y: auto; }
+    .sidebar h2 { font-size: 16px; margin: 0 0 2px; color: #38bdf8; text-align: center; }
+    .sidebar p { font-size: 11px; text-align: center; color: #94a3b8; margin: 0 0 12px; }
+    .menu-btn { background: transparent; border: none; color: #cbd5e1; text-align: left; padding: 8px 11px; border-radius: 7px; cursor: pointer; font-size: 12.5px; margin-bottom: 3px; }
+    .menu-btn:hover, .menu-btn.active { background: #1d4ed8; color: white; font-weight: bold; }
     .main { flex: 1; display: flex; flex-direction: column; }
-    .topbar { background: white; padding: 14px 22px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
-    .content { padding: 22px; }
-    .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-bottom: 18px; }
-    .card { background: white; padding: 15px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border-left: 4px solid #4338ca; }
+    .topbar { background: white; padding: 11px 18px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
+    .content { padding: 18px; }
+    .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; margin-bottom: 16px; }
+    .card { background: white; padding: 14px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border-left: 4px solid #1d4ed8; }
     .card h4 { margin: 0 0 5px; font-size: 11px; color: #64748b; text-transform: uppercase; }
-    .card .val { font-size: 17px; font-weight: bold; color: #1e1b4b; }
-    .panel { background: white; padding: 18px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 18px; }
-    input, select, textarea { padding: 9px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; width: 100%; }
-    table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 12.5px; }
-    th, td { padding: 8px; border: 1px solid #e2e8f0; text-align: left; }
-    th { background: #f8fafc; color: #1e1b4b; }
-    .btn { padding: 7px 12px; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold; }
+    .card .val { font-size: 18px; font-weight: bold; color: #0f172a; }
+    .panel { background: white; padding: 16px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 16px; }
+    input, select, textarea { padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12.5px; width: 100%; }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; }
+    th, td { padding: 7px 8px; border: 1px solid #e2e8f0; text-align: left; }
+    th { background: #f8fafc; color: #0f172a; }
+    .btn { padding: 6px 10px; border: none; border-radius: 6px; cursor: pointer; font-size: 11.5px; font-weight: bold; }
     .btn-green { background: #059669; color: white; }
-    .btn-red { background: #dc2626; color: white; }
     .btn-blue { background: #1d4ed8; color: white; }
     .btn-amber { background: #d97706; color: white; }
-    .logout-btn { background: #dc2626; color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: bold; margin-top: auto; }
+    .btn-red { background: #dc2626; color: white; }
   </style>
 </head>
 <body>
 <div class="sidebar">
-  <h2>MKURUGENZI (DIRECTOR)</h2>
-  <p>Ilemela MC | Sangabuye Sec</p>
-  <button class="menu-btn active" onclick="openTab('exec_overview', this)">🏛️ 1. Muhtasari Mkuu & Vyanzo</button>
-  <button class="menu-btn" onclick="openTab('verify_receipt', this)">🧾 2. Uhakiki wa Risiti (SGB-)</button>
-  <button class="menu-btn" onclick="openTab('users_mgmt', this)">👥 3. Usimamizi wa Watumiaji & Nywila</button>
-  <button class="menu-btn" onclick="openTab('sys_config', this)">⚙️ 4. Matengenezo, Shule & Hesabu</button>
-  <button class="menu-btn" onclick="openTab('audit_logs', this)">🛡️ 5. Kumbukumbu za Usalama (Audit Logs)</button>
-  <button class="logout-btn" onclick="SGB.logout()">🚪 Toka (Logout)</button>
+  <h2>SYSTEM ADMIN</h2>
+  <p>Sangabuye SIS Control</p>
+  <button class="menu-btn active" onclick="openTab('users', this)">👥 1. Watumiaji & Uthibitisho</button>
+  <button class="menu-btn" onclick="openTab('settings', this)">⚙️ 2. Mipangilio & Matengenezo</button>
+  <button class="menu-btn" onclick="openTab('logs', this)">🛡️ 3. Kumbukumbu za Ukaguzi</button>
 </div>
 <div class="main">
   <div class="topbar">
-    <div><strong id="tabTitle">🏛️ 1. Muhtasari Mkuu & Vyanzo</strong> <span id="syncTime" style="font-size:11px; color:#059669;"></span></div>
+    <div><strong id="tabTitle">👥 1. Watumiaji & Uthibitisho</strong> <span id="syncTime" style="font-size:11px; color:#059669;"></span></div>
     <div></div>
   </div>
   <div class="content" id="viewArea"></div>
 </div>
 <script>
-  const user = SGB.requireRole(['super_admin', 'director']);
+  const user = SGB.requireRole(['super_admin']);
   SGB.startSessionTimer();
+
+  function filterUsersTbl() {
+    const q = (document.getElementById('usrSearch')?.value || '').toLowerCase();
+    document.querySelectorAll('#allUsersTbl tbody tr').forEach(r => {
+      r.style.display = r.innerText.toLowerCase().includes(q) ? '' : 'none';
+    });
+  }
 
   function openTab(tab, btn) {
     document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('active'));
@@ -61,238 +64,174 @@
     if (btn) document.getElementById('tabTitle').innerText = btn.innerText;
     const area = document.getElementById('viewArea');
 
-    if (tab === 'exec_overview') {
-      const recs = SGB.select('accounting_receipts');
-      const vchs = SGB.select('expense_vouchers').filter(v => v.status === 'Paid');
-      const procs = SGB.select('procurement_committee').filter(p => p.status === 'Paid');
-      const pays = SGB.select('staff_payroll').filter(p => p.status === 'Paid');
+    if (tab === 'users') {
       const users = SGB.select('users_profile');
-      const isMaint = localStorage.getItem('sgb_maintenance') === 'true' || localStorage.getItem('sgb_maintenance_mode') === 'true' || SGB.getConfig().maintenance === true;
-
-      const totalIn = recs.reduce((s, r) => s + Number(r.amount_paid), 0);
-      const totalOut = vchs.reduce((s, v) => s + Number(v.amount), 0) + procs.reduce((s, p) => s + Number(p.estimated_budget), 0) + pays.reduce((s, p) => s + Number(p.net_pay), 0);
+      const pendingUsers = users.filter(u => u.status && u.status !== 'Approved' && u.status !== 'Active');
 
       area.innerHTML = `
-        ${isMaint ? `<div style="background:#fef2f2;border:2px solid #dc2626;padding:12px;border-radius:8px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;">
-          <b style="color:#dc2626;">⚙️ ONYO: Mfumo uko kwenye MATENGENEZO (Maintenance Mode). Watumiaji wengine hawawezi kuingia!</b>
-          <button class="btn btn-green" onclick="setMaintenanceMode(false)">🟢 Zima Matengenezo Sasa</button>
-        </div>` : ''}
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-          <h3 style="margin:0; color:#1e1b4b;">Muhtasari wa Taasisi (Executive Dashboard)</h3>
-          <button class="btn btn-blue" onclick="SGB.liveRefresh(false)">🔄 Refresh Data</button>
-        </div>
         <div class="cards">
-          <div class="card"><h4>Jumla ya Mapato</h4><div class="val" style="color:#059669;">TZS ${totalIn.toLocaleString()}</div></div>
-          <div class="card" style="border-color:#dc2626;"><h4>Jumla ya Matumizi</h4><div class="val" style="color:#dc2626;">TZS ${totalOut.toLocaleString()}</div></div>
-          <div class="card" style="border-color:#1d4ed8;"><h4>Salio Halisi</h4><div class="val" style="color:#1d4ed8;">TZS ${(totalIn - totalOut).toLocaleString()}</div></div>
-          <div class="card" style="border-color:#d97706;"><h4>Watumiaji Wote</h4><div class="val">${users.length}</div></div>
+          <div class="card"><h4>Watumiaji Wote</h4><div class="val">${users.length}</div></div>
+          <div class="card" style="border-color:#d97706;"><h4>Wanaosubiri Uthibitisho</h4><div class="val">${pendingUsers.length}</div></div>
+          <div class="card" style="border-color:#059669;"><h4>Waliothibitishwa (Active)</h4><div class="val">${users.length - pendingUsers.length}</div></div>
         </div>
-        <div class="panel">
-          <h3>Miamala ya Mapokezi ya Hivi Karibuni</h3>
-          <table><tr><th>Risiti Na.</th><th>Mwanafunzi</th><th>Mchango</th><th>Chanzo</th><th>Kiasi (TZS)</th><th>Tarehe</th></tr>
-          ${recs.slice(0, 12).map(r => `<tr><td><b>${r.receipt_number}</b></td><td>${r.student_name}</td><td>${r.payment_category}</td><td>${r.source_fund || 'Kutwa'}</td><td><b>${Number(r.amount_paid).toLocaleString()}</b></td><td>${r.created_at}</td></tr>`).join('') || '<tr><td colspan="6">Hakuna miamala bado.</td></tr>'}
-          </table>
-        </div>`;
-      return;
-    }
 
-    if (tab === 'verify_receipt') {
-      const recentRcpts = SGB.select('accounting_receipts');
-      area.innerHTML = `
-        <div class="panel">
-          <h3>Uhakiki wa Uhalali wa Risiti (Andika Namba Pekee — SGB- Inajijaza Yenyewe)</h3>
-          <p style="font-size:12px; color:#64748b;">Mfumo umeweka <b>SGB-</b> tayari. Andika tarakimu za risiti pekee (Mfano: <b>482910</b>) kisha bofya Hakiki.</p>
-          <div style="display:flex; gap:8px; max-width:480px; align-items:center;">
-            <span style="background:#1e1b4b; color:#fff; padding:9px 14px; border-radius:6px; font-weight:bold; font-size:13.5px; letter-spacing:1px;">SGB-</span>
-            <input type="text" id="rcptCode" placeholder="Andika namba pekee (Mfano: 482910)" onkeyup="if(event.key==='Enter') verifyRcpt()">
-            <button class="btn btn-blue" onclick="verifyRcpt()">🔍 Hakiki</button>
-          </div>
-          <div id="rcptRes" style="margin-top:15px;"></div>
-        </div>
-        <div class="panel">
-          <h4>Risiti za Hivi Karibuni Zilizotolewa na Mfumo (Bofya Namba Kuhakiki Haraka)</h4>
-          <table><tr><th>Namba ya Risiti</th><th>Mwanafunzi</th><th>Mchango</th><th>Chanzo</th><th>Kiasi (TZS)</th><th>Tarehe</th></tr>
-          ${recentRcpts.slice(0, 15).map(r => {
-            const pureDigits = (r.receipt_number || '').replace(/^SGB-?/i, '');
-            return `<tr><td><a href="javascript:void(0)" onclick="document.getElementById('rcptCode').value='${pureDigits}'; verifyRcpt();"><b>${r.receipt_number}</b></a></td><td>${r.student_name}</td><td>${r.payment_category}</td><td>${r.source_fund || 'Kutwa'}</td><td><b>${Number(r.amount_paid).toLocaleString()}</b></td><td>${r.created_at}</td></tr>`;
-          }).join('') || '<tr><td colspan="6">Hakuna risiti bado.</td></tr>'}
+        <div class="panel" style="border-left:4px solid #d97706;">
+          <h3>⏳ 1. Maombi Mapya ya Usajili (Waliojisajili Wenyewe Kwenye Login)</h3>
+          <table>
+            <thead><tr><th>Tarehe</th><th>Jina Kamili</th><th>Nafasi</th><th>Username</th><th>Simu</th><th>Hatua ya Admin</th></tr></thead>
+            <tbody>
+            ${pendingUsers.map(u => `<tr>
+              <td>${u.created_at || '-'}</td>
+              <td><b>${u.full_name}</b></td>
+              <td><b>${u.role}</b></td>
+              <td>${u.username}</td>
+              <td>${u.phone_number || '-'}</td>
+              <td>
+                <button class="btn btn-green" onclick="approveUserAccount('${u.id}')">✅ Thibitisha (Approve)</button>
+                <button class="btn btn-red" onclick="deleteUserAccount('${u.id}')">✕ Kataa</button>
+              </td>
+            </tr>`).join('') || '<tr><td colspan="6">Hakuna maombi mapya yanayosubiri uthibitisho sasa.</td></tr>'}
+            </tbody>
           </table>
-        </div>`;
-      return;
-    }
-    if (tab === 'users_mgmt') {
-      const users = SGB.select('users_profile');
-      area.innerHTML = `
+        </div>
+
         <div class="panel">
-          <h3>1. Sajili Mtumiaji Mpya (Mwalimu, Mwanafunzi, Mzazi, Mhasibu, Mkuu)</h3>
-          <form onsubmit="addUserAccount(event)" style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:15px;">
-            <input type="text" id="uFull" required placeholder="Jina Kamili">
-            <select id="uRole">
-              <option value="student">Mwanafunzi (Student)</option>
-              <option value="parent">Mzazi / Mlezi (Parent)</option>
-              <option value="teacher">Mwalimu (Teacher)</option>
-              <option value="academic">Mtaaluma (Academic)</option>
-              <option value="accountant">Mhasibu (Accountant)</option>
-              <option value="headmaster">Mkuu wa Shule (Headmaster)</option>
-              <option value="librarian">Maktaba (Librarian)</option>
-              <option value="matron">Bweni & Zahanati (Matron/Patron)</option>
-              <option value="super_admin">Super Admin / Mkurugenzi</option>
+          <h3>➕ 2. Sajili Mtumiaji Mpya Moja kwa Moja</h3>
+          <form onsubmit="adminCreateUser(event)" style="display:grid; grid-template-columns:1.5fr 1fr 1fr 1fr 1fr auto; gap:8px; margin-bottom:14px;">
+            <input type="text" id="adFull" required placeholder="Jina Kamili">
+            <select id="adRole">
+              <option value="accountant">Mhasibu (accountant)</option>
+              <option value="headmaster">Mkuu wa Shule (headmaster)</option>
+              <option value="academic">Mtaaluma (academic)</option>
+              <option value="teacher">Mwalimu (teacher)</option>
+              <option value="librarian">Mkutubi (librarian)</option>
+              <option value="matron">Bweni/Zahanati (matron)</option>
+              <option value="parent">Mzazi (parent)</option>
+              <option value="student">Mwanafunzi (student)</option>
+              <option value="super_admin">Admin (super_admin)</option>
             </select>
-            <input type="text" id="uReg" placeholder="Namba ya Usajili / Cheo">
-            <input type="text" id="uPhone" placeholder="Namba ya Simu (07...)">
-            <input type="text" id="uUser" required placeholder="Username ya Kuingilia">
-            <input type="text" id="uPass" required placeholder="Nywila (Password)">
-            <button type="submit" class="btn btn-green" style="grid-column: span 3;">➕ Hifadhi Akaunti Mpya</button>
+            <input type="text" id="adUser" required placeholder="Username">
+            <input type="text" id="adPass" required placeholder="Password">
+            <input type="text" id="adPhone" placeholder="Simu (07...)">
+            <button type="submit" class="btn btn-blue">✅ Sajili</button>
           </form>
 
-          <h3>2. Orodha ya Watumiaji Wote (${users.length})</h3>
-          <table><tr><th>Jina Kamili</th><th>Cheo (Role)</th><th>Reg / Simu</th><th>Username</th><th>Password</th><th>Hatua</th></tr>
-          ${users.map(u => `<tr>
-            <td><b>${u.full_name}</b></td><td>${u.role}</td><td>${u.reg_or_staff_no || '-'} | ${u.phone_number || '-'}</td>
-            <td><code>${u.username}</code></td><td><code>${u.password}</code></td>
-            <td><button class="btn btn-amber" onclick="resetUserPass(${u.id})">🔑 Badili Nywila</button> <button class="btn btn-red" onclick="deleteUserAcc(${u.id})">🗑️ Futa</button></td>
-          </tr>`).join('') || '<tr><td colspan="6">Hakuna watumiaji waliosajiliwa bado.</td></tr>'}
+          <h3>📋 3. Orodha ya Watumiaji Wote Kwenye Mfumo</h3>
+          <input type="text" id="usrSearch" onkeyup="filterUsersTbl()" placeholder="🔍 Tafuta mtumiaji kwa jina, username au nafasi..." style="margin-bottom:8px;">
+          <table id="allUsersTbl">
+            <thead><tr><th>Jina Kamili</th><th>Nafasi</th><th>Username</th><th>Password</th><th>Simu</th><th>Hali</th><th>Hatua</th></tr></thead>
+            <tbody>
+            ${users.map(u => `<tr>
+              <td><b>${u.full_name}</b></td>
+              <td>${u.role}</td>
+              <td><b>${u.username}</b></td>
+              <td><code>${u.password}</code></td>
+              <td>${u.phone_number || '-'}</td>
+              <td><b style="color:${(u.status==='Approved'||u.status==='Active'||!u.status)?'#059669':'#d97706'};">${u.status || 'Approved'}</b></td>
+              <td>
+                <button class="btn btn-amber" onclick="resetUserPassword('${u.id}')">🔑 Badili Pass</button>
+                ${u.username !== 'admin' ? `<button class="btn btn-red" onclick="deleteUserAccount('${u.id}')">Futa</button>` : ''}
+              </td>
+            </tr>`).join('')}
+            </tbody>
           </table>
         </div>`;
       return;
     }
-
-    if (tab === 'sys_config') {
+    if (tab === 'settings') {
       const cfg = SGB.getConfig();
-      const locks = SGB.select('account_locks');
-      const isMaint = localStorage.getItem('sgb_maintenance') === 'true' || localStorage.getItem('sgb_maintenance_mode') === 'true' || cfg.maintenance === true;
+      const maint = JSON.parse(localStorage.getItem('sgb_maintenance_mode') || '{"enabled":false}');
       area.innerHTML = `
-        <div class="panel" style="border-left:5px solid ${isMaint ? '#dc2626' : '#059669'};">
-          <h3>0. Hali ya Uendeshaji wa Mfumo (Washa / Zima Maintenance Mode)</h3>
-          <p>Hali ya Sasa: <b style="color:${isMaint ? '#dc2626' : '#059669'};">${isMaint ? '⚙️ UKO KWENYE MATENGENEZO (Watumiaji Wengine Wamezuiwa)' : '🟢 MFUMO UKO HEWANI (Watumiaji Wote Wanaruhusiwa)'}</b></p>
-          <div style="display:flex; gap:10px; flex-wrap:wrap;">
-            <button type="button" class="btn btn-green" onclick="setMaintenanceMode(false)">🟢 Zima Matengenezo (Rejesha Mfumo Hewani)</button>
-            <button type="button" class="btn btn-red" onclick="setMaintenanceMode(true)">⚙️ Weka Kwenye Matengenezo (Maintenance Mode)</button>
-          </div>
-        </div>
-
         <div class="panel">
-          <h3>1. Mipangilio ya Shule & Akaunti ya Benki</h3>
-          <form onsubmit="saveSchoolCfg(event)" style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:15px;">
-            <input type="text" id="cfgYear" value="${cfg.year}" required placeholder="Mwaka wa Masomo">
-            <input type="text" id="cfgTerm" value="${cfg.term}" required placeholder="Muhula (Term)">
-            <input type="text" id="cfgCrdb" value="${cfg.crdb}" required placeholder="Akaunti ya CRDB">
-            <button type="submit" class="btn btn-blue" style="grid-column: span 3;">💾 Hifadhi Mipangilio</button>
+          <h3>🏫 1. Mipangilio Mikuu ya Shule & Akaunti ya Benki</h3>
+          <form onsubmit="saveSchoolConfig(event)" style="display:grid; grid-template-columns:1fr 1fr 1.5fr auto; gap:10px; margin-bottom:14px;">
+            <input type="text" id="cfgYear" value="${cfg.year || '2026'}" required placeholder="Mwaka wa Masomo">
+            <input type="text" id="cfgTerm" value="${cfg.term || 'Term I'}" required placeholder="Muhula">
+            <input type="text" id="cfgCrdb" value="${cfg.crdb || '0150838972100'}" required placeholder="Akaunti ya CRDB">
+            <button type="submit" class="btn btn-green">💾 Hifadhi</button>
           </form>
         </div>
 
-        <div class="panel">
-          <h3>2. Udhibiti wa Hesabu Zilizofungwa (Admin Unlock Override)</h3>
-          <table><tr><th>Kipindi</th><th>Mapato / Matumizi / Salio</th><th>Hali</th><th>Hatua ya Admin</th></tr>
-          ${locks.map(l => `<tr>
-            <td><b>${l.label}</b> (${l.start_date} - ${l.end_date})</td>
-            <td>In: ${Number(l.period_in||0).toLocaleString()} | Out: ${Number(l.period_out||0).toLocaleString()} | Bal: ${Number(l.period_bal||0).toLocaleString()}</td>
-            <td><b>${l.status}</b></td>
-            <td>${l.status === 'Locked' ? `<button class="btn btn-green" onclick="SGB.update('account_locks', ${l.id}, {status:'Unlocked', unlock_requested:false}); openTab('sys_config')">🔓 Fungua (Admin Override)</button>` : 'Imefunguliwa'}</td>
-          </tr>`).join('') || '<tr><td colspan="4">Hakuna kipindi kilichofungwa.</td></tr>'}
-          </table>
+        <div class="panel" style="border-left:4px solid ${maint.enabled ? '#dc2626' : '#059669'};">
+          <h3>🛠️ 2. Hali ya Matengenezo ya Mfumo (Maintenance Mode)</h3>
+          <p>Hali ya Sasa: <b>${maint.enabled ? '🔴 IMEWASHWA (Watumiaji wa kawaida hawawezi kuingia)' : '🟢 IMEZIMWA (Mfumo uko hewani kwa wote)'}</b></p>
+          <button class="btn ${maint.enabled ? 'btn-green' : 'btn-red'}" onclick="toggleMaintenanceMode(${!maint.enabled})">
+            ${maint.enabled ? '🟢 Zima Matengenezo (Ruhusu Watumiaji)' : '🔴 Washa Matengenezo (Funga Kwa Muda)'}
+          </button>
         </div>`;
       return;
     }
-    if (tab === 'audit_logs') {
-      const logs = SGB.select('audit_logs');
-      area.innerHTML = `
-        <div class="panel">
-          <h3>Kumbukumbu za Usalama na Mienendo ya Mfumo (Audit Trail)</h3>
-          <table><tr><th>Muda</th><th>Mtumiaji</th><th>Tukio / Hatua</th></tr>
-          ${logs.map(l => `<tr><td>${l.time}</td><td><b>${l.actor}</b></td><td>${l.action}</td></tr>`).join('') || '<tr><td colspan="3">Hakuna kumbukumbu bado.</td></tr>'}
-          </table>
-        </div>`;
-      return;
-    }
+
+    const logs = SGB.select('audit_logs');
+    area.innerHTML = `
+      <div class="panel">
+        <h3>🛡️ Kumbukumbu za Ukaguzi wa Mfumo (System Audit Logs)</h3>
+        <table><thead><tr><th>Muda</th><th>Mtumiaji</th><th>Kitendo</th></tr></thead>
+        <tbody>
+        ${logs.slice(0, 60).map(l => `<tr><td>${l.time}</td><td><b>${l.actor}</b></td><td>${l.action}</td></tr>`).join('') || '<tr><td colspan="3">Hakuna kumbukumbu bado.</td></tr>'}
+        </tbody></table>
+      </div>`;
+  }
+  function approveUserAccount(id) {
+    SGB.update('users_profile', id, { status: 'Approved' });
+    alert('✅ Akaunti imethibitishwa! Mtumiaji sasa anaweza kuingia kwenye mfumo.');
+    openTab('users');
   }
 
-  async function verifyRcpt() {
-    await SGB.pullFromCloud(true);
-    let raw = (document.getElementById('rcptCode').value || '').trim().toUpperCase();
-    if (!raw) { alert('⚠️ Ingiza namba ya risiti kwanza.'); return; }
-
-    const digitsOnly = raw.replace(/^SGB-?/i, '').trim();
-    const fullCode = 'SGB-' + digitsOnly;
-
-    const matches = SGB.select('accounting_receipts').filter(r => {
-      const dbCode = (r.receipt_number || '').trim().toUpperCase();
-      return dbCode === fullCode || dbCode === digitsOnly || dbCode.endsWith('-' + digitsOnly);
-    });
-
-    if (matches.length > 0) {
-      const first = matches;
-      const totalAmt = matches.reduce((s, x) => s + Number(x.amount_paid), 0);
-      const itemsList = matches.map(x => `• <b>${x.payment_category}</b> (${x.source_fund || 'Kutwa'}): TZS ${Number(x.amount_paid).toLocaleString()}/=`).join('<br>');
-
-      document.getElementById('rcptRes').innerHTML = `
-        <div style="background:#ecfdf5; border:2px solid #059669; padding:16px; border-radius:8px; max-width:600px;">
-          <h4 style="margin:0 0 8px; color:#059669;">✅ RISITI HII NI HALALI KABISA! (${first.receipt_number})</h4>
-          <b>Jina la Mwanafunzi:</b> ${first.student_name} (${first.student_reg_no || '-'})<br>
-          <b>Njia ya Malipo:</b> ${first.payment_method} (Ref: ${first.bank_ref_no || '-'})<br>
-          <b>Tarehe ya Malipo:</b> ${first.tx_date || first.created_at}<hr>
-          <b>Mchanganuo wa Michango Iliyolipwa:</b><br>${itemsList}<hr>
-          <b style="font-size:15px; color:#064e3b;">JUMLA KUU ILIYOLIPWA: TZS ${totalAmt.toLocaleString()}/=</b>
-        </div>`;
-    } else {
-      document.getElementById('rcptRes').innerHTML = `
-        <div style="background:#fef2f2; border:2px solid #dc2626; padding:16px; border-radius:8px; max-width:600px;">
-          <b style="color:#dc2626;">❌ RISITI NAMBA "${fullCode}" HAIKUPATIKANA KWENYE MFUMO!</b><br>
-          <small>Hakikisha umeandika tarakimu sahihi za risiti au bofya 🔄 Refresh kuvuta data mpya kutoka hewani.</small>
-        </div>`;
-    }
-  }
-  function setMaintenanceMode(state) {
-    localStorage.setItem('sgb_maintenance', state ? 'true' : 'false');
-    localStorage.setItem('sgb_maintenance_mode', state ? 'true' : 'false');
-    const cfg = SGB.getConfig();
-    cfg.maintenance = state;
-    localStorage.setItem('sgb_school_config', JSON.stringify(cfg));
-    SGB.pushToCloud('maintenance');
-    SGB.pushToCloud('maintenance_mode');
-    SGB.pushToCloud('school_config');
-    alert(state ? '⚙️ Mfumo umewekwa kwenye Matengenezo (Maintenance Mode)!' : '🟢 Matengenezo yamezimwa! Watumiaji wote sasa wanaweza kuingia.');
-    openTab('sys_config');
-  }
-
-  function addUserAccount(e) {
+  function adminCreateUser(e) {
     e.preventDefault();
+    const username = document.getElementById('adUser').value.trim().toLowerCase();
+    if (SGB.select('users_profile').some(u => (u.username || '').toLowerCase() === username)) {
+      alert('⚠️ Username hiyo tayari ipo.');
+      return;
+    }
     SGB.insert('users_profile', {
-      full_name: document.getElementById('uFull').value.trim(),
-      role: document.getElementById('uRole').value,
-      reg_or_staff_no: document.getElementById('uReg').value.trim(),
-      phone_number: document.getElementById('uPhone').value.trim(),
-      username: document.getElementById('uUser').value.trim(),
-      password: document.getElementById('uPass').value.trim()
+      full_name: document.getElementById('adFull').value.trim(),
+      role: document.getElementById('adRole').value,
+      username,
+      password: document.getElementById('adPass').value.trim(),
+      phone_number: document.getElementById('adPhone').value.trim(),
+      status: 'Approved'
     });
-    alert('✅ Akaunti mpya imeundwa na kupandishwa hewani!');
-    openTab('users_mgmt');
+    openTab('users');
   }
 
-  function resetUserPass(id) {
-    const np = prompt('Ingiza nywila (password) mpya:');
-    if (np && np.trim()) { SGB.update('users_profile', id, { password: np.trim() }); openTab('users_mgmt'); }
+  function resetUserPassword(id) {
+    const newPass = prompt('Ingiza nenosiri jipya (New Password):');
+    if (!newPass || !newPass.trim()) return;
+    SGB.update('users_profile', id, { password: newPass.trim() });
+    alert('✅ Nenosiri limebadilishwa!');
+    openTab('users');
   }
 
-  function deleteUserAcc(id) {
-    if (!confirm('Una uhakika unataka kufuta mtumiaji huyu?')) return;
-    localStorage.setItem('sgb_users_profile', JSON.stringify(SGB.select('users_profile').filter(x => x.id !== id)));
+  function deleteUserAccount(id) {
+    if (!confirm('Je, una uhakika unataka kufuta akaunti hii?')) return;
+    const list = SGB.select('users_profile').filter(u => String(u.id) !== String(id));
+    localStorage.setItem('sgb_users_profile', JSON.stringify(list));
     SGB.pushToCloud('users_profile');
-    openTab('users_mgmt');
+    openTab('users');
   }
 
-  function saveSchoolCfg(e) {
+  function saveSchoolConfig(e) {
     e.preventDefault();
-    const cfg = SGB.getConfig();
-    cfg.year = document.getElementById('cfgYear').value.trim();
-    cfg.term = document.getElementById('cfgTerm').value.trim();
-    cfg.crdb = document.getElementById('cfgCrdb').value.trim();
+    const cfg = {
+      year: document.getElementById('cfgYear').value.trim(),
+      term: document.getElementById('cfgTerm').value.trim(),
+      crdb: document.getElementById('cfgCrdb').value.trim()
+    };
     localStorage.setItem('sgb_school_config', JSON.stringify(cfg));
     SGB.pushToCloud('school_config');
-    alert('✅ Mipangilio imehifadhiwa!');
+    alert('✅ Mipangilio ya shule imehifadhiwa!');
+    openTab('settings');
   }
 
-  openTab('exec_overview', document.querySelector('.menu-btn'));
+  function toggleMaintenanceMode(enable) {
+    localStorage.setItem('sgb_maintenance_mode', JSON.stringify({ enabled: enable }));
+    SGB.pushToCloud('maintenance_mode');
+    openTab('settings');
+  }
+
+  openTab('users', document.querySelector('.menu-btn'));
 </script>
 </body>
 </html>
