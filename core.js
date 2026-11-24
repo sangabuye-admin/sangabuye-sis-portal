@@ -1,4 +1,4 @@
-// INJINI KUU YA SANGABUYE SIS PORTAL (v6.8 - FFARS, FULL BILINGUAL, CLOUD SYNC & RELIABLE BACKUP)
+// INJINI KUU YA SANGABUYE SIS PORTAL (v7.0 - FFARS, FULL BILINGUAL, CLOUD SYNC, BACKUP & TOPBAR LOGOUT)
 const FIREBASE_DB_URL = 'https://firebaseio.com';
 
 const SGB = {
@@ -167,7 +167,6 @@ const SGB = {
     clearTimeout(this._toastTimer);
     this._toastTimer = setTimeout(() => { toast.style.opacity = '0'; }, 2500);
   },
-
   exportBackup() {
     const backup = { portal: 'Sangabuye SIS Portal', exported_at: new Date().toISOString(), data: {} };
     let count = 0;
@@ -180,7 +179,6 @@ const SGB = {
     const jsonStr = JSON.stringify(backup, null, 2);
     const fileName = 'Sangabuye_Backup_' + new Date().toISOString().slice(0, 10) + '.json';
 
-    // Pakua Faili Moja kwa Moja kwa Data URI (Inafanya kazi kwenye Simu & PC zote)
     const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(jsonStr);
     const link = document.createElement('a');
     link.setAttribute('href', dataUri);
@@ -340,23 +338,19 @@ const SGB = {
     ['DASHIBODI YA MWALIMU', 'TEACHER DASHBOARD'], ['MKUU WA SHULE', 'HEADMASTER OFFICE'],
     ['MKURUGENZI (DIRECTOR)', 'SCHOOL DIRECTOR'], ['TOVUTI YA MZAZI', 'PARENT PORTAL'],
     ['TOVUTI YA MWANAFUNZI', 'STUDENT PORTAL'], ['MAKTABA YA SHULE', 'SCHOOL LIBRARY'],
-    ['MABWENI & ZAHANATI', 'HOSTELS & SICKBAY'], ['Muhtasari wa Fedha & Vyanzo', 'Finance & Sources Summary'],
+    ['MABWENI & ZAHANATI', 'HOSTELS & SICKBAY'], ['Muhtasari (Fedha & Stoo)', 'Summary (Finance & Store)'],
     ['Mapokezi (Kapu la Michango)', 'Receipts (Fee Basket)'], ['Taarifa Kwa Mzazi & Wadaiwa', 'Parent Statement & Defaulters'],
-    ['Matumizi (Filters & Vocha)', 'Expenses (Filters & Vouchers)'], ['Kamati ya Manunuzi', 'Procurement Committee'],
-    ['Mishahara (Pre-Audit, PV & Slip)', 'Payroll (Pre-Audit, PV & Slip)'], ['Kambi ya Masomo & Basi', 'Academic Camp & School Bus'],
-    ['Viwango vya Ada & Michango', 'Fee & Contribution Structures'], ['Stoo ya Vyakula & Vifaa', 'Food & Equipment Store'],
-    ['Ripoti Zote za Kifedha', 'All Financial Reports'], ['Funga Hesabu & Clearance', 'Lock Accounts & Clearance'],
-    ['Toka (Logout)', 'Sign Out (Logout)'], ['Jina la Mwanafunzi', 'Student Full Name'],
-    ['Namba ya Usajili', 'Registration Number'], ['Simu ya Mzazi', 'Parent Phone'],
-    ['Aina ya Malipo', 'Payment Category'], ['Kiasi Kilicholipwa', 'Amount Paid'],
-    ['Salio / Deni', 'Balance / Debt'], ['Chanzo cha Pato', 'Revenue Source'],
-    ['Maelezo ya Matumizi', 'Expense Description'], ['Kiasi (TZS)', 'Amount (TZS)'],
+    ['Viwango vya Ada, Kambi & Basi', 'Fee Structures, Camp & Bus'], ['Matumizi & FFARS PV', 'Expenses & FFARS PV'],
+    ['Kamati ya Manunuzi', 'Procurement Committee'], ['Mishahara (Pre-Audit & Slip)', 'Payroll (Pre-Audit & Slip)'],
+    ['Masurufu (Imprest) & Petty Cash', 'Staff Imprest & Petty Cash'], ['Ruzuku (Capitation Grant)', 'Government Capitation Grant'],
+    ['Bajeti vs Utekelezaji', 'Budget vs Actual Variance'], ['Stoo ya Vyakula & Vifaa', 'Food & Equipment Store'],
+    ['Daftari la Mali (Fixed Assets)', 'Fixed Assets Register'], ['Ripoti, Funga Hesabu & Clearance', 'Reports, Lock & Clearance'],
+    ['Jina la Mwanafunzi', 'Student Full Name'], ['Namba ya Usajili', 'Registration Number'],
+    ['Simu ya Mzazi', 'Parent Phone'], ['Aina ya Malipo', 'Payment Category'],
+    ['Kiasi Kilicholipwa', 'Amount Paid'], ['Salio / Deni', 'Balance / Debt'],
+    ['Chanzo cha Pato', 'Revenue Source'], ['Kiasi (TZS)', 'Amount (TZS)'],
     ['Tarehe', 'Date'], ['Hali', 'Status'], ['Hatua', 'Action'], ['Mtumishi', 'Staff Member'],
-    ['Kazi', 'Job Title'], ['Bidhaa', 'Item Name'], ['Salio', 'Balance'], ['Mtoaji', 'Donor / Supplier'],
-    ['Mwanafunzi', 'Student'], ['Somo', 'Subject'], ['Darasa', 'Class'], ['Jumla', 'Total'],
-    ['Daraja', 'Grade'], ['Pointi', 'Points'], ['Risiti Na.', 'Receipt No.'], ['Njia', 'Method'],
-    ['Andika jina la mwanafunzi...', 'Type student name...'], ['Hakuna miamala bado.', 'No transactions yet.'],
-    ['Hakuna matumizi kwenye kipindi hiki.', 'No expenses in this period.'], ['Hakuna vikao vya manunuzi bado.', 'No procurement meetings yet.']
+    ['Kazi', 'Job Title'], ['Bidhaa', 'Item Name'], ['Salio', 'Balance'], ['Mwanafunzi', 'Student']
   ],
   toggleLang() {
     this.lang = this.lang === 'sw' ? 'en' : 'sw';
@@ -448,6 +442,7 @@ window.addEventListener('DOMContentLoaded', () => {
       <button class="btn" style="background:#d97706;color:#fff;" onclick="SGB.toggleLang()">🌐 SW | EN</button>
       <button class="btn" style="background:#059669;color:#fff;" onclick="SGB.exportBackup()">💾 Backup</button>
       <button class="btn" style="background:#475569;color:#fff;" onclick="SGB.importBackup()">📂 Restore</button>
+      <button class="btn" style="background:#dc2626;color:#fff;" onclick="SGB.logout()">🚪 Logout</button>
     `;
     if (topbar.lastElementChild && topbar.children.length > 1) topbar.replaceChild(tools, topbar.lastElementChild);
     else topbar.appendChild(tools);
