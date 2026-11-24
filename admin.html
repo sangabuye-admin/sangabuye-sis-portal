@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>System Administrator (Admin Control v8.2) | Sangabuye SIS</title>
+  <title>System Administrator (Admin Control v8.3) | Sangabuye SIS</title>
   <script src="core.js?v=7.5"></script>
   <style>
     * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
@@ -47,6 +47,10 @@
   <div class="topbar">
     <div><strong id="tabTitle">👥 1. Watumiaji & Uthibitisho</strong> <span id="syncTime" style="font-size:11px; color:#059669;"></span></div>
     <div></div>
+  </div>
+  <div id="maintTopBanner" style="display:none; background:#dc2626; color:#fff; padding:10px 18px; font-size:13px; font-weight:bold; justify-content:space-between; align-items:center;">
+    <span>⚠️ TAHADHARI: MFUMO UMEZIMWA KWA MATENGENEZO (WATUMIAJI WAMEZUIWA KUINGIA)</span>
+    <button class="btn" style="background:#fff; color:#dc2626;" onclick="setSystemPower(false)">🟢 REJESHA MFUMO SASA (ONLINE)</button>
   </div>
   <div class="content" id="viewArea"></div>
 </div>
@@ -141,13 +145,15 @@
       const maint = JSON.parse(localStorage.getItem('sgb_maintenance_mode') || '{"enabled":false,"reason":"Mfumo upo kwenye matengenezo ya kiufundi."}');
       area.innerHTML = `
         <div class="panel" style="border-left:5px solid ${maint.enabled ? '#dc2626' : '#059669'};">
-          <h3>🛠️ 1. Kuwasha au Kuzima Mfumo (System Power & Maintenance Switch)</h3>
+          <h3>🛠️ 1. Udhibiti wa Hali ya Mfumo (Zima Kwa Matengenezo / Rejesha Mfumo Hewani)</h3>
           <p>Hali ya Sasa ya Mfumo: <b style="font-size:14px; color:${maint.enabled ? '#dc2626' : '#059669'};">${maint.enabled ? '🔴 UMEZIMWA (Maintenance Mode ON — Watumiaji wamezuiwa)' : '🟢 UMEWASHWA (System LIVE — Watumiaji wote wanaingia)'}</b></p>
-          <div style="display:grid; grid-template-columns:2fr auto; gap:10px; align-items:center;">
-            <input type="text" id="maintReason" value="${maint.reason || 'Mfumo upo kwenye matengenezo ya kiufundi.'}" placeholder="Ujumbe utakaotokea mfumo ukizimwa...">
-            ${maint.enabled
-              ? `<button class="btn btn-green" style="padding:11px 18px; font-size:13px;" onclick="setSystemPower(false)">🟢 WASHA MFUMO SASA (TURN SYSTEM ON)</button>`
-              : `<button class="btn btn-red" style="padding:11px 18px; font-size:13px;" onclick="setSystemPower(true)">🔴 ZIMA MFUMO KWA MATENGENEZO (TURN OFF)</button>`}
+          <div style="margin-bottom:10px;">
+            <label style="font-size:12px; font-weight:bold;">Ujumbe wa Matengenezo (Utakaoonekana Kwenye Login):</label>
+            <input type="text" id="maintReason" value="${maint.reason || 'Mfumo upo kwenye matengenezo ya kiufundi.'}" placeholder="Andika sababu ya matengenezo...">
+          </div>
+          <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <button type="button" class="btn btn-green" style="padding:11px 18px; font-size:13px;" onclick="setSystemPower(false)">🟢 WASHA / REJESHA MFUMO BAADA YA MATENGENEZO</button>
+            <button type="button" class="btn btn-red" style="padding:11px 18px; font-size:13px;" onclick="setSystemPower(true)">🔴 ZIMA MFUMO KWA MATENGENEZO</button>
           </div>
         </div>
 
@@ -232,6 +238,22 @@
         </tbody></table>
       </div>`;
   }
+  function updateMaintBanner() {
+    const maint = JSON.parse(localStorage.getItem('sgb_maintenance_mode') || '{"enabled":false}');
+    const b = document.getElementById('maintTopBanner');
+    if (b) b.style.display = maint.enabled ? 'flex' : 'none';
+  }
+
+  async function setSystemPower(turnOff) {
+    const reason = (document.getElementById('maintReason')?.value || '').trim() || 'Mfumo upo kwenye matengenezo.';
+    localStorage.setItem('sgb_maintenance_mode', JSON.stringify({ enabled: turnOff, reason }));
+    await SGB.pushToCloud('maintenance_mode');
+    updateMaintBanner();
+    SGB.logAction(turnOff ? `Amezima mfumo (Maintenance Mode ON): ${reason}` : 'Amerejesha mfumo hewani (System LIVE)');
+    alert(turnOff ? '🔴 Mfumo umezimwa kwa matengenezo!' : '🟢 Mfumo umerejeshwa hewani na watumiaji wote wanaweza kuingia sasa!');
+    openTab('maintenance');
+  }
+
   function openPortalAsAdmin(url) {
     if (user) {
       const elevated = { ...user, role: 'super_admin' };
@@ -302,15 +324,6 @@
     openTab('users');
   }
 
-  function setSystemPower(turnOff) {
-    const reason = (document.getElementById('maintReason')?.value || '').trim() || 'Mfumo upo kwenye matengenezo.';
-    localStorage.setItem('sgb_maintenance_mode', JSON.stringify({ enabled: turnOff, reason }));
-    SGB.pushToCloud('maintenance_mode');
-    SGB.logAction(turnOff ? `Amezima mfumo (Maintenance Mode ON): ${reason}` : 'Amewasha mfumo (System LIVE)');
-    alert(turnOff ? '🔴 Mfumo umezimwa kwa matengenezo!' : '🟢 Mfumo umewashwa na uko hewani kwa watumiaji wote!');
-    openTab('maintenance');
-  }
-
   function approveUserAccount(id) {
     SGB.update('users_profile', id, { status: 'Approved' });
     alert('✅ Akaunti imethibitishwa! Mtumiaji sasa anaweza kuingia kwenye mfumo.');
@@ -364,6 +377,7 @@
     openTab('maintenance');
   }
 
+  updateMaintBanner();
   openTab('users', document.querySelector('.menu-btn'));
 </script>
 </body>
