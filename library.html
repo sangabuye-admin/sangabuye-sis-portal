@@ -86,7 +86,7 @@
     const members = SGB.select('library_members');
     const books = SGB.select('library_books');
     document.getElementById('libMemberList').innerHTML = members.map(m => `<option value="${m.full_name} (${m.member_id})">`).join('');
-    document.getElementById('libBookList').innerHTML = books.map(b => `<option value="${b.title} [${b.barcode}]">`).join('');
+    document.getElementById('libBookList').innerHTML = books.map(b => `<option value="${b.title} (${b.barcode})">`).join('');
   }
 
   function generateNextMemberId(role) {
@@ -135,12 +135,18 @@
         }
       });
 
-      const topBooks = Object.entries(bookCounts).sort((a, b) => b - a).slice(0, 3);
-      const topReaders = Object.entries(readerCounts).sort((a, b) => b - a).slice(0, 3);
-      const topClasses = Object.entries(classCounts).sort((a, b) => b - a).slice(0, 3);
+      const topBooks = Object.entries(bookCounts).sort((a, b) => b.at(1) - a.at(1)).slice(0, 3);
+      const topReaders = Object.entries(readerCounts).sort((a, b) => b.at(1) - a.at(1)).slice(0, 3);
+      const topClasses = Object.entries(classCounts).sort((a, b) => b.at(1) - a.at(1)).slice(0, 3);
 
-      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
-      const heights =;
+      const chartData = new Array(
+        { m: 'Jan', h: 55 },
+        { m: 'Feb', h: 95 },
+        { m: 'Mar', h: 65 },
+        { m: 'Apr', h: 80 },
+        { m: 'May', h: 115 },
+        { m: 'Jun', h: 88 }
+      );
 
       area.innerHTML = `
         <div class="panel" style="padding:10px 14px; margin-bottom:14px;">
@@ -166,9 +172,9 @@
           <div class="panel">
             <h3 style="margin-top:0;">📈 Mwenendo wa Uazimaji</h3>
             <div style="display:flex; align-items:flex-end; justify-content:space-around; height:145px; padding-top:15px; border-bottom:1px solid #cbd5e1;">
-              ${months.map((m, idx) => `<div style="text-align:center; width:14%;">
-                <div style="background:#2563eb; height:${heights[idx]}px; border-radius:4px 4px 0 0;"></div>
-                <small style="font-size:11px; color:#64748b;">${m}</small>
+              ${chartData.map(item => `<div style="text-align:center; width:14%;">
+                <div style="background:#2563eb; height:${item.h}px; border-radius:4px 4px 0 0;"></div>
+                <small style="font-size:11px; color:#64748b;">${item.m}</small>
               </div>`).join('')}
             </div>
           </div>
@@ -191,9 +197,9 @@
         </div>
 
         <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:14px;">
-          <div class="panel"><h4 style="margin-top:0;">⭐ Vitabu Vinavyopendwa</h4>${topBooks.map((x, i) => `<div style="font-size:12px; padding:4px 0;">${i+1}. <b>${x}</b> (${x})</div>`).join('') || '<small>Hakuna takwimu bado.</small>'}</div>
-          <div class="panel"><h4 style="margin-top:0;">🏆 Wasomaji Bora</h4>${topReaders.map((x, i) => `<div style="font-size:12px; padding:4px 0;">${i+1}. <b>${x}</b> (${x})</div>`).join('') || '<small>Hakuna takwimu bado.</small>'}</div>
-          <div class="panel"><h4 style="margin-top:0;">🎓 Madarasa Yanayoongoza</h4>${topClasses.map((x, i) => `<div style="font-size:12px; padding:4px 0;">${i+1}. <b>${x}</b> (${x})</div>`).join('') || '<small>Hakuna takwimu bado.</small>'}</div>
+          <div class="panel"><h4 style="margin-top:0;">⭐ Vitabu Vinavyopendwa</h4>${topBooks.map((x, i) => `<div style="font-size:12px; padding:4px 0;">${i+1}. <b>${x.at(0)}</b> (${x.at(1)})</div>`).join('') || '<small>Hakuna takwimu bado.</small>'}</div>
+          <div class="panel"><h4 style="margin-top:0;">🏆 Wasomaji Bora</h4>${topReaders.map((x, i) => `<div style="font-size:12px; padding:4px 0;">${i+1}. <b>${x.at(0)}</b> (${x.at(1)})</div>`).join('') || '<small>Hakuna takwimu bado.</small>'}</div>
+          <div class="panel"><h4 style="margin-top:0;">🎓 Madarasa Yanayoongoza</h4>${topClasses.map((x, i) => `<div style="font-size:12px; padding:4px 0;">${i+1}. <b>${x.at(0)}</b> (${x.at(1)})</div>`).join('') || '<small>Hakuna takwimu bado.</small>'}</div>
         </div>`;
       return;
     }
@@ -438,7 +444,8 @@
   }
 
   function uploadBooksCsv() {
-    const file = document.getElementById('bkCsvFile').files;
+    const inp = document.getElementById('bkCsvFile');
+    const file = inp && inp.files ? inp.files.item(0) : null;
     if (!file) { alert('⚠️ Chagua faili la CSV kwanza.'); return; }
     const reader = new FileReader();
     reader.onload = (ev) => {
@@ -446,9 +453,17 @@
       let added = 0;
       lines.forEach(line => {
         const cols = line.split(',');
-        if (cols.length >= 2 && cols.trim()) {
-          const qty = Number(cols || 1);
-          SGB.insert('library_books', { barcode: cols.trim(), title: cols.trim(), author: (cols || '-').trim(), category: (cols || 'Jumla').trim(), shelf: (cols || 'R-01').trim(), total_copies: qty, available_copies: qty });
+        if (cols.length >= 2 && cols.at(0).trim()) {
+          const qty = Number(cols.at(5) || 1);
+          SGB.insert('library_books', {
+            barcode: cols.at(0).trim(),
+            title: cols.at(1).trim(),
+            author: (cols.at(2) || '-').trim(),
+            category: (cols.at(3) || 'Jumla').trim(),
+            shelf: (cols.at(4) || 'R-01').trim(),
+            total_copies: qty,
+            available_copies: qty
+          });
           added++;
         }
       });
@@ -480,7 +495,8 @@
   }
 
   function uploadMembersCsv() {
-    const file = document.getElementById('memCsvFile').files;
+    const inp = document.getElementById('memCsvFile');
+    const file = inp && inp.files ? inp.files.item(0) : null;
     if (!file) { alert('⚠️ Chagua faili la CSV kwanza.'); return; }
     const reader = new FileReader();
     reader.onload = (ev) => {
@@ -488,9 +504,14 @@
       let added = 0;
       lines.forEach(line => {
         const cols = line.split(',');
-        if (cols.length >= 2 && cols.trim()) {
-          const role = (cols || 'Student').trim().toLowerCase().includes('teach') ? 'Teacher' : 'Student';
-          SGB.insert('library_members', { member_id: generateNextMemberId(role), full_name: cols.trim(), role, class_dept: (cols || 'Form 1').trim() });
+        if (cols.length >= 2 && cols.at(0).trim()) {
+          const role = (cols.at(1) || 'Student').trim().toLowerCase().includes('teach') ? 'Teacher' : 'Student';
+          SGB.insert('library_members', {
+            member_id: generateNextMemberId(role),
+            full_name: cols.at(0).trim(),
+            role: role,
+            class_dept: (cols.at(2) || 'Form 1').trim()
+          });
           added++;
         }
       });
@@ -505,7 +526,7 @@
     const rawMem = document.getElementById('lnMember').value.trim();
     const days = Number(document.getElementById('lnDays').value || 7);
 
-    const cleanBookTitle = rawBook.replace(/\s*\[.*?\]\s*$/, '').trim();
+    const cleanBookTitle = rawBook.replace(/\s*\(.*?\)\s*$/, '').trim();
     const cleanMemName = rawMem.replace(/\s*\(.*?\)\s*$/, '').trim();
 
     const books = SGB.select('library_books');
@@ -546,7 +567,7 @@
     const code = prompt('Mulika QR Code au andika Barcode ya Kitabu / ID ya Mwanafunzi:');
     if (!code) return;
     const bk = SGB.select('library_books').find(b => b.barcode.toLowerCase() === code.trim().toLowerCase());
-    if (bk) { document.getElementById('lnBook').value = `${bk.title} [${bk.barcode}]`; return; }
+    if (bk) { document.getElementById('lnBook').value = `${bk.title} (${bk.barcode})`; return; }
     const mem = SGB.select('library_members').find(m => m.member_id.toLowerCase() === code.trim().toLowerCase());
     if (mem) { document.getElementById('lnMember').value = `${mem.full_name} (${mem.member_id})`; return; }
     alert('⚠️ QR / Barcode haijapatikana.');
