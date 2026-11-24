@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Maktaba (School Library v7.5) | Sangabuye SIS</title>
+  <title>Maktaba (School Library v8.0) | Sangabuye SIS</title>
   <script src="core.js?v=7.5"></script>
   <style>
     * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
@@ -56,7 +56,7 @@
 
 <div class="main">
   <div class="topbar">
-    <div><strong id="tabTitle">👋 Karibu, Librarian!</strong> <span id="syncTime" style="font-size:11px; color:#059669;"></span></div>
+    <div><strong id="welcomeUser">Karibu, Librarian!</strong> <span id="syncTime" style="font-size:11px; color:#059669;"></span></div>
     <div></div>
   </div>
   <div class="content" id="viewArea"></div>
@@ -66,19 +66,27 @@
 <script>
   const user = SGB.requireRole(['librarian', 'super_admin', 'academic', 'headmaster']);
   SGB.startSessionTimer();
+  if (user && user.full_name) {
+    document.getElementById('welcomeUser').innerText = `Karibu, ${user.full_name}!`;
+  }
 
-  function getSeatStats() {
-    const raw = JSON.parse(localStorage.getItem('sgb_library_seats') || '{"total":50,"occupied":2}');
-    const tot = Number(raw.total || 50);
-    const occ = Number(raw.occupied || 0);
-    return { total: tot, occupied: occ, free: Math.max(0, tot - occ) };
+  function getLibSettings() {
+    const raw = JSON.parse(localStorage.getItem('sgb_library_settings') || '{"fine_per_day":500,"max_books_student":5,"days_student":7,"days_teacher":14,"occupied_seats":2,"total_seats":50}');
+    return {
+      fine_per_day: Number(raw.fine_per_day || 500),
+      max_books_student: Number(raw.max_books_student || 5),
+      days_student: Number(raw.days_student || 7),
+      days_teacher: Number(raw.days_teacher || 14),
+      occupied_seats: Number(raw.occupied_seats || 0),
+      total_seats: Number(raw.total_seats || 50)
+    };
   }
 
   function changeSeats(delta) {
-    const s = getSeatStats();
-    s.occupied = Math.min(s.total, Math.max(0, s.occupied + delta));
-    localStorage.setItem('sgb_library_seats', JSON.stringify(s));
-    SGB.pushToCloud('library_seats');
+    const s = getLibSettings();
+    s.occupied_seats = Math.min(s.total_seats, Math.max(0, s.occupied_seats + delta));
+    localStorage.setItem('sgb_library_settings', JSON.stringify(s));
+    SGB.pushToCloud('library_settings');
     openTab('dash');
   }
 
@@ -103,28 +111,32 @@
       r.style.display = r.innerText.toLowerCase().includes(q) ? '' : 'none';
     });
   }
+
+  function topSearchBarHtml(inputId, targetTableId) {
+    return `<div class="panel" style="padding:10px 14px; margin-bottom:14px;">
+      <input type="text" id="${inputId}" onkeyup="filterTableRows('${inputId}','${targetTableId}')" placeholder="🔍 Tafuta kitabu au jina...">
+    </div>`;
+  }
   function openTab(tab, btn) {
     document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('active'));
     if (btn) btn.classList.add('active');
-    if (btn) document.getElementById('tabTitle').innerText = btn.innerText;
     syncDatalists();
     const area = document.getElementById('viewArea');
+    const cfg = getLibSettings();
 
     if (tab === 'dash') {
       const books = SGB.select('library_books');
       const loans = SGB.select('library_loans');
       const ebooks = SGB.select('library_ebooks');
       const members = SGB.select('library_members');
-      const seats = getSeatStats();
+      const freeSeats = Math.max(0, cfg.total_seats - cfg.occupied_seats);
 
       const totalCopies = books.reduce((s, b) => s + Number(b.total_copies || 1), 0);
       const activeLoans = loans.filter(l => !(l.status || '').includes('Amerudisha'));
       const todayIso = new Date().toISOString().slice(0, 10);
       const dueToday = activeLoans.filter(l => l.due_date === todayIso).length;
 
-      const bookCounts = {};
-      const readerCounts = {};
-      const classCounts = {};
+      const bookCounts = {}, readerCounts = {}, classCounts = {};
       loans.forEach(l => {
         if (l.book) bookCounts[l.book] = (bookCounts[l.book] || 0) + 1;
         if (l.student_name) {
@@ -139,20 +151,10 @@
       const topReaders = Object.entries(readerCounts).sort((a, b) => b.at(1) - a.at(1)).slice(0, 3);
       const topClasses = Object.entries(classCounts).sort((a, b) => b.at(1) - a.at(1)).slice(0, 3);
 
-      const chartData = new Array(
-        { m: 'Jan', h: 55 },
-        { m: 'Feb', h: 95 },
-        { m: 'Mar', h: 65 },
-        { m: 'Apr', h: 80 },
-        { m: 'May', h: 115 },
-        { m: 'Jun', h: 88 }
-      );
+      const chartData = new Array({ m: 'Jan', h: 55 }, { m: 'Feb', h: 95 }, { m: 'Mar', h: 65 }, { m: 'Apr', h: 80 }, { m: 'May', h: 115 }, { m: 'Jun', h: 88 });
 
       area.innerHTML = `
-        <div class="panel" style="padding:10px 14px; margin-bottom:14px;">
-          <input type="text" id="globalLibSearch" onkeyup="filterTableRows('globalLibSearch','dashLoansTbl')" placeholder="🔍 Tafuta kitabu, barcode, au jina la mwanafunzi/mwalimu papo hapo...">
-        </div>
-
+        ${topSearchBarHtml('globalLibSearch', 'dashLoansTbl')}
         <div class="cards-5">
           <div class="card"><h4>📚 Jumla ya Vitabu</h4><div class="val">${totalCopies.toLocaleString()}</div></div>
           <div class="card" style="border-color:#d97706;"><h4>👥 Walioazima</h4><div class="val">${activeLoans.length}</div></div>
@@ -160,10 +162,10 @@
           <div class="card" style="border-color:#7c3aed;"><h4>💻 E-Books</h4><div class="val">${ebooks.length}</div></div>
           <div class="card" style="border-color:#0284c7;">
             <h4>🪑 Viti Vilivyo Wazi</h4>
-            <div class="val">${seats.free}/${seats.total}</div>
+            <div class="val">${freeSeats}/${cfg.total_seats}</div>
             <div style="display:flex; gap:5px; margin-top:6px;">
-              <button class="btn btn-green" style="padding:3px 7px; font-size:10px;" onclick="changeSeats(-1)">+1 Ingia</button>
-              <button class="btn btn-red" style="padding:3px 7px; font-size:10px;" onclick="changeSeats(1)">-1 Toka</button>
+              <button class="btn btn-green" style="padding:3px 7px; font-size:10px;" onclick="changeSeats(1)">+1 Ingia</button>
+              <button class="btn btn-red" style="padding:3px 7px; font-size:10px;" onclick="changeSeats(-1)">-1 Toka</button>
             </div>
           </div>
         </div>
@@ -206,9 +208,7 @@
     if (tab === 'catalog') {
       const books = SGB.select('library_books');
       area.innerHTML = `
-        <div class="panel" style="padding:10px;">
-          <input type="text" id="catSearch" onkeyup="filterTableRows('catSearch','booksTbl')" placeholder="🔍 Tafuta kitabu kwa Barcode, Jina la Kitabu, Mwandishi, Kategoria au Rafu...">
-        </div>
+        ${topSearchBarHtml('catSearch', 'booksTbl')}
         <div class="panel">
           <h3>➕ Sajili Kitabu Kimoja Kimoja</h3>
           <form onsubmit="addSingleBook(event)" style="display:grid; grid-template-columns:1fr 2fr 1.5fr 1fr 1fr 0.8fr auto; gap:8px; margin-bottom:14px;">
@@ -243,13 +243,10 @@
         </div>`;
       return;
     }
-
     if (tab === 'members') {
       const members = SGB.select('library_members');
       area.innerHTML = `
-        <div class="panel" style="padding:10px;">
-          <input type="text" id="memSearch" onkeyup="filterTableRows('memSearch','membersTbl')" placeholder="🔍 Tafuta Mwanafunzi au Mwalimu kwa ID, Jina, au Darasa/Idara...">
-        </div>
+        ${topSearchBarHtml('memSearch', 'membersTbl')}
         <div class="panel">
           <h3>➕ Sajili Mwanafunzi au Mwalimu (ID Inatokea Otomatiki)</h3>
           <form onsubmit="addSingleMember(event)" style="display:grid; grid-template-columns:2fr 1.2fr 1.5fr auto; gap:8px; margin-bottom:14px;">
@@ -278,20 +275,17 @@
         </div>`;
       return;
     }
-
     if (tab === 'issue_return') {
       const loans = SGB.select('library_loans');
       const todayIso = new Date().toISOString().slice(0, 10);
       area.innerHTML = `
-        <div class="panel" style="padding:10px;">
-          <input type="text" id="loanSearch" onkeyup="filterTableRows('loanSearch','loansTbl')" placeholder="🔍 Tafuta muamala kwa ID (TR-), Jina la Kitabu, au Aliyeazima...">
-        </div>
+        ${topSearchBarHtml('loanSearch', 'loansTbl')}
         <div class="panel">
           <h3>🔄 Azimisha Kitabu (Andika Jina au Mulika QR Code)</h3>
           <form onsubmit="issueBookLoan(event)" style="display:grid; grid-template-columns:2fr 2fr 0.8fr auto auto; gap:8px; margin-bottom:14px;">
             <input type="text" id="lnBook" list="libBookList" required placeholder="Andika jina, barcode au somo la kitabu...">
             <input type="text" id="lnMember" list="libMemberList" required placeholder="Andika jina la mwanafunzi/mwalimu...">
-            <input type="number" id="lnDays" value="7" min="1" required title="Siku za Kuazima">
+            <input type="number" id="lnDays" value="${cfg.days_student}" min="1" required title="Siku za Kuazima">
             <button type="submit" class="btn btn-green">✅ Azimisha</button>
             <button type="button" class="btn btn-blue" onclick="scanQrPrompt()">📷 Scan QR</button>
           </form>
@@ -303,7 +297,7 @@
             ${loans.filter(l => !(l.status || '').includes('Amerudisha')).map(l => {
               const isLate = l.due_date && l.due_date < todayIso;
               const daysLate = isLate ? Math.max(1, Math.floor((new Date(todayIso) - new Date(l.due_date)) / 86400000)) : 0;
-              const fine = daysLate * 500;
+              const fine = daysLate * cfg.fine_per_day;
               return `<tr>
                 <td><b>${l.tx_id || 'TR-' + String(l.id).slice(-4)}</b></td>
                 <td><b>${l.book}</b></td>
@@ -316,6 +310,201 @@
             }).join('') || '<tr><td colspan="7">Hakuna vitabu vilivyoazimwa sasa.</td></tr>'}
             </tbody>
           </table>
+        </div>`;
+      return;
+    }
+    if (tab === 'reservations') {
+      const books = SGB.select('library_books');
+      const resList = SGB.select('library_reservations');
+      area.innerHTML = `
+        ${topSearchBarHtml('resSearch', 'resTbl')}
+        <div class="panel">
+          <h3>📅 Weka Oda ya Kuhifadhi Kitabu</h3>
+          <form onsubmit="addBookReservation(event)" style="display:grid; grid-template-columns:2fr 1.5fr auto; gap:8px; margin-bottom:14px;">
+            <select id="resBookSel" required>
+              <option value="">-- Chagua Kitabu cha Kuhifadhi --</option>
+              ${books.map(b => `<option value="${b.barcode}|${b.title}">${b.title} (${b.barcode}) — Zilizopo: ${b.available_copies}</option>`).join('')}
+            </select>
+            <input type="text" id="resMember" list="libMemberList" value="${user ? user.full_name : ''}" required placeholder="Jina la Aliyeomba">
+            <button type="submit" class="btn btn-blue">Weka Oda</button>
+          </form>
+
+          <h3>Orodha ya Maombi ya Uhifadhi</h3>
+          <table id="resTbl">
+            <thead><tr><th>ID</th><th>Barcode</th><th>Kitabu</th><th>Aliyeomba</th><th>Tarehe</th><th>Hali</th><th>Kitendo</th></tr></thead>
+            <tbody>
+            ${resList.map(r => `<tr>
+              <td><b>${r.res_id || 'RES-' + String(r.id).slice(-4)}</b></td>
+              <td>${r.barcode || '-'}</td>
+              <td><b>${r.book_title}</b></td>
+              <td>${r.requester}</td>
+              <td>${r.created_at}</td>
+              <td><b>${r.status}</b></td>
+              <td>
+                ${r.status === 'Inasubiri' ? `<button class="btn btn-green" onclick="SGB.update('library_reservations','${r.id}',{status:'Imeidhinishwa'}); openTab('reservations')">✅ Idhinisha</button> <button class="btn btn-red" onclick="SGB.update('library_reservations','${r.id}',{status:'Imekataliwa'}); openTab('reservations')">✕ Kataa</button>` : '✓ Tayari'}
+              </td>
+            </tr>`).join('') || '<tr><td colspan="7">Hakuna maombi ya uhifadhi bado.</td></tr>'}
+            </tbody>
+          </table>
+        </div>`;
+      return;
+    }
+
+    if (tab === 'ebooks') {
+      const ebooks = SGB.select('library_ebooks');
+      area.innerHTML = `
+        ${topSearchBarHtml('ebSearch', 'ebTbl')}
+        <div class="panel">
+          <h3>➕ Pakia Nyenzo Mpya Kwenye Maktaba Mtandao</h3>
+          <form onsubmit="addEbookResource(event)" style="display:grid; grid-template-columns:1.5fr 1fr 1.5fr 1fr auto; gap:8px; margin-bottom:14px;">
+            <input type="text" id="ebTitle" required placeholder="Jina la Kitabu/Notes">
+            <select id="ebType">
+              <option value="PDF">PDF Document</option>
+              <option value="Video">Video Lesson</option>
+              <option value="Link">Google Drive / Web Link</option>
+            </select>
+            <input type="text" id="ebLink" placeholder="Kiungo (Google Drive Link) au chagua PDF chini">
+            <input type="text" id="ebSubj" required placeholder="Somo (mf. Physics)">
+            <button type="submit" class="btn btn-green">✅ Pakia Nyenzo</button>
+            <div style="grid-column: span 5; background:#f8fafc; padding:8px; border:1px dashed #94a3b8; border-radius:6px;">
+              <small><b>Au Pakia Faili la PDF Moja kwa Moja (Mtumiaji Yeyote Anaweza Kufungua):</b></small>
+              <input type="file" id="ebPdfFile" accept=".pdf" style="margin-top:4px;">
+            </div>
+          </form>
+
+          <h3>💻 Maktaba Mtandao (E-Books & Video)</h3>
+          <table id="ebTbl">
+            <thead><tr><th>ID</th><th>Jina la Nyenzo</th><th>Aina</th><th>Somo</th><th>Fungua</th></tr></thead>
+            <tbody>
+            ${ebooks.map((e, idx) => `<tr>
+              <td><b>${e.eb_id || 'EB-' + String(idx + 1).padStart(2, '0')}</b></td>
+              <td><b>${e.title}</b></td>
+              <td>${e.res_type || 'PDF'}</td>
+              <td>${e.subject}</td>
+              <td><button class="btn btn-blue" onclick="openEbookItem('${e.id}')">📂 Fungua</button></td>
+            </tr>`).join('') || '<tr><td colspan="5">Hakuna nyenzo za mtandao bado.</td></tr>'}
+            </tbody>
+          </table>
+        </div>`;
+      return;
+    }
+    if (tab === 'suggestions') {
+      const sugs = SGB.select('library_suggestions');
+      area.innerHTML = `
+        ${topSearchBarHtml('sugSearch', 'sugTbl')}
+        <div class="panel">
+          <h3>💡 Pendekeza Kitabu Kipya cha Kununuliwa</h3>
+          <form onsubmit="submitBookSuggestion(event)" style="display:grid; grid-template-columns:2fr 1.5fr auto; gap:8px; margin-bottom:14px;">
+            <input type="text" id="sgBook" required placeholder="Jina la Kitabu Unachopendekeza">
+            <input type="text" id="sgAuthorSubj" required placeholder="Mwandishi au Somo (mf. Biology)">
+            <button type="submit" class="btn btn-blue">📩 Tuma Pendekezo (Kwa Mkuu wa Shule)</button>
+          </form>
+          <table id="sugTbl">
+            <thead><tr><th>Tarehe</th><th>Kitabu Kilichopendekezwa</th><th>Mwandishi / Somo</th><th>Aliyependekeza</th><th>Hali</th></tr></thead>
+            <tbody>
+            ${sugs.map(s => `<tr><td>${s.created_at}</td><td><b>${s.book_title}</b></td><td>${s.author_subject}</td><td>${s.suggested_by}</td><td><b>${s.status}</b></td></tr>`).join('') || '<tr><td colspan="5">Hakuna mapendekezo yaliyotumwa bado.</td></tr>'}
+            </tbody>
+          </table>
+        </div>`;
+      return;
+    }
+
+    if (tab === 'fines') {
+      const loans = SGB.select('library_loans');
+      const todayIso = new Date().toISOString().slice(0, 10);
+      const lateOrFined = loans.filter(l => (l.due_date && l.due_date < todayIso && !(l.status || '').includes('Amerudisha')) || Number(l.fine_paid || 0) > 0);
+      area.innerHTML = `
+        ${topSearchBarHtml('fineSearch', 'finesTbl')}
+        <div class="panel">
+          <h3>💰 Usimamizi wa Faini za Maktaba (Kiwango cha Mkuu wa Shule: TZS ${cfg.fine_per_day}/siku)</h3>
+          <table id="finesTbl">
+            <thead><tr><th>ID</th><th>Mwanafunzi / Mwalimu</th><th>Kitabu</th><th>Tarehe Kurudisha</th><th>Faini (TZS)</th><th>Hali</th></tr></thead>
+            <tbody>
+            ${lateOrFined.map(l => {
+              const isLate = l.due_date && l.due_date < todayIso && !(l.status || '').includes('Amerudisha');
+              const daysLate = isLate ? Math.max(1, Math.floor((new Date(todayIso) - new Date(l.due_date)) / 86400000)) : 0;
+              const fine = isLate ? daysLate * cfg.fine_per_day : Number(l.fine_paid || 0);
+              return `<tr><td>${l.tx_id || l.id}</td><td><b>${l.student_name}</b></td><td>${l.book}</td><td>${l.due_date}</td><td style="color:#dc2626;"><b>TZS ${fine.toLocaleString()}</b></td><td>${l.status}</td></tr>`;
+            }).join('') || '<tr><td colspan="6">Hakuna madeni ya faini sasa.</td></tr>'}
+            </tbody>
+          </table>
+        </div>`;
+      return;
+    }
+    if (tab === 'id_cards') {
+      const members = SGB.select('library_members');
+      area.innerHTML = `
+        ${topSearchBarHtml('idSearch', 'idCardsHolder')}
+        <div class="panel">
+          <h3>🪪 Vitambulisho vya Maktaba vyenye QR Code</h3>
+          <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:14px;">
+            <select id="idMemberPick" onchange="renderLibraryIdCards()" style="max-width:360px;">
+              <option value="ALL">-- Chagua Mwanafunzi/Mwalimu au Onyesha Wote --</option>
+              ${members.map(m => `<option value="${m.member_id}">${m.full_name} (${m.member_id} — ${m.class_dept})</option>`).join('')}
+            </select>
+            <button class="btn btn-blue" onclick="document.getElementById('idMemberPick').value='ALL'; renderLibraryIdCards();">👥 Onyesha Kadi Zote</button>
+            <button class="btn btn-green" onclick="printDiv('idCardsHolder')">🖨️ Chapisha Kadi</button>
+          </div>
+          <div id="idCardsHolder" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:12px;"></div>
+        </div>`;
+      renderLibraryIdCards();
+      return;
+    }
+
+    if (tab === 'reports') {
+      const books = SGB.select('library_books');
+      const loans = SGB.select('library_loans');
+      const members = SGB.select('library_members');
+      const todayIso = new Date().toISOString().slice(0, 10);
+
+      const totalBooks = books.reduce((s, b) => s + Number(b.total_copies || 1), 0);
+      const activeLoans = loans.filter(l => !(l.status || '').includes('Amerudisha'));
+      const overdueLoans = activeLoans.filter(l => l.due_date && l.due_date < todayIso);
+      const totalFinesDue = overdueLoans.reduce((s, l) => {
+        const d = Math.max(1, Math.floor((new Date(todayIso) - new Date(l.due_date)) / 86400000));
+        return s + (d * cfg.fine_per_day);
+      }, 0);
+
+      area.innerHTML = `
+        ${topSearchBarHtml('repSearch', 'repBooksTbl')}
+        <div class="panel">
+          <div style="display:flex; gap:8px; margin-bottom:12px;">
+            <button class="btn btn-green" onclick="downloadLibraryReportCsv()">⬇️ Pakua Ripoti (CSV)</button>
+            <button class="btn btn-blue" onclick="printDiv('libMainReportPrint')">🖨️ Chapisha Ripoti (PDF)</button>
+          </div>
+
+          <div id="libMainReportPrint" style="border:2px solid #0f172a; padding:18px; background:#fff;">
+            <div style="text-align:center; border-bottom:2px solid #0f172a; padding-bottom:8px; margin-bottom:12px;">
+              <h3 style="margin:0; color:#0f172a;">📊 Ripoti Kuu ya Maktaba — Shule ya Sekondari Sangabuye</h3>
+              <small>Kaulimbiu: “Elimu Kwa Ukombozi” | S.L.P 11898, Ilemela - Mwanza</small>
+            </div>
+
+            <div class="cards-5">
+              <div class="card"><h4>Jumla ya Vitabu:</h4><div class="val">${totalBooks}</div></div>
+              <div class="card" style="border-color:#d97706;"><h4>Vilivyoazimwa Sasa:</h4><div class="val">${activeLoans.length}</div></div>
+              <div class="card" style="border-color:#dc2626;"><h4>Faini Zinazodaiwa:</h4><div class="val">TZS ${totalFinesDue.toLocaleString()}</div></div>
+              <div class="card" style="border-color:#059669;"><h4>Wanachama:</h4><div class="val">${members.length}</div></div>
+            </div>
+
+            <h4>⚠️ Orodha ya Vitabu Vilivyocheleweshwa & Madeni ya Faini</h4>
+            <table>
+              <thead><tr><th>ID</th><th>Mwanafunzi/Mwalimu</th><th>Kitabu</th><th>Tarehe Kurudisha</th><th>Faini (TZS)</th></tr></thead>
+              <tbody>
+              ${overdueLoans.map(l => {
+                const d = Math.max(1, Math.floor((new Date(todayIso) - new Date(l.due_date)) / 86400000));
+                return `<tr><td>${l.tx_id || l.id}</td><td><b>${l.student_name}</b></td><td>${l.book}</td><td>${l.due_date}</td><td style="color:#dc2626;"><b>${(d * cfg.fine_per_day).toLocaleString()}</b></td></tr>`;
+              }).join('') || '<tr><td colspan="5">Hakuna vitabu vilivyocheleweshwa.</td></tr>'}
+              </tbody>
+            </table>
+
+            <h4 style="margin-top:16px;">📚 Muhtasari wa Katalogi ya Vitabu Vyote</h4>
+            <table id="repBooksTbl">
+              <thead><tr><th>Barcode</th><th>Jina la Kitabu</th><th>Kategoria</th><th>Rafu</th><th>Jumla</th><th>Zilizopo</th></tr></thead>
+              <tbody>
+              ${books.map(b => `<tr><td>${b.barcode}</td><td><b>${b.title}</b></td><td>${b.category}</td><td>${b.shelf}</td><td>${b.total_copies}</td><td><b>${b.available_copies}</b></td></tr>`).join('') || '<tr><td colspan="6">Hakuna vitabu vilivyosajiliwa.</td></tr>'}
+              </tbody>
+            </table>
+          </div>
         </div>`;
       return;
     }
@@ -352,24 +541,6 @@
       return;
     }
 
-    if (tab === 'ebooks') {
-      const ebooks = SGB.select('library_ebooks');
-      area.innerHTML = `
-        <div class="panel">
-          <h3>💻 Maktaba Mtandao (E-Books & Digital Notes)</h3>
-          <form onsubmit="addEbook(event)" style="display:grid; grid-template-columns:2fr 1fr 2fr auto; gap:8px; margin-bottom:12px;">
-            <input type="text" id="ebTitle" required placeholder="Jina la E-Book / Notes">
-            <input type="text" id="ebSubj" required placeholder="Somo / Kidato">
-            <input type="text" id="ebLink" required placeholder="Kiungo (Link / URL)">
-            <button type="submit" class="btn btn-blue">➕ Ongeza E-Book</button>
-          </form>
-          <table><tr><th>Jina la E-Book</th><th>Somo</th><th>Kiungo</th></tr>
-          ${ebooks.map(e => `<tr><td><b>${e.title}</b></td><td>${e.subject}</td><td><a href="${e.link}" target="_blank">Fungua Kitabu</a></td></tr>`).join('') || '<tr><td colspan="3">Hakuna E-Books bado.</td></tr>'}
-          </table>
-        </div>`;
-      return;
-    }
-
     if (tab === 'ict') {
       const ict = SGB.select('library_ict');
       area.innerHTML = `
@@ -382,65 +553,153 @@
             <button type="submit" class="btn btn-green">➕ Hifadhi</button>
           </form>
           <table><tr><th>Kifaa</th><th>Namba</th><th>Hali</th></tr>
-          ${ict.map(x => `<tr><td><b>${x.name}</b></td><td>${x.code}</td><td>${x.status}</td></tr>`).join('') || '<tr><td colspan="3">Hakuna vifaa vilivyosajiliwa bado.</td></tr>'}
+          ${ict.map(x => `<tr><td><b>${x.name}</b></td><td>${x.code}</td><td>${x.status}</td></tr>`).join('') || '<tr><td colspan="3">Hakuna vifaa bado.</td></tr>'}
           </table>
         </div>`;
       return;
     }
 
-    if (tab === 'id_cards' || tab === 'book_labels') {
-      const isId = tab === 'id_cards';
-      const list = isId ? SGB.select('library_members') : SGB.select('library_books');
-      area.innerHTML = `
-        <div class="panel">
-          <h3>${isId ? '🪪 Vitambulisho vya Maktaba (QR Codes)' : '🏷️ Stika za Vitabu (Barcode & QR Labels)'}</h3>
-          <button class="btn btn-blue" onclick="printDiv('qrGridBox')">🖨️ Chapisha Zote</button>
-          <div id="qrGridBox" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(210px, 1fr)); gap:10px; margin-top:12px;">
-            ${list.map(x => {
-              const title = isId ? x.full_name : x.title;
-              const code = isId ? x.member_id : x.barcode;
-              const sub = isId ? `${x.role} - ${x.class_dept}` : `Rafu: ${x.shelf} | ${x.category}`;
-              return `<div style="border:1.5px solid #0f172a; padding:10px; border-radius:8px; text-align:center; background:#fff;">
-                <b style="font-size:11px;">SANGABUYE SEC LIBRARY</b><br>
-                <img src="${SGB.qrImg(code + '|' + title)}" style="margin:6px 0;"><br>
-                <b>${title}</b><br><small>${code} | ${sub}</small>
-              </div>`;
-            }).join('') || '<p>Hakuna rekodi za kuchapisha bado.</p>'}
-          </div>
-        </div>`;
-      return;
-    }
-
-    const loansAll = SGB.select('library_loans');
+    const bList = SGB.select('library_books');
     area.innerHTML = `
       <div class="panel">
-        <h3>📊 Muhtasari wa Kumbukumbu & Ripoti za Maktaba</h3>
-        <table><tr><th>ID</th><th>Kitabu</th><th>Aliyeazima</th><th>Tarehe</th><th>Hali</th><th>Faini (TZS)</th></tr>
-        ${loansAll.map(l => `<tr><td>${l.tx_id || l.id}</td><td><b>${l.book}</b></td><td>${l.student_name}</td><td>${l.due_date || l.created_at}</td><td>${l.status}</td><td>${Number(l.fine_paid || 0).toLocaleString()}</td></tr>`).join('') || '<tr><td colspan="6">Hakuna kumbukumbu bado.</td></tr>'}
-        </table>
+        <h3>🏷️ Stika za Vitabu (Barcode & QR Labels)</h3>
+        <button class="btn btn-blue" onclick="printDiv('bkLabelsBox')">🖨️ Chapisha Stika Zote</button>
+        <div id="bkLabelsBox" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(210px, 1fr)); gap:10px; margin-top:12px;">
+          ${bList.map(x => `<div style="border:1.5px solid #0f172a; padding:10px; border-radius:8px; text-align:center; background:#fff;">
+            <b style="font-size:11px;">SANGABUYE SEC LIBRARY</b><br>
+            <img src="${SGB.qrImg(x.barcode + '|' + x.title)}" style="margin:6px 0;"><br>
+            <b>${x.title}</b><br><small>${x.barcode} | Rafu: ${x.shelf}</small>
+          </div>`).join('') || '<p>Hakuna vitabu vilivyosajiliwa bado.</p>'}
+        </div>
       </div>`;
   }
+  function submitBookSuggestion(e) {
+    e.preventDefault();
+    const book_title = document.getElementById('sgBook').value.trim();
+    const author_subject = document.getElementById('sgAuthorSubj').value.trim();
+    const senderName = user ? `${user.full_name} (${user.role})` : 'Mtumiaji wa Maktaba';
+
+    SGB.insert('library_suggestions', {
+      book_title,
+      author_subject,
+      suggested_by: senderName,
+      status: 'Imetumwa Kwa Mkuu wa Shule'
+    });
+
+    SGB.insert('direct_messages', {
+      sender: senderName,
+      recipient: 'Mkuu wa Shule',
+      subject: `PENDEKEZO LA KITABU MAKTABA: ${book_title}`,
+      body: `Kitabu kinachopendekezwa kununuliwa: ${book_title} (${author_subject}).`
+    });
+
+    alert('✅ Pendekezo limetumwa kwa Mkuu wa Shule!');
+    openTab('suggestions');
+  }
+
+  function addBookReservation(e) {
+    e.preventDefault();
+    const raw = document.getElementById('resBookSel').value;
+    if (!raw) return;
+    const parts = raw.split('|');
+    const requester = document.getElementById('resMember').value.trim();
+    SGB.insert('library_reservations', {
+      res_id: 'RES-' + Math.floor(1000 + Math.random() * 9000),
+      barcode: parts.at(0),
+      book_title: parts.at(1),
+      requester,
+      status: 'Inasubiri'
+    });
+    alert('✅ Oda ya kuhifadhi kitabu imewekwa!');
+    openTab('reservations');
+  }
+
+  function addEbookResource(e) {
+    e.preventDefault();
+    const title = document.getElementById('ebTitle').value.trim();
+    const res_type = document.getElementById('ebType').value;
+    const link = document.getElementById('ebLink').value.trim();
+    const subject = document.getElementById('ebSubj').value.trim();
+    const fileInp = document.getElementById('ebPdfFile');
+    const file = fileInp && fileInp.files ? fileInp.files.item(0) : null;
+
+    if (file) {
+      if (file.size > 2500000) {
+        alert('⚠️ Faili la PDF ni kubwa sana (>2.5MB). Tumia kiungo cha Google Drive kwa mafaili makubwa.');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        SGB.insert('library_ebooks', {
+          eb_id: 'EB-' + String(SGB.select('library_ebooks').length + 1).padStart(2, '0'),
+          title, res_type: 'PDF', subject, pdf_data: ev.target.result, link: ''
+        });
+        alert('✅ Faili la PDF limepakiwa kwenye Maktaba Mtandao!');
+        openTab('ebooks');
+      };
+      reader.readAsDataURL(file);
+    } else {
+      if (!link) { alert('⚠️ Weka kiungo (Link) au chagua faili la PDF.'); return; }
+      SGB.insert('library_ebooks', {
+        eb_id: 'EB-' + String(SGB.select('library_ebooks').length + 1).padStart(2, '0'),
+        title, res_type, subject, link, pdf_data: ''
+      });
+      alert('✅ Nyenzo imepakiwa kwenye Maktaba Mtandao!');
+      openTab('ebooks');
+    }
+  }
+
+  function openEbookItem(id) {
+    const item = SGB.select('library_ebooks').find(x => String(x.id) === String(id));
+    if (!item) return;
+    if (item.pdf_data) {
+      const w = window.open('', '_blank');
+      w.document.write(`<iframe src="${item.pdf_data}" style="width:100%;height:100%;border:none;"></iframe>`);
+    } else if (item.link) {
+      window.open(item.link, '_blank');
+    }
+  }
+  function renderLibraryIdCards() {
+    const pick = document.getElementById('idMemberPick')?.value || 'ALL';
+    let members = SGB.select('library_members');
+    if (pick !== 'ALL') members = members.filter(m => m.member_id === pick);
+
+    document.getElementById('idCardsHolder').innerHTML = members.map(m => `
+      <div style="border:2px solid #0f172a; border-radius:10px; padding:14px; background:#fff; text-align:center; line-height:1.5;">
+        <b style="font-size:12px; color:#0f172a;">SHULE YA SEKONDARI SANGABUYE</b><br>
+        <span style="background:#1d4ed8; color:#fff; padding:2px 8px; border-radius:4px; font-size:10.5px; font-weight:bold;">KITAMBULISHO CHA MAKTABA</span>
+        <div style="text-align:left; font-size:12px; margin:10px 0; border-top:1px solid #e2e8f0; border-bottom:1px solid #e2e8f0; padding:6px 0;">
+          <b>Jina:</b> ${m.full_name}<br>
+          <b>Namba:</b> ${m.member_id}<br>
+          <b>Nafasi:</b> ${m.role}<br>
+          <b>Darasa/Idara:</b> ${m.class_dept}
+        </div>
+        <img src="${SGB.qrImg(m.member_id + '|' + m.full_name)}" style="height:68px;"><br>
+        <small style="font-size:10.5px; color:#475569;">“Elimu Kwa Ukombozi” | Ilemela - Mwanza</small>
+      </div>
+    `).join('') || '<p>Hakuna wanachama waliosajiliwa bado.</p>';
+  }
+
+  function downloadLibraryReportCsv() {
+    const books = SGB.select('library_books');
+    let csv = "Barcode,Jina la Kitabu,Mwandishi,Kategoria,Rafu,Jumla,Zilizopo\n";
+    books.forEach(b => { csv += `"${b.barcode}","${b.title}","${b.author}","${b.category}","${b.shelf}",${b.total_copies},${b.available_copies}\n`; });
+    const a = document.createElement('a');
+    a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+    a.download = 'Ripoti_Kuu_Maktaba_Sangabuye.csv';
+    a.click();
+  }
+
   function addSingleBook(e) {
     e.preventDefault();
     const qty = Number(document.getElementById('bkQty').value || 1);
-    SGB.insert('library_books', {
-      barcode: document.getElementById('bkCode').value.trim(),
-      title: document.getElementById('bkTitle').value.trim(),
-      author: document.getElementById('bkAuthor').value.trim() || '-',
-      category: document.getElementById('bkCat').value.trim(),
-      shelf: document.getElementById('bkShelf').value.trim(),
-      total_copies: qty,
-      available_copies: qty
-    });
+    SGB.insert('library_books', { barcode: document.getElementById('bkCode').value.trim(), title: document.getElementById('bkTitle').value.trim(), author: document.getElementById('bkAuthor').value.trim() || '-', category: document.getElementById('bkCat').value.trim(), shelf: document.getElementById('bkShelf').value.trim(), total_copies: qty, available_copies: qty });
     openTab('catalog');
   }
 
   function downloadBooksTemplate() {
-    const csv = "Barcode,Jina la Kitabu,Mwandishi,Kategoria,Rafu,Jumla\nBK-1006,Biology For Secondary School Book Two,TIE,Sayansi,R-01,15\nBK-1007,Kiswahili Kidato cha Tatu,TUKI,Lugha,R-02,20";
-    const a = document.createElement('a');
-    a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
-    a.download = 'Template_Vitabu_Maktaba.csv';
-    a.click();
+    const csv = "Barcode,Jina la Kitabu,Mwandishi,Kategoria,Rafu,Jumla\nBK-1006,Biology For Secondary School Book Two,TIE,Sayansi,R-01,15";
+    const a = document.createElement('a'); a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv); a.download = 'Template_Vitabu_Maktaba.csv'; a.click();
   }
 
   function uploadBooksCsv() {
@@ -450,48 +709,27 @@
     const reader = new FileReader();
     reader.onload = (ev) => {
       const lines = ev.target.result.split(/\r?\n/).slice(1);
-      let added = 0;
       lines.forEach(line => {
         const cols = line.split(',');
         if (cols.length >= 2 && cols.at(0).trim()) {
           const qty = Number(cols.at(5) || 1);
-          SGB.insert('library_books', {
-            barcode: cols.at(0).trim(),
-            title: cols.at(1).trim(),
-            author: (cols.at(2) || '-').trim(),
-            category: (cols.at(3) || 'Jumla').trim(),
-            shelf: (cols.at(4) || 'R-01').trim(),
-            total_copies: qty,
-            available_copies: qty
-          });
-          added++;
+          SGB.insert('library_books', { barcode: cols.at(0).trim(), title: cols.at(1).trim(), author: (cols.at(2) || '-').trim(), category: (cols.at(3) || 'Jumla').trim(), shelf: (cols.at(4) || 'R-01').trim(), total_copies: qty, available_copies: qty });
         }
       });
-      alert(`✅ Vitabu ${added} vimepakiwa kikamilifu!`);
       openTab('catalog');
     };
     reader.readAsText(file);
   }
-
   function addSingleMember(e) {
     e.preventDefault();
     const role = document.getElementById('mRole').value;
-    const autoId = generateNextMemberId(role);
-    SGB.insert('library_members', {
-      member_id: autoId,
-      full_name: document.getElementById('mFull').value.trim(),
-      role: role,
-      class_dept: document.getElementById('mClassDept').value.trim()
-    });
+    SGB.insert('library_members', { member_id: generateNextMemberId(role), full_name: document.getElementById('mFull').value.trim(), role, class_dept: document.getElementById('mClassDept').value.trim() });
     openTab('members');
   }
 
   function downloadMembersTemplate() {
-    const csv = "Jina Kamili,Nafasi (Student/Teacher),Darasa au Idara\nAmina Juma Ally,Student,Form 4A\nMwl. John Peter,Teacher,Sayansi";
-    const a = document.createElement('a');
-    a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
-    a.download = 'Template_Wanafunzi_Walimu_Maktaba.csv';
-    a.click();
+    const csv = "Jina Kamili,Nafasi (Student/Teacher),Darasa au Idara\nAmina Juma Ally,Student,Form 4A";
+    const a = document.createElement('a'); a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv); a.download = 'Template_Wanafunzi_Walimu.csv'; a.click();
   }
 
   function uploadMembersCsv() {
@@ -501,66 +739,43 @@
     const reader = new FileReader();
     reader.onload = (ev) => {
       const lines = ev.target.result.split(/\r?\n/).slice(1);
-      let added = 0;
       lines.forEach(line => {
         const cols = line.split(',');
         if (cols.length >= 2 && cols.at(0).trim()) {
           const role = (cols.at(1) || 'Student').trim().toLowerCase().includes('teach') ? 'Teacher' : 'Student';
-          SGB.insert('library_members', {
-            member_id: generateNextMemberId(role),
-            full_name: cols.at(0).trim(),
-            role: role,
-            class_dept: (cols.at(2) || 'Form 1').trim()
-          });
-          added++;
+          SGB.insert('library_members', { member_id: generateNextMemberId(role), full_name: cols.at(0).trim(), role, class_dept: (cols.at(2) || 'Form 1').trim() });
         }
       });
-      alert(`✅ Wanafunzi/Walimu ${added} wamepakiwa!`);
       openTab('members');
     };
     reader.readAsText(file);
   }
+
   function issueBookLoan(e) {
     e.preventDefault();
     const rawBook = document.getElementById('lnBook').value.trim();
     const rawMem = document.getElementById('lnMember').value.trim();
     const days = Number(document.getElementById('lnDays').value || 7);
-
     const cleanBookTitle = rawBook.replace(/\s*\(.*?\)\s*$/, '').trim();
     const cleanMemName = rawMem.replace(/\s*\(.*?\)\s*$/, '').trim();
-
-    const books = SGB.select('library_books');
-    const foundBk = books.find(b => b.title.toLowerCase() === cleanBookTitle.toLowerCase() || b.barcode.toLowerCase() === rawBook.toLowerCase());
+    const foundBk = SGB.select('library_books').find(b => b.title.toLowerCase() === cleanBookTitle.toLowerCase() || b.barcode.toLowerCase() === rawBook.toLowerCase());
     if (foundBk) {
       if (Number(foundBk.available_copies) <= 0) { alert('⚠️ Nakala zote za kitabu hiki zimeazimwa!'); return; }
       SGB.update('library_books', foundBk.id, { available_copies: Number(foundBk.available_copies) - 1 });
     }
-
-    const due = new Date();
-    due.setDate(due.getDate() + days);
-    const txId = 'TR-' + Math.floor(1000 + Math.random() * 9000);
-
-    SGB.insert('library_loans', {
-      tx_id: txId,
-      book: foundBk ? foundBk.title : cleanBookTitle,
-      barcode: foundBk ? foundBk.barcode : '-',
-      student_name: cleanMemName,
-      due_date: due.toISOString().slice(0, 10),
-      status: 'Ameazima (Kwa Wakati)'
-    });
+    const due = new Date(); due.setDate(due.getDate() + days);
+    SGB.insert('library_loans', { tx_id: 'TR-' + Math.floor(1000 + Math.random() * 9000), book: foundBk ? foundBk.title : cleanBookTitle, barcode: foundBk ? foundBk.barcode : '-', student_name: cleanMemName, due_date: due.toISOString().slice(0, 10), status: 'Ameazima (Kwa Wakati)' });
     openTab('issue_return');
   }
 
   function returnBookLoan(id, fine) {
-    const loans = SGB.select('library_loans');
-    const ln = loans.find(x => String(x.id) === String(id));
+    const ln = SGB.select('library_loans').find(x => String(x.id) === String(id));
     if (ln) {
       const bk = SGB.select('library_books').find(b => b.title.toLowerCase() === (ln.book || '').toLowerCase());
       if (bk) SGB.update('library_books', bk.id, { available_copies: Number(bk.available_copies) + 1 });
     }
     SGB.update('library_loans', id, { status: 'Amerudisha', fine_paid: fine, returned_at: new Date().toLocaleDateString('sw-TZ') });
-    alert('✅ Kitabu kimerejeshwa maktaba!');
-    openTab('issue_return');
+    alert('✅ Kitabu kimerejeshwa maktaba!'); openTab('issue_return');
   }
 
   function scanQrPrompt() {
@@ -572,33 +787,26 @@
     if (mem) { document.getElementById('lnMember').value = `${mem.full_name} (${mem.member_id})`; return; }
     alert('⚠️ QR / Barcode haijapatikana.');
   }
-
   function verifyLibraryClearance() {
     const rawName = (document.getElementById('libClrName').value || '').trim();
     const name = rawName.replace(/\s*\(.*?\)\s*$/, '').trim();
-    if (!name) { alert('⚠️ Andika jina la mwanafunzi au mwalimu kwanza.'); return; }
-
+    if (!name) { alert('⚠️ Andika jina kwanza.'); return; }
     const unreturned = SGB.select('library_loans').filter(l => (l.student_name || '').toLowerCase() === name.toLowerCase() && !(l.status || '').includes('Amerudisha'));
     const mem = SGB.select('library_members').find(m => (m.full_name || '').toLowerCase() === name.toLowerCase());
     const isClear = unreturned.length === 0;
     const todayStr = new Date().toLocaleDateString('sw-TZ');
     const qr = SGB.qrImg(`LIB-CLEARANCE:${name}|STATUS:${isClear ? 'CLEARED' : 'HOLD'}`);
-
     document.getElementById('libClrResult').innerHTML = `
       <div id="libClrPrintBox" style="border:2px solid #0f172a; padding:20px; background:#fff; max-width:680px; line-height:1.7;">
         <div style="text-align:center; border-bottom:2px solid #0f172a; padding-bottom:8px; margin-bottom:10px;">
-          <b>HALMASHAURI YA MANISPAA YA ILEMELA</b><br>
-          <h3 style="margin:2px 0; color:#1d4ed8;">SHULE YA SEKONDARI SANGABUYE — MAKTABA</h3>
-          <small>S.L.P 11898, Ilemela - Mwanza</small>
+          <b>HALMASHAURI YA MANISPAA YA ILEMELA</b><br><h3 style="margin:2px 0; color:#1d4ed8;">SHULE YA SEKONDARI SANGABUYE — MAKTABA</h3><small>S.L.P 11898, Ilemela - Mwanza</small>
         </div>
         <h4 style="text-align:center; text-decoration:underline;">KIBALI CHA MAKTABA (LIBRARY CLEARANCE CERTIFICATE)</h4>
         <p><b>Jina Kamili:</b> ${name.toUpperCase()} &nbsp;|&nbsp; <b>ID:</b> ${mem ? mem.member_id : '-'} &nbsp;|&nbsp; <b>Darasa/Idara:</b> ${mem ? mem.class_dept : '-'}</p>
         <p><b>Hali ya Maktaba:</b> ${isClear ? '<span style="color:#059669; font-weight:bold;">✅ AMEKAMILISHA (CLEARED) — HANA KITABU WALA FAINI YA MAKTABA.</span>' : '<span style="color:#dc2626; font-weight:bold;">❌ HAJAKAMILISHA — ANADAIWA VITABU VIFUATAVYO:</span>'}</p>
         ${!isClear ? `<ul>${unreturned.map(u => `<li><b>${u.book}</b> (${u.tx_id || '-'}) — Ilitakiwa irudi: ${u.due_date}</li>`).join('')}</ul>` : ''}
         <div style="display:flex; justify-content:space-between; align-items:center; margin-top:20px; font-size:12px;">
-          <div><b>Mkutubi (Librarian):</b><br><br>____________________<br>Sahihi & Tarehe: ${todayStr}</div>
-          <img src="${qr}" style="height:60px;">
-          <div><b>Mkuu wa Shule:</b><br><br>____________________<br>Muhuri & Tarehe</div>
+          <div><b>Mkutubi (Librarian):</b><br><br>____________________<br>Sahihi & Tarehe: ${todayStr}</div><img src="${qr}" style="height:60px;"><div><b>Mkuu wa Shule:</b><br><br>____________________<br>Muhuri & Tarehe</div>
         </div>
       </div>`;
   }
@@ -614,7 +822,6 @@
   }
 
   function addLibAttendance(e) { e.preventDefault(); SGB.insert('library_attendance', { name: document.getElementById('attName').value.trim(), purpose: document.getElementById('attPurpose').value.trim() }); openTab('attendance'); }
-  function addEbook(e) { e.preventDefault(); SGB.insert('library_ebooks', { title: document.getElementById('ebTitle').value.trim(), subject: document.getElementById('ebSubj').value.trim(), link: document.getElementById('ebLink').value.trim() }); openTab('ebooks'); }
   function addIctDevice(e) { e.preventDefault(); SGB.insert('library_ict', { name: document.getElementById('icName').value.trim(), code: document.getElementById('icCode').value.trim(), status: document.getElementById('icStatus').value }); openTab('ict'); }
 
   function printDiv(id) {
