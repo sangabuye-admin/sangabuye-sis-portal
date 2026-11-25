@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashibodi ya Mwalimu (Teacher Portal v9.4 — Form 1-6) | Sangabuye SIS</title>
+  <title>Dashibodi ya Mwalimu (Teacher Portal v9.6 — Form 1-6) | Sangabuye SIS</title>
   <script src="core.js?v=7.5"></script>
   <style>
     * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
@@ -22,6 +22,8 @@
     .card h4 { margin: 0 0 5px; font-size: 11px; color: #64748b; text-transform: uppercase; }
     .card .val { font-size: 18px; font-weight: bold; color: #0f294a; }
     .panel { background: white; padding: 16px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 16px; }
+    .form-bar { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+    .form-tools { display: flex; gap: 6px; align-items: center; }
     input, select, textarea { padding: 7.5px 9px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12.5px; width: 100%; }
     table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 12px; }
     th, td { padding: 6px 8px; border: 1px solid #e2e8f0; text-align: left; }
@@ -39,29 +41,31 @@
   <p id="tcSideName">Teacher Portal | Form 1–6</p>
 
   <div class="grp-lbl">A. Taaluma & Alama</div>
-  <button class="menu-btn active" onclick="openTab('overview', this)">📊 1. Muhtasari wa Mwalimu</button>
-  <button class="menu-btn" onclick="openTab('score_entry', this)">✍️ 2. Jaza & Tuma Score Sheet</button>
-  <button class="menu-btn" onclick="openTab('subj_analytics', this)">📈 3. Uchambuzi wa Somo (A–F)</button>
-  <button class="menu-btn" onclick="openTab('remedial', this)">🆘 4. Wanafunzi wa Remedial (D/F)</button>
+  <button class="menu-btn active" onclick="openTab('overview', this)">📊  Muhtasari & Graphs</button>
+  <button class="menu-btn" onclick="openTab('score_entry', this)">✍️  Jaza & Tuma Score Sheet</button>
+  <button class="menu-btn" onclick="openTab('subj_analytics', this)">📈  Uchambuzi wa Somo (A–F)</button>
+  <button class="menu-btn" onclick="openTab('remedial', this)">🆘  Wanafunzi wa Remedial (D/F)</button>
 
   <div class="grp-lbl">B. Darasa, Mahudhurio & Zamu</div>
-  <button class="menu-btn" onclick="openTab('attendance', this)">📋 5. Mahudhurio (Roll Call)</button>
-  <button class="menu-btn" onclick="openTab('homework', this)">📝 6. Mazoezi & Notes (Students)</button>
-  <button class="menu-btn" onclick="openTab('discipline', this)">⚖️ 7. Nidhamu & Maoni ya Darasa</button>
-  <button class="menu-btn" onclick="openTab('tod_duty', this)">🛡️ 8. Ripoti ya Mwalimu wa Zamu</button>
+  <button class="menu-btn" onclick="openTab('attendance', this)">📋  Mahudhurio (Roll Call)</button>
+  <button class="menu-btn" onclick="openTab('homework', this)">📝  Mazoezi & Notes (Students)</button>
+  <button class="menu-btn" onclick="openTab('discipline', this)">⚖️  Nidhamu & Maoni ya Darasa</button>
+  <button class="menu-btn" onclick="openTab('tod_duty', this)">🛡️  Ripoti ya Mwalimu wa Zamu</button>
 
   <div class="grp-lbl">C. Maandalio, Ratiba & Fedha</div>
-  <button class="menu-btn" onclick="openTab('schemes', this)">📑 9. Schemes, Lesson Plans & Silabasi</button>
-  <button class="menu-btn" onclick="openTab('timetable_lib', this)">📅 10. Ratiba Yangu & Maktaba</button>
-  <button class="menu-btn" onclick="openTab('leave_swap', this)">🏖️ 11. Omba Ruhusa / Badili Kipindi</button>
-  <button class="menu-btn" onclick="openTab('payroll_imprest', this)">💼 12. Salary Slip & Masurufu</button>
+  <button class="menu-btn" onclick="openTab('schemes', this)">📑  Schemes, Lesson Plans & Silabasi</button>
+  <button class="menu-btn" onclick="openTab('timetable_lib', this)">📅  Ratiba Yangu & Maktaba</button>
+  <button class="menu-btn" onclick="openTab('leave_swap', this)">🏖️  Omba Ruhusa / Badili Kipindi</button>
+  <button class="menu-btn" onclick="openTab('payroll_imprest', this)">💼  Salary Slip & Masurufu</button>
+  <button class="menu-btn" onclick="openTab('ca_tracker', this)">🧪  Mazoezi Endelevu (CA / Tests)</button>
+  <button class="menu-btn" onclick="openTab('tc_messages', this)">💬  Ujumbe (Mkuu/Mtaaluma/Mhasibu)</button>
 </div>
 
 <div class="main">
   <div class="topbar">
-    <div><strong id="tabTitle">📊 1. Muhtasari wa Mwalimu</strong> <span id="syncTime" style="font-size:11px; color:#059669;"></span></div>
+    <div><strong id="tabTitle">📊 1. Muhtasari & Graphs</strong> <span id="syncTime" style="font-size:11px; color:#059669;"></span></div>
     <div style="display:flex; gap:8px; align-items:center; flex:1; max-width:460px;">
-      <input type="text" id="globalTcSearch" onkeyup="filterTeacherTables(this.value)" placeholder="🔍 Tafuta mwanafunzi, kidato, somo au kitabu...">
+      <input type="text" id="globalTcSearch" onkeyup="filterTeacherTables(this.value)" placeholder="🔍 Tafuta popote kwa herufi za jina, kidato, somo...">
       <button type="button" class="btn btn-blue" style="white-space:nowrap;" onclick="refreshTeacherNow()">🔄 Refresh</button>
     </div>
   </div>
@@ -104,6 +108,14 @@
     const mine = all.filter(r => (r.teacher_name || '').toLowerCase() === myTeacherName.toLowerCase());
     return mine.length ? mine : all;
   }
+
+  function formToolsHtml(placeholder = '🔍 Tafuta kwenye fomu hii...') {
+    return `<div class="form-tools">
+      <input type="text" onkeyup="filterTeacherTables(this.value)" placeholder="${placeholder}" style="width:220px;">
+      <button type="button" class="btn btn-blue" onclick="refreshTeacherNow()">🔄 Refresh</button>
+    </div>`;
+  }
+
   function openTab(tab, btn) {
     currentTcTab = tab;
     document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('active'));
@@ -113,24 +125,73 @@
 
     if (tab === 'overview') {
       const myAllocs = SGB.select('subject_allocations').filter(a => (a.teacher_name || '').toLowerCase().includes(myTeacherName.toLowerCase()));
-      const allAllocs = SGB.select('subject_allocations');
-      const displayAllocs = myAllocs.length ? myAllocs : allAllocs;
+      const displayAllocs = myAllocs.length ? myAllocs : SGB.select('subject_allocations');
       const examWin = JSON.parse(localStorage.getItem('sgb_exam_window') || '{"open":true,"active_exam":"Terminal 2026"}');
       const myRes = getMyResults();
       const returnedCount = myRes.filter(r => r.verified_status === 'Returned').length;
+      const myAvg = myRes.length ? (myRes.reduce((s, r) => s + Number(r.score || 0), 0) / myRes.length).toFixed(1) : '0.0';
+
+      const grades = { A: 0, B: 0, C: 0, D: 0, E: 0, S: 0, F: 0 };
+      myRes.forEach(r => {
+        const g = r.grade || gradeFromScore(r.score, isALevelClass(r.class_name));
+        if (grades[g] !== undefined) grades[g]++;
+      });
+      const maxG = Math.max(1, ...Object.values(grades));
+
+      const byGroup = {};
+      myRes.forEach(r => {
+        const k = `${r.class_name || '-'} (${r.subject || '-'})`;
+        if (!byGroup[k]) byGroup[k] = { label: k, sum: 0, count: 0 };
+        byGroup[k].sum += Number(r.score || 0); byGroup[k].count++;
+      });
+      const groupBars = Object.values(byGroup).map(x => ({ label: x.label, avg: Number((x.sum / x.count).toFixed(1)) }));
+      const sylList = SGB.select('syllabus_tracker');
 
       area.innerHTML = `
         <div class="cards">
           <div class="card"><h4>Masomo Niliyopangiwa</h4><div class="val">${displayAllocs.length}</div></div>
-          <div class="card" style="border-color:${examWin.open ? '#059669' : '#dc2626'};"><h4>Dirisha la Alama (${examWin.active_exam})</h4><div class="val">${examWin.open ? '🟢 Wazi' : '🔒 Limefungwa'}</div></div>
+          <div class="card" style="border-color:#059669;"><h4>Wastani wa Masomo Yangu</h4><div class="val">${myAvg}%</div></div>
+          <div class="card" style="border-color:${examWin.open ? '#059669' : '#dc2626'};"><h4>Dirisha (${examWin.active_exam})</h4><div class="val">${examWin.open ? '🟢 Wazi' : '🔒 Limefungwa'}</div></div>
           <div class="card" style="border-color:#d97706;"><h4>Score Sheets Zilizorudishwa</h4><div class="val">${returnedCount}</div></div>
-          <div class="card" style="border-color:#7c3aed;"><h4>Alama Nilizoingiza</h4><div class="val">${myRes.length}</div></div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(320px, 1fr)); gap:14px; margin-bottom:16px;">
+          <div class="panel" style="margin-bottom:0;">
+            <h3 style="margin-top:0;">📊 Grafu ya Mgawanyo wa Madaraja (A–F)</h3>
+            ${Object.entries(grades).map(([g, cnt]) => {
+              const pct = Math.round((cnt / maxG) * 100);
+              const col = g === 'A' ? '#059669' : g === 'B' ? '#0284c7' : g === 'C' ? '#2563eb' : g === 'D' ? '#d97706' : '#dc2626';
+              return `<div style="margin-bottom:7px;">
+                <div style="display:flex; justify-content:space-between; font-size:12px;"><b>Daraja ${g}</b><span>${cnt} wanafunzi</span></div>
+                <div style="background:#e2e8f0; height:12px; border-radius:6px; overflow:hidden;">
+                  <div style="width:${pct}%; background:${col}; height:100%;"></div>
+                </div>
+              </div>`;
+            }).join('')}
+          </div>
+
+          <div class="panel" style="margin-bottom:0;">
+            <h3 style="margin-top:0;">📈 Ulinganisho wa Wastani Kwa Kidato & Somo</h3>
+            ${groupBars.length ? groupBars.map(b => `
+              <div style="margin-bottom:8px;">
+                <div style="display:flex; justify-content:space-between; font-size:12px;"><b>${b.label}</b><span><b>${b.avg}%</b></span></div>
+                <div style="background:#e2e8f0; height:14px; border-radius:6px; overflow:hidden;">
+                  <div style="width:${Math.min(100, b.avg)}%; background:#1d4ed8; height:100%;"></div>
+                </div>
+              </div>`).join('') : '<p style="color:#64748b; font-size:12px;">Ingiza alama za wanafunzi ili grafu ya madarasa ichoreke.</p>'}
+            <hr style="border:0; border-top:1px solid #e2e8f0; margin:10px 0;">
+            <h4 style="margin:0 0 6px; font-size:12px;">📖 Maendeleo ya Silabasi (Syllabus Coverage)</h4>
+            ${sylList.slice(0, 4).map(s => `<div style="font-size:11.5px; margin-bottom:5px;">
+              ${s.class_name} (${s.subject}): <b>${s.percent}%</b>
+              <div style="background:#e2e8f0; height:8px; border-radius:4px;"><div style="width:${s.percent}%; background:#059669; height:100%;"></div></div>
+            </div>`).join('') || '<small style="color:#64748b;">Hakuna rekodi ya silabasi bado.</small>'}
+          </div>
         </div>
 
         <div class="panel">
-          <div style="display:flex; justify-content:space-between; align-items:center;">
+          <div class="form-bar">
             <h3 style="margin:0;">📚 Masomo na Madarasa Niliyopangiwa na Mtaaluma</h3>
-            <button class="btn btn-blue" onclick="refreshTeacherNow()">🔄 Refresh Fomu</button>
+            ${formToolsHtml('🔍 Tafuta somo au kidato...')}
           </div>
           <table>
             <thead><tr><th>Kidato / Mkondo</th><th>Somo</th><th>Vipindi/Wiki</th><th>Hatua ya Haraka</th></tr></thead>
@@ -145,7 +206,6 @@
       applyTcSearch();
       return;
     }
-
     if (tab === 'score_entry') {
       const students = SGB.select('academic_students');
       const classes = Array.from(new Set(students.map(s => s.class_name).filter(Boolean)));
@@ -153,9 +213,9 @@
 
       area.innerHTML = `
         <div class="panel">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+          <div class="form-bar">
             <h3 style="margin:0;">✍️ Jaza & Tuma Score Sheet Kwa Mtaaluma (${examWin.active_exam})</h3>
-            <button class="btn btn-blue" onclick="refreshTeacherNow()">🔄 Refresh Fomu</button>
+            ${formToolsHtml('🔍 Tafuta mwanafunzi kwenye grid...')}
           </div>
           ${!examWin.open ? '<p style="color:#dc2626; font-weight:bold;">🔒 Dirisha la kuingiza alama limefungwa na Mtaaluma kwa sasa.</p>' : `
           <div style="display:grid; grid-template-columns:1fr 1.2fr 1fr auto; gap:8px; margin-bottom:12px;">
@@ -183,6 +243,7 @@
         </div>`;
       return;
     }
+
     if (tab === 'subj_analytics') {
       const myRes = getMyResults();
       const bySubjClass = {};
@@ -198,7 +259,10 @@
 
       area.innerHTML = `
         <div class="panel">
-          <h3>📈 Uchambuzi wa Ufaulu wa Somo Langu (O-Level & A-Level)</h3>
+          <div class="form-bar">
+            <h3 style="margin:0;">📈 Uchambuzi wa Ufaulu wa Somo Langu (O-Level & A-Level)</h3>
+            ${formToolsHtml('🔍 Tafuta kidato au somo...')}
+          </div>
           <table>
             <thead><tr><th>Kidato</th><th>Somo</th><th>Watahiniwa</th><th>Wastani (%)</th><th>A</th><th>B</th><th>C</th><th>D</th><th>E</th><th>S</th><th>F</th></tr></thead>
             <tbody>
@@ -217,7 +281,10 @@
       const weak = getMyResults().filter(r => Number(r.score || 0) < 45);
       area.innerHTML = `
         <div class="panel" style="border-left:4px solid #dc2626;">
-          <h3>🆘 Wanafunzi Wanaohitaji Masomo ya Ziada (Remedial Watchlist — Alama Chini ya 45%)</h3>
+          <div class="form-bar">
+            <h3 style="margin:0;">🆘 Wanafunzi Wanaohitaji Masomo ya Ziada (Remedial — Chini ya 45%)</h3>
+            ${formToolsHtml('🔍 Tafuta mwanafunzi wa remedial...')}
+          </div>
           <table>
             <thead><tr><th>Mwanafunzi</th><th>Kidato</th><th>Somo</th><th>Mtihani</th><th>Alama</th><th>Daraja</th><th>Hatua</th></tr></thead>
             <tbody>
@@ -237,7 +304,10 @@
       const logs = SGB.select('class_attendance');
       area.innerHTML = `
         <div class="panel">
-          <h3>📋 Mahudhurio ya Darasa (Roll Call) & Tahadhari ya Utoro (${SYSTEM_GATEWAY_PHONE})</h3>
+          <div class="form-bar">
+            <h3 style="margin:0;">📋 Mahudhurio ya Darasa (Roll Call) & Tahadhari ya Utoro (${SYSTEM_GATEWAY_PHONE})</h3>
+            ${formToolsHtml('🔍 Tafuta mwanafunzi au tarehe...')}
+          </div>
           <form onsubmit="saveStudentAttendance(event)" style="display:grid; grid-template-columns:1.6fr 1fr 1fr 1.2fr auto; gap:8px; margin-bottom:12px;">
             <input type="text" id="attStudent" list="stAllList" required placeholder="Jina la Mwanafunzi">
             <select id="attStatus">
@@ -275,7 +345,10 @@
       const hws = SGB.select('student_assignments');
       area.innerHTML = `
         <div class="panel">
-          <h3>📝 Toa Mazoezi ya Nyumbani & Notes Kwa Wanafunzi</h3>
+          <div class="form-bar">
+            <h3 style="margin:0;">📝 Toa Mazoezi ya Nyumbani & Notes Kwa Wanafunzi</h3>
+            ${formToolsHtml('🔍 Tafuta zoezi au somo...')}
+          </div>
           <form onsubmit="postHomework(event)" style="display:grid; grid-template-columns:1fr 1.2fr 1fr auto; gap:8px; margin-bottom:10px;">
             <input type="text" id="hwClass" required placeholder="Kidato (mf. Form 4A / Form 6 PCM)">
             <input type="text" id="hwSubj" required placeholder="Somo">
@@ -289,11 +362,15 @@
       applyTcSearch();
       return;
     }
+
     if (tab === 'discipline') {
       const discs = SGB.select('discipline_logs');
       area.innerHTML = `
         <div class="panel">
-          <h3>⚖️ Kumbukumbu za Nidhamu & Maoni ya Mwalimu wa Darasa</h3>
+          <div class="form-bar">
+            <h3 style="margin:0;">⚖️ Kumbukumbu za Nidhamu & Maoni ya Mwalimu wa Darasa</h3>
+            ${formToolsHtml('🔍 Tafuta rekodi ya nidhamu...')}
+          </div>
           <form onsubmit="addDisciplineLog(event)" style="display:grid; grid-template-columns:1.5fr 1fr 2fr auto; gap:8px; margin-bottom:12px;">
             <input type="text" id="dsStudent" list="stAllList" required placeholder="Jina la Mwanafunzi">
             <select id="dsType"><option value="Pongezi / Tabia Nzuri">🌟 Pongezi / Tabia Nzuri</option><option value="Onyo la Utoro / Kuchelewa">⚠️ Onyo la Utoro / Kuchelewa</option><option value="Kosa la Kinidhamu">🚨 Kosa la Kinidhamu</option></select>
@@ -311,7 +388,10 @@
       const reports = SGB.select('tod_duty_reports');
       area.innerHTML = `
         <div class="panel" style="border-left:4px solid #059669;">
-          <h3>🛡️ Ripoti ya Mwalimu wa Zamu (Teacher on Duty — Inakwenda Kwa Mkuu wa Shule)</h3>
+          <div class="form-bar">
+            <h3 style="margin:0;">🛡️ Ripoti ya Mwalimu wa Zamu (Inakwenda Kwa Mkuu wa Shule)</h3>
+            ${formToolsHtml('🔍 Tafuta ripoti ya zamu...')}
+          </div>
           <form onsubmit="submitTodReport(event)" style="display:grid; grid-template-columns:1fr 1fr 1fr auto; gap:8px; margin-bottom:12px;">
             <input type="date" id="todDate" value="${new Date().toISOString().slice(0, 10)}" required>
             <select id="todClean"><option value="Usafi: Mzuri Sana">Usafi: Mzuri Sana</option><option value="Usafi: Wastani">Usafi: Wastani</option><option value="Usafi: Unahitaji Mkazo">Usafi: Unahitaji Mkazo</option></select>
@@ -330,7 +410,10 @@
       const syl = SGB.select('syllabus_tracker');
       area.innerHTML = `
         <div class="panel">
-          <h3>📑 1. Wasilisha Scheme of Work / Lesson Plan Kwa Mtaaluma</h3>
+          <div class="form-bar">
+            <h3 style="margin:0;">📑 1. Wasilisha Scheme of Work / Lesson Plan Kwa Mtaaluma</h3>
+            ${formToolsHtml('🔍 Tafuta scheme au somo...')}
+          </div>
           <form onsubmit="tcSubmitPlan(event)" style="display:grid; grid-template-columns:1fr 1.2fr 1.2fr auto; gap:8px; margin-bottom:12px;">
             <input type="text" id="tcLpCls" required placeholder="Kidato (mf. Form 4A)">
             <input type="text" id="tcLpSubj" required placeholder="Somo">
@@ -361,7 +444,10 @@
       const books = SGB.select('library_books');
       area.innerHTML = `
         <div class="panel">
-          <h3>📅 1. Ratiba Kuu ya Vipindi Shuleni</h3>
+          <div class="form-bar">
+            <h3 style="margin:0;">📅 1. Ratiba Kuu ya Vipindi Shuleni</h3>
+            ${formToolsHtml('🔍 Tafuta siku, somo au kitabu...')}
+          </div>
           <table><thead><tr><th>Siku</th><th>Muda</th><th>Kidato</th><th>Somo</th><th>Mwalimu</th></tr></thead>
           <tbody>${tt.map(x => `<tr><td><b>${x.day_name}</b></td><td>${x.time_slot}</td><td><b>${x.class_name}</b></td><td>${x.subject}</td><td>${x.teacher_name}</td></tr>`).join('') || '<tr><td colspan="5">Hakuna ratiba iliyowekwa bado.</td></tr>'}</tbody></table>
         </div>
@@ -384,7 +470,10 @@
       const msgs = SGB.select('direct_messages');
       area.innerHTML = `
         <div class="panel">
-          <h3>🏖️ Omba Ruhusa / Likizo au Badilisha Kipindi</h3>
+          <div class="form-bar">
+            <h3 style="margin:0;">🏖️ Omba Ruhusa / Likizo au Badilisha Kipindi</h3>
+            ${formToolsHtml('🔍 Tafuta maombi...')}
+          </div>
           <form onsubmit="submitTeacherLeave(event)" style="display:grid; grid-template-columns:1.2fr 2fr auto; gap:8px; margin-bottom:12px;">
             <select id="lvType"><option value="Ombi la Ruhusa ya Dharura">Ombi la Ruhusa ya Dharura</option><option value="Ombi la Likizo">Ombi la Likizo</option><option value="Taarifa ya Kubadilishana Kipindi">Kubadilishana Kipindi na Mwalimu</option></select>
             <input type="text" id="lvDetails" required placeholder="Eleza tarehe, sababu au mwalimu unayebadilishana naye...">
@@ -395,14 +484,64 @@
         </div>`;
       return;
     }
+    if (tab === 'ca_tracker') {
+      const cas = SGB.select('continuous_assessment');
+      area.innerHTML = `
+        <div class="panel">
+          <div class="form-bar">
+            <h3 style="margin:0;">🧪 Kumbukumbu za Mazoezi Endelevu (CA — Tests / Quiz / Practicals)</h3>
+            ${formToolsHtml('🔍 Tafuta mwanafunzi au somo...')}
+          </div>
+          <form onsubmit="saveCaScore(event)" style="display:grid; grid-template-columns:1.5fr 1fr 1fr 1fr 0.8fr auto; gap:7px; margin-bottom:12px;">
+            <input type="text" id="caStName" list="stAllList" required placeholder="Jina la Mwanafunzi">
+            <input type="text" id="caClass" required placeholder="Kidato">
+            <input type="text" id="caSubj" required placeholder="Somo">
+            <select id="caType"><option value="Quiz 1">Quiz 1</option><option value="Monthly Test">Monthly Test</option><option value="Practical">Practical</option><option value="Group Work">Group Work</option></select>
+            <input type="number" id="caScore" min="0" max="100" required placeholder="Alama">
+            <button type="submit" class="btn btn-green">💾 Hifadhi</button>
+          </form>
+          <table><thead><tr><th>Tarehe</th><th>Mwanafunzi</th><th>Kidato</th><th>Somo</th><th>Aina</th><th>Alama</th></tr></thead>
+          <tbody>${cas.map(c => `<tr><td>${c.created_at}</td><td><b>${c.student_name}</b></td><td>${c.class_name}</td><td>${c.subject}</td><td>${c.ca_type}</td><td><b>${c.score}%</b></td></tr>`).join('') || '<tr><td colspan="6">Hakuna rekodi za mazoezi endelevu bado.</td></tr>'}</tbody></table>
+        </div>`;
+      applyTcSearch();
+      return;
+    }
+
+    if (tab === 'tc_messages') {
+      const msgs = SGB.select('direct_messages');
+      area.innerHTML = `
+        <div class="panel">
+          <div class="form-bar">
+            <h3 style="margin:0;">💬 Mawasiliano ya Moja Kwa Moja (Mkuu wa Shule, Mtaaluma & Mhasibu)</h3>
+            ${formToolsHtml('🔍 Tafuta ujumbe...')}
+          </div>
+          <form onsubmit="sendTcDirectMsg(event)" style="display:grid; grid-template-columns:1fr 1.5fr 2.5fr auto; gap:8px; margin-bottom:12px;">
+            <select id="tcMsgTo"><option value="Headmaster">Mkuu wa Shule</option><option value="Academic">Ofisi ya Mtaaluma</option><option value="Accountant">Ofisi ya Mhasibu</option></select>
+            <input type="text" id="tcMsgSubj" required placeholder="Mada ya Ujumbe">
+            <input type="text" id="tcMsgBody" required placeholder="Andika ujumbe wako...">
+            <button type="submit" class="btn btn-blue">📤 Tuma</button>
+          </form>
+          <table><thead><tr><th>Muda</th><th>Kutoka</th><th>Kwenda</th><th>Mada</th><th>Ujumbe</th></tr></thead>
+          <tbody>${msgs.slice(0, 30).map(m => `<tr><td>${m.created_at}</td><td><b>${m.sender}</b></td><td>${m.recipient}</td><td><b>${m.subject}</b></td><td>${m.body}</td></tr>`).join('') || '<tr><td colspan="5">Hakuna ujumbe bado.</td></tr>'}</tbody></table>
+        </div>`;
+      return;
+    }
 
     const slips = SGB.select('staff_payroll');
     const imprests = SGB.select('staff_imprest');
     area.innerHTML = `
       <div class="panel">
-        <h3>💼 1. Hati Zangu za Mshahara (Salary Slips)</h3>
-        <table><thead><tr><th>Mwezi</th><th>Mtumishi</th><th>Cheo</th><th>Basic</th><th>Net Pay</th><th>Hali</th></tr></thead>
-        <tbody>${slips.map(s => `<tr><td><b>${s.month_year}</b></td><td><b>${s.staff_name}</b></td><td>${s.role_title}</td><td>${SGB.formatTZS(s.basic_salary)}</td><td style="color:#059669;"><b>${SGB.formatTZS(s.net_pay)}</b></td><td><b>${s.audit_status}</b></td></tr>`).join('') || '<tr><td colspan="6">Hakuna Salary Slip iliyotolewa bado.</td></tr>'}</tbody></table>
+        <div class="form-bar">
+          <h3 style="margin:0;">💼 1. Hati Zangu za Mshahara (Salary Slips — Bofya Print Kufungua Slip)</h3>
+          ${formToolsHtml('🔍 Tafuta mwezi au jina...')}
+        </div>
+        <table><thead><tr><th>Mwezi</th><th>Mtumishi</th><th>Cheo</th><th>Basic Salary</th><th>Net Pay</th><th>Hali</th><th>Salary Slip</th></tr></thead>
+        <tbody>${slips.map(s => `<tr>
+          <td><b>${s.month_year}</b></td><td><b>${s.staff_name}</b></td><td>${s.role_title}</td>
+          <td>${SGB.formatTZS(s.basic_salary)}</td><td style="color:#059669;"><b>${SGB.formatTZS(s.net_pay)}</b></td><td><b>${s.audit_status}</b></td>
+          <td><button type="button" class="btn btn-blue" onclick="openTeacherSalarySlip('${s.id}')">🖨️ Print Salary Slip</button></td>
+        </tr>`).join('') || '<tr><td colspan="7">Hakuna Salary Slip iliyotolewa na Mhasibu bado.</td></tr>'}</tbody></table>
+        <div id="tcSlipPreviewBox" style="margin-top:12px;"></div>
       </div>
 
       <div class="panel">
@@ -433,6 +572,40 @@
     openTab(currentTcTab);
     const st = document.getElementById('syncTime');
     if (st) st.innerText = ` (Imesasishwa: ${new Date().toLocaleTimeString()})`;
+  }
+
+  function openTeacherSalarySlip(id) {
+    const s = SGB.select('staff_payroll').find(x => String(x.id) === String(id));
+    if (!s) { alert('⚠️ Salary Slip haikupatikana.'); return; }
+    const qr = SGB.qrImg(`SALARY-SLIP:${s.staff_name}|MONTH:${s.month_year}|NET:${s.net_pay}`);
+    const slipHtml = `
+      <div style="border:2px solid #0f294a; padding:18px; background:#fff; max-width:650px; margin-top:10px; line-height:1.6;">
+        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #0f294a; padding-bottom:8px;">
+          <div>
+            <b>HALMASHAURI YA MANISPAA YA ILEMELA</b><br>
+            <h3 style="margin:2px 0; color:#1d4ed8;">SHULE YA SEKONDARI SANGABUYE</h3>
+            <small>HATI RASMI YA MSHAHARA (OFFICIAL SALARY SLIP — ${s.month_year})</small>
+          </div>
+          <img src="${qr}" style="height:56px;">
+        </div>
+        <p><b>Jina la Mtumishi:</b> ${s.staff_name} &nbsp;|&nbsp; <b>Cheo:</b> ${s.role_title}<br>
+        <b>Mwezi wa Malipo:</b> ${s.month_year} &nbsp;|&nbsp; <b>Hali ya Ukaguzi:</b> ${s.audit_status}</p>
+        <table>
+          <tr><th>Maelezo ya Mapato / Makato</th><th>Kiasi (TZS)</th></tr>
+          <tr><td>Mshahara wa Msingi (Basic Salary)</td><td>${SGB.formatTZS(s.basic_salary)}</td></tr>
+          <tr><td>Posho / Allowances</td><td>${SGB.formatTZS(s.allowances || 0)}</td></tr>
+          <tr><td>Makato (PAYE / NSSF / Bima / Mengineyo)</td><td style="color:#dc2626;">- ${SGB.formatTZS(s.deductions || 0)}</td></tr>
+          <tr style="background:#ecfdf5;"><td><b>MSHAHARA HALISI (NET PAY)</b></td><td><b style="color:#059669; font-size:14px;">${SGB.formatTZS(s.net_pay)}</b></td></tr>
+        </table>
+        <div style="display:flex; justify-content:space-between; margin-top:24px; font-size:12px;">
+          <div><b>Mhasibu wa Shule:</b><br><br>____________________</div>
+          <div><b>Mkuu wa Shule:</b><br><br>____________________</div>
+        </div>
+      </div>`;
+    document.getElementById('tcSlipPreviewBox').innerHTML = slipHtml;
+    const w = window.open('', '', 'width=750,height=600');
+    w.document.write('<html><head><title>Salary Slip</title><style>body{font-family:sans-serif;padding:20px;}table{width:100%;border-collapse:collapse;}th,td{border:1px solid #000;padding:6px;font-size:12px;}</style></head><body>' + slipHtml + '</body></html>');
+    w.document.close(); w.focus(); setTimeout(() => { w.print(); w.close(); }, 300);
   }
 
   function loadTeacherScoreGrid() {
@@ -490,7 +663,6 @@
     };
     reader.readAsText(file);
   }
-
   function saveStudentAttendance(e) {
     e.preventDefault();
     SGB.insert('class_attendance', { student_name: document.getElementById('attStudent').value.trim(), status: document.getElementById('attStatus').value, att_date: document.getElementById('attDate').value, note: document.getElementById('attNote').value.trim(), teacher_name: myTeacherName });
@@ -552,6 +724,18 @@
     SGB.insert('direct_messages', { sender: myTeacherName, recipient: 'Headmaster & Academic', subject: document.getElementById('lvType').value, body: document.getElementById('lvDetails').value.trim() });
     alert('✅ Ombi lako limetumwa kwa Mkuu wa Shule na Mtaaluma!');
     openTab('leave_swap');
+  }
+
+  function saveCaScore(e) {
+    e.preventDefault();
+    SGB.insert('continuous_assessment', { student_name: document.getElementById('caStName').value.trim(), class_name: document.getElementById('caClass').value.trim(), subject: document.getElementById('caSubj').value.trim(), ca_type: document.getElementById('caType').value, score: Number(document.getElementById('caScore').value || 0), teacher_name: myTeacherName });
+    openTab('ca_tracker');
+  }
+
+  function sendTcDirectMsg(e) {
+    e.preventDefault();
+    SGB.insert('direct_messages', { sender: myTeacherName, recipient: document.getElementById('tcMsgTo').value, subject: document.getElementById('tcMsgSubj').value.trim(), body: document.getElementById('tcMsgBody').value.trim() });
+    openTab('tc_messages');
   }
 
   function tcRequestImprest(e) {
