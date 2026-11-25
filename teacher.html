@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashibodi ya Mwalimu (Teacher Portal v10.0 — Form 1-6) | Sangabuye SIS</title>
+  <title>Dashibodi ya Mwalimu (Teacher Portal v10.1 — Form 1-6) | Sangabuye SIS</title>
   <script src="core.js?v=7.5"></script>
   <style>
     * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
@@ -80,17 +80,23 @@
   if (document.getElementById('tcSideName')) document.getElementById('tcSideName').innerText = myTeacherName;
   let currentTcTab = 'overview';
 
-  function isALevelClass(cls) {
-    const c = (cls || '').toLowerCase();
-    return c.includes('5') || c.includes('6') || c.includes('v') || c.includes('vi');
-  }
-
   function normClass(str) {
     return String(str || '').toLowerCase()
-      .replace(/form|kidato|stream|mkondo/g, '')
+      .replace(/kidato cha kwanza|kwanza/g, '1')
+      .replace(/kidato cha pili|pili/g, '2')
+      .replace(/kidato cha tatu|tatu/g, '3')
+      .replace(/kidato cha nne|nne/g, '4')
+      .replace(/kidato cha tano|tano/g, '5')
+      .replace(/kidato cha sita|sita/g, '6')
+      .replace(/form|kidato|cha|stream|mkondo/g, '')
       .replace(/\bvi\b/g, '6').replace(/\bv\b/g, '5').replace(/\biv\b/g, '4')
       .replace(/\biii\b/g, '3').replace(/\bii\b/g, '2').replace(/\bi\b/g, '1')
       .replace(/[^a-z0-9]/g, '');
+  }
+
+  function isALevelClass(cls) {
+    const n = normClass(cls);
+    return n.startsWith('5') || n.startsWith('6');
   }
 
   function gradeFromScore(sc, isALevel = false) {
@@ -803,7 +809,6 @@
     alert('✅ Ripoti ya Mwalimu wa Zamu imetumwa kwa Mkuu wa Shule!');
     openTab('tod_duty');
   }
-
   function tcSubmitPlan(e) {
     e.preventDefault();
     const [cls, subj] = (document.getElementById('tcLpAlloc')?.value || 'Form 1A|Somo').split('|');
