@@ -475,3 +475,48 @@ window.addEventListener('DOMContentLoaded', () => {
   }
   setTimeout(() => SGB.applyLanguage(), 150);
 });
+window.SGB_FACTORY_RESET = async function() {
+  if (!confirm('⚠️ TAHADHARI KUBWA: Hatua hii itafuta wanafunzi wote, alama, mgawanyo wa masomo, mahudhurio na ripoti zote za majaribio (itahifadhi akaunti za Admin/Mkuu pekee). Uko tayari?')) return;
+  if (!confirm('Thibitisha mara ya pili: Futa data zote za mfumo (Local + Cloud) sasa?')) return;
+
+  const keepAdmins = (JSON.parse(localStorage.getItem('sgb_users_profile') || '[]'))
+    .filter(u => ['super_admin', 'admin', 'headmaster'].includes((u.role || '').toLowerCase()));
+
+  const tables = [
+    'academic_students', 'subject_allocations', 'exam_results', 'class_attendance',
+    'student_assignments', 'assignment_submissions', 'discipline_logs', 'tod_duty_reports',
+    'lesson_plans', 'syllabus_tracker', 'school_timetable', 'library_books',
+    'library_suggestions', 'direct_messages', 'staff_payroll', 'staff_imprest',
+    'continuous_assessment', 'sms_outbox', 'fee_payments', 'expenses',
+    'dorm_allocations', 'clinic_visits', 'gate_passes'
+  ];
+
+  for (const t of tables) {
+    localStorage.setItem('sgb_' + t, '[]');
+    if (window.SGB && SGB.pushToCloud) await SGB.pushToCloud(t);
+  }
+
+  localStorage.setItem('sgb_users_profile', JSON.stringify(keepAdmins));
+  if (window.SGB && SGB.pushToCloud) await SGB.pushToCloud('users_profile');
+  localStorage.removeItem('sgb_exam_types');
+  localStorage.removeItem('sgb_exam_window');
+
+  alert('✅ Mfumo wote umesafishwa 100% (Local + Cloud)! Sasa unaanza upya ukiwa safi.');
+  location.reload();
+};
+
+window.addEventListener('DOMContentLoaded', () => {
+  const cur = JSON.parse(localStorage.getItem('sgb_current_user') || 'null');
+  if (cur && ['super_admin', 'admin', 'headmaster', 'academic'].includes((cur.role || '').toLowerCase())) {
+    const topbar = document.querySelector('.topbar');
+    if (topbar && !document.getElementById('btnSgbReset')) {
+      const btn = document.createElement('button');
+      btn.id = 'btnSgbReset';
+      btn.type = 'button';
+      btn.innerText = '🧹 Futa Data Zote (Reset)';
+      btn.style.cssText = 'background:#dc2626;color:#fff;border:none;padding:7px 11px;border-radius:6px;cursor:pointer;font-size:11.5px;font-weight:bold;';
+      btn.onclick = window.SGB_FACTORY_RESET;
+      topbar.appendChild(btn);
+    }
+  }
+});
