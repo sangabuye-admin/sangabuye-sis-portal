@@ -3,8 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashibodi ya Mwalimu (Teacher Portal v12.6 — Form 1-6) | Sangabuye SIS</title>
+  <title>Dashibodi ya Mwalimu (Teacher Portal v13.0 — Form 1-6) | Sangabuye SIS</title>
   <script src="core.js?v=7.5"></script>
+  <script src="https://sheetjs.com"></script>
   <style>
     * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
     body { margin: 0; background: #f1f5f9; display: flex; min-height: 100vh; color: #1e293b; overflow-x: hidden; }
@@ -56,7 +57,7 @@
 
   <div class="grp-lbl">A. Taaluma & Alama</div>
   <button class="menu-btn active" onclick="openTab('overview', this)">📊 1. Muhtasari & Graphs</button>
-  <button class="menu-btn" onclick="openTab('score_entry', this)">✍️ 2. Jaza & Tuma Score Sheet</button>
+  <button class="menu-btn" onclick="openTab('score_entry', this)">✍️ 2. Jaza, Excel (.xlsx) & Score Sheet</button>
   <button class="menu-btn" onclick="openTab('subj_analytics', this)">📈 3. Uchambuzi wa Somo (A–F)</button>
   <button class="menu-btn" onclick="openTab('remedial', this)">🆘 4. Wanafunzi wa Remedial (D/F)</button>
 
@@ -105,27 +106,34 @@
   }
 
   function saveTableClean(table, arr) {
-    if (SGB.forceReplaceCloud) {
-      SGB.forceReplaceCloud(table, arr);
-    } else {
-      localStorage.setItem('sgb_' + table, JSON.stringify(arr));
-      SGB.pushToCloud(table);
-    }
+    if (SGB.forceReplaceCloud) SGB.forceReplaceCloud(table, arr);
+    else { localStorage.setItem('sgb_' + table, JSON.stringify(arr)); SGB.pushToCloud(table); }
+  }
+
+  function isWindowOpenForMe() {
+    const cfg = JSON.parse(localStorage.getItem('sgb_exam_window') || '{"open":true,"unlocked_teachers":[]}');
+    if (cfg.open) return true;
+    const unlocked = Array.isArray(cfg.unlocked_teachers) ? cfg.unlocked_teachers : new Array();
+    const myLow = myTeacherName.trim().toLowerCase();
+    return unlocked.some(t => String(t || '').trim().toLowerCase() === myLow);
   }
 
   function renderTeacherDeadlineBanner() {
     const box = document.getElementById('deadlineBannerBox');
     if (!box) return;
-    const cfg = JSON.parse(localStorage.getItem('sgb_exam_window') || '{"open":true,"active_exam":"Terminal","deadline":""}');
+    const cfg = JSON.parse(localStorage.getItem('sgb_exam_window') || '{"open":true,"active_exam":"Terminal","deadline":"","unlocked_teachers":[]}');
     const examName = cfg.active_exam || 'Terminal';
     const dlText = cfg.deadline ? ` | Mwisho wa Kutuma Score Sheet: ${cfg.deadline.replace('T', ' ')}` : '';
-    if (cfg.open) {
+    const openForMe = isWindowOpenForMe();
+
+    if (openForMe) {
+      const specialNote = !cfg.open ? ' (🔓 UMEFUNGULIWA KWA IDHINI MAALUM YA MTAALUMA)' : '';
       box.innerHTML = `<div class="marquee-wrap" style="background:#e0f2fe; color:#0f294a; border-bottom:2px solid #0284c7;">
-        <div class="marquee-text">📢 TANGAZO LA OFISI YA MTAALUMA: Dirisha la kuingiza alama za mtihani wa <span style="color:#0369a1; font-weight:bold;">"${examName.toUpperCase()}"</span> LIKO WAZI${dlText}. Tafadhali kamilisha kujaza na kutuma Score Sheet yako kwa wakati.</div>
+        <div class="marquee-text">📢 TANGAZO LA OFISI YA MTAALUMA: Dirisha la kuingiza alama za mtihani wa <span style="color:#0369a1; font-weight:bold;">"${examName.toUpperCase()}"</span> LIKO WAZI${dlText}${specialNote}.</div>
       </div>`;
     } else {
       box.innerHTML = `<div class="marquee-wrap" style="background:#fee2e2; color:#7f1d1d; border-bottom:2px solid #ef4444;">
-        <div class="marquee-text">🔒 TANGAZO LA OFISI YA MTAALUMA: Dirisha la kuingiza alama za "${examName.toUpperCase()}" LIMEFUNGWA RASMI. Wasiliana na Mtaaluma (${getAcadContactPhone()}) kwa dharura.</div>
+        <div class="marquee-text">🔒 TANGAZO LA OFISI YA MTAALUMA: Dirisha la kuingiza alama za "${examName.toUpperCase()}" LIMEFUNGWA. Unaweza kuomba Mtaaluma akufungulie wewe peke yako kwenye Kichupo cha 2!</div>
       </div>`;
     }
   }
@@ -234,6 +242,7 @@
     if (tab === 'overview') {
       const displayAllocs = getMyAllocations();
       const examWin = JSON.parse(localStorage.getItem('sgb_exam_window') || '{"open":true,"active_exam":"Terminal"}');
+      const openForMe = isWindowOpenForMe();
       const myRes = getMyResults();
       const returnedCount = myRes.filter(r => r.verified_status === 'Returned').length;
       const editedByAcad = myRes.filter(r => r.edited_by_academic).length;
@@ -258,7 +267,7 @@
         <div class="cards">
           <div class="card"><h4>Masomo & Madarasa Yangu</h4><div class="val">${displayAllocs.length}</div></div>
           <div class="card" style="border-color:#059669;"><h4>Wastani wa Masomo Yangu</h4><div class="val">${myAvg}%</div></div>
-          <div class="card" style="border-color:${examWin.open ? '#059669' : '#dc2626'};"><h4>Dirisha (${examWin.active_exam})</h4><div class="val">${examWin.open ? '🟢 Wazi' : '🔒 Limefungwa'}</div></div>
+          <div class="card" style="border-color:${openForMe ? '#059669' : '#dc2626'};"><h4>Dirisha (${examWin.active_exam})</h4><div class="val">${openForMe ? '🟢 Wazi' : '🔒 Limefungwa'}</div></div>
           <div class="card" style="border-color:#d97706;"><h4>Marekebisho / Zilizorudishwa</h4><div class="val">${editedByAcad} / ${returnedCount}</div></div>
         </div>
 
@@ -290,7 +299,7 @@
             ${formToolsHtml('🔍 Tafuta somo au kidato...')}
           </div>
           <table><thead><tr><th>Kidato / Mkondo</th><th>Somo</th><th>Vipindi/Wiki</th><th>Hatua ya Haraka</th></tr></thead><tbody>
-          ${displayAllocs.map(a => `<tr><td><b>${a.class_name}</b></td><td><b>${a.subject}</b></td><td>${a.periods_per_week}</td><td><button type="button" class="btn btn-green" onclick="openTab('score_entry')">✍️ Jaza / Angalia Score Sheet</button></td></tr>`).join('') || '<tr><td colspan="4">Mtaaluma bado hajakupangia somo/darasa lolote.</td></tr>'}
+          ${displayAllocs.map(a => `<tr><td><b>${a.class_name}</b></td><td><b>${a.subject}</b></td><td>${a.periods_per_week}</td><td><button type="button" class="btn btn-green" onclick="openTab('score_entry')">✍️ Jaza / Pakua Excel (.xlsx)</button></td></tr>`).join('') || '<tr><td colspan="4">Mtaaluma bado hajakupangia somo/darasa lolote.</td></tr>'}
           </tbody></table>
         </div>`;
       applyTcSearch();
@@ -304,7 +313,7 @@
       area.innerHTML = `
         <div class="panel">
           <div class="form-bar">
-            <h3 style="margin:0;">✍️ Jaza, Kagua Marekebisho ya Mtaaluma & Tuma Score Sheet</h3>
+            <h3 style="margin:0;">✍️ Jaza Alama, Pakua/Pakia Excel (.xlsx) & Tuma Score Sheet</h3>
             ${formToolsHtml('🔍 Tafuta mwanafunzi kwenye grid...')}
           </div>
           ${myAllocs.length === 0 ? '<p style="color:#d97706; font-weight:bold;">⚠️ Mtaaluma bado hajakupangia somo/darasa lolote. Wasiliana na Ofisi ya Mtaaluma akupangie.</p>' : `
@@ -522,7 +531,7 @@
     const [cls, subj] = val.split('|');
     const targetNorm = normClass(cls);
     const list = getAllUnifiedStudents().filter(s => normClass(s.class_name) === targetNorm);
-    const examWin = JSON.parse(localStorage.getItem('sgb_exam_window') || '{"open":true}');
+    const openForMe = isWindowOpenForMe();
 
     const existingRows = SGB.select('exam_results').filter(r =>
       normClass(r.class_name) === targetNorm &&
@@ -530,11 +539,19 @@
       (r.exam_type || '').toLowerCase() === exam.toLowerCase()
     );
     const isApprovedLocked = existingRows.some(r => r.verified_status === 'Approved');
-    const isReadOnly = !examWin.open || isApprovedLocked;
+    const isReadOnly = !openForMe || isApprovedLocked;
 
     document.getElementById('tcGridArea').innerHTML = `
+      <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center; background:#f8fafc; border:1px solid #cbd5e1; padding:9px; border-radius:8px; margin-bottom:10px;">
+        <button type="button" class="btn btn-blue" onclick="downloadTeacherScoreExcel('${cls}', '${subj}', '${exam}')">⬇️ Pakua Excel (.xlsx)</button>
+        ${!isReadOnly ? `<input type="file" id="tcExcelUploadInp" accept=".xlsx,.xls,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel" style="max-width:230px;">
+        <button type="button" class="btn btn-green" onclick="uploadTeacherScoreExcel('${cls}', '${subj}', '${exam}')">📤 Pakia Excel (.xlsx)</button>` : ''}
+        ${!openForMe && !isApprovedLocked ? `<button type="button" class="btn btn-amber" onclick="requestTeacherWindowUnlock()">🔓 Omba Mtaaluma Akufungulie Wewe Pekee</button>` : ''}
+      </div>
+
       ${isApprovedLocked ? '<p style="background:#ecfdf5; border:1px solid #059669; color:#065f46; padding:8px 12px; border-radius:6px; font-weight:bold;">🔒 Score Sheet hii imeshathibitishwa na kufungwa na Mtaaluma (Approved). Unaweza kuona alama za mwisho hapa chini.</p>' : ''}
-      ${!examWin.open && !isApprovedLocked ? '<p style="background:#fef2f2; border:1px solid #dc2626; color:#991b1b; padding:8px 12px; border-radius:6px; font-weight:bold;">🔒 Dirisha la kuingiza alama limefungwa na Mtaaluma.</p>' : ''}
+      ${!openForMe && !isApprovedLocked ? '<p style="background:#fef2f2; border:1px solid #dc2626; color:#991b1b; padding:8px 12px; border-radius:6px; font-weight:bold;">🔒 Dirisha la kuingiza alama limefungwa na Mtaaluma. Bofya kitufe cha njano hapo juu kuomba akufungulie wewe peke yako.</p>' : ''}
+
       <form onsubmit="submitTeacherScoreSheet(event, '${cls}', '${subj}', '${exam}')">
         <table><thead><tr><th>Mwanafunzi</th><th>Jinsia</th><th>Kidato</th><th>PREM</th><th>Alama (0-100)</th><th>Hali / Marekebisho</th></tr></thead>
         <tbody>
@@ -553,6 +570,52 @@
         </tbody></table>
         ${list.length && !isReadOnly ? `<button type="submit" class="btn btn-green" style="margin-top:10px;">📤 Wasilisha Score Sheet (${cls} — ${subj} — ${exam}) Kwa Mtaaluma</button>` : ''}
       </form>`;
+  }
+  function downloadTeacherScoreExcel(cls, subj, exam) {
+    if (typeof XLSX === 'undefined') { alert('⚠️ Maktaba ya Excel inapakia, subiri sekunde 2 jaribu tena.'); return; }
+    const list = getAllUnifiedStudents().filter(s => normClass(s.class_name) === normClass(cls));
+    if (!list.length) { alert(`⚠️ Hakuna wanafunzi kwenye ${cls}.`); return; }
+    const rows = [['Jina la Mwanafunzi', 'PREM No', 'Kidato', 'Somo', 'Mtihani', 'Alama (0-100)']];
+    list.forEach(s => rows.push([s.full_name, s.prem_no || '-', s.class_name, subj, exam, '']));
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.aoa_to_sheet(rows);
+    const safeSheet = subj.replace(/[\\/?*[\]:]/g, '').trim().slice(0, 28) || 'ScoreSheet';
+    XLSX.utils.book_append_sheet(wb, ws, safeSheet);
+    XLSX.writeFile(wb, `${cls}_${subj}_${exam}.xlsx`.replace(/\s+/g, '_'));
+  }
+
+  function uploadTeacherScoreExcel(cls, subj, exam) {
+    if (typeof XLSX === 'undefined') { alert('⚠️ Maktaba ya Excel haijapakia bado.'); return; }
+    const file = document.getElementById('tcExcelUploadInp')?.files?.item(0);
+    if (!file) { alert('⚠️ Chagua faili la Excel (.xlsx) lililojazwa alama kwanza.'); return; }
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const wb = XLSX.read(new Uint8Array(ev.target.result), { type: 'array' });
+      const rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames.at(0)], { header: 1 });
+      const scoreMap = {};
+      rows.slice(1).forEach(r => {
+        if (r.at(0) && r.at(5) !== undefined && r.at(5) !== null && String(r.at(5)).trim() !== '') {
+          scoreMap[String(r.at(0)).trim().toLowerCase()] = Number(r.at(5));
+        }
+      });
+      let filled = 0;
+      document.querySelectorAll('.tc-sc-inp').forEach(inp => {
+        const val = scoreMap[(inp.dataset.name || '').trim().toLowerCase()];
+        if (val !== undefined && !isNaN(val)) { inp.value = val; filled++; }
+      });
+      alert(`✅ Alama ${filled} kutoka Excel zimejazwa kwenye jedwali! Bofya "Wasilisha Score Sheet" kuzituma kwa Mtaaluma.`);
+    };
+    reader.readAsArrayBuffer(file);
+  }
+
+  function requestTeacherWindowUnlock() {
+    const reason = prompt(`Andika sababu ya kuomba Mtaaluma akufungulie dirisha wewe peke yako (${myTeacherName}):`);
+    if (!reason || !reason.trim()) return;
+    const reqs = JSON.parse(localStorage.getItem('sgb_unlock_requests') || '[]');
+    reqs.unshift({ teacher: myTeacherName, reason: reason.trim(), time: new Date().toLocaleString('sw-TZ'), status: 'Pending' });
+    localStorage.setItem('sgb_unlock_requests', JSON.stringify(reqs));
+    SGB.pushToCloud('unlock_requests');
+    alert('✅ Ombi lako limetumwa kwa Mtaaluma! Akikubali, dirisha litafunguka kwako peke yako.');
   }
   function submitTeacherScoreSheet(e, cls, subj, exam) {
     e.preventDefault();
@@ -611,6 +674,7 @@
       openTab('homework');
     }
   }
+
   function gradeAndReturnSubmission(subId) {
     const score = document.getElementById(`grd_${subId}`)?.value;
     const remark = document.getElementById(`rem_${subId}`)?.value || '';
