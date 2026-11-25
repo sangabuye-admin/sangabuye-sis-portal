@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashibodi ya Mwalimu (Teacher Portal v9.9 — Form 1-6) | Sangabuye SIS</title>
+  <title>Dashibodi ya Mwalimu (Teacher Portal v10.0 — Form 1-6) | Sangabuye SIS</title>
   <script src="core.js?v=7.5"></script>
   <style>
     * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
@@ -137,12 +137,12 @@
     const map = {};
     SGB.select('academic_students').forEach(s => {
       const k = (s.full_name || '').trim().toLowerCase();
-      if (k) map[k] = { full_name: s.full_name.trim(), class_name: s.class_name || '', prem_no: s.prem_no || '-', parent_phone: s.parent_phone || '' };
+      if (k) map[k] = { full_name: s.full_name.trim(), gender: (s.gender || 'M').toUpperCase().startsWith('F') ? 'F' : 'M', class_name: s.class_name || '', prem_no: s.prem_no || '-', parent_phone: s.parent_phone || '' };
     });
     SGB.select('users_profile').filter(u => (u.role || '').toLowerCase() === 'student').forEach(u => {
       const k = (u.full_name || '').trim().toLowerCase();
       if (k && !map[k]) {
-        map[k] = { full_name: u.full_name.trim(), class_name: u.class_name || u.department || '', prem_no: u.username || '-', parent_phone: u.phone || '' };
+        map[k] = { full_name: u.full_name.trim(), gender: (u.gender || 'M').toUpperCase().startsWith('F') ? 'F' : 'M', class_name: u.class_name || u.department || '', prem_no: u.username || '-', parent_phone: u.phone || '' };
       }
     });
     return Object.values(map);
@@ -707,9 +707,9 @@
 
     document.getElementById('tcGridArea').innerHTML = `
       <form onsubmit="submitTeacherScoreSheet(event, '${cls}', '${subj}', '${exam}')">
-        <table><thead><tr><th>Mwanafunzi</th><th>Kidato</th><th>PREM / Reg</th><th>Alama (0-100)</th></tr></thead>
+        <table><thead><tr><th>Mwanafunzi</th><th>Jinsia</th><th>Kidato</th><th>PREM</th><th>Alama (0-100)</th></tr></thead>
         <tbody>
-        ${list.map(s => `<tr><td><b>${s.full_name}</b></td><td>${s.class_name}</td><td>${s.prem_no}</td><td><input type="number" class="tc-sc-inp" data-name="${s.full_name}" min="0" max="100" placeholder="Alama"></td></tr>`).join('') || `<tr><td colspan="4">Hakuna wanafunzi waliosajiliwa kwenye kidato cha <b>${cls}</b> bado.</td></tr>`}
+        ${list.map(s => `<tr><td><b>${s.full_name}</b></td><td>${s.gender}</td><td>${s.class_name}</td><td>${s.prem_no}</td><td><input type="number" class="tc-sc-inp" data-name="${s.full_name}" min="0" max="100" placeholder="Alama"></td></tr>`).join('') || `<tr><td colspan="5">Hakuna wanafunzi waliosajiliwa kwenye kidato cha <b>${cls}</b> bado.</td></tr>`}
         </tbody></table>
         ${list.length ? `<button type="submit" class="btn btn-green" style="margin-top:10px;">📤 Wasilisha Score Sheet (${cls} — ${subj}) Kwa Mtaaluma</button>` : ''}
       </form>`;
@@ -803,6 +803,7 @@
     alert('✅ Ripoti ya Mwalimu wa Zamu imetumwa kwa Mkuu wa Shule!');
     openTab('tod_duty');
   }
+
   function tcSubmitPlan(e) {
     e.preventDefault();
     const [cls, subj] = (document.getElementById('tcLpAlloc')?.value || 'Form 1A|Somo').split('|');
