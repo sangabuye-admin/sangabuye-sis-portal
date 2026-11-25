@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashibodi ya Mwalimu (Teacher Portal v10.1 — Form 1-6) | Sangabuye SIS</title>
+  <title>Dashibodi ya Mwalimu (Teacher Portal v11.0 — Form 1-6) | Sangabuye SIS</title>
   <script src="core.js?v=7.5"></script>
   <style>
     * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
@@ -75,10 +75,23 @@
   const user = SGB.requireRole(['teacher', 'academic', 'headmaster', 'super_admin', 'admin']);
   SGB.startSessionTimer();
 
-  const SYSTEM_GATEWAY_PHONE = localStorage.getItem('sgb_system_gateway_phone') || '0615000305';
   const myTeacherName = user ? (user.full_name || user.username || 'Mwalimu') : 'Mwalimu';
   if (document.getElementById('tcSideName')) document.getElementById('tcSideName').innerText = myTeacherName;
   let currentTcTab = 'overview';
+
+  function getAcadContactPhone() {
+    return localStorage.getItem('sgb_academic_master_phone') || localStorage.getItem('sgb_system_gateway_phone') || '0615000305';
+  }
+
+  function getExamTypesList() {
+    const saved = JSON.parse(localStorage.getItem('sgb_exam_types') || 'null');
+    if (saved && saved.length) return saved;
+    return ['Midterm March', 'Terminal', 'Midterm September', 'Annual', 'Mock / Pre-NECTA'];
+  }
+
+  function examOptionsHtml(selected = '') {
+    return getExamTypesList().map(ex => `<option value="${ex}" ${ex === selected ? 'selected' : ''}>${ex}</option>`).join('');
+  }
 
   function normClass(str) {
     return String(str || '').toLowerCase()
@@ -102,19 +115,12 @@
   function gradeFromScore(sc, isALevel = false) {
     const s = Number(sc);
     if (isALevel) {
-      if (s >= 80) return 'A';
-      if (s >= 70) return 'B';
-      if (s >= 60) return 'C';
-      if (s >= 50) return 'D';
-      if (s >= 40) return 'E';
-      if (s >= 35) return 'S';
+      if (s >= 80) return 'A'; if (s >= 70) return 'B'; if (s >= 60) return 'C';
+      if (s >= 50) return 'D'; if (s >= 40) return 'E'; if (s >= 35) return 'S';
       return 'F';
     }
-    if (s >= 75) return 'A';
-    if (s >= 65) return 'B';
-    if (s >= 45) return 'C';
-    if (s >= 30) return 'D';
-    return 'F';
+    if (s >= 75) return 'A'; if (s >= 65) return 'B'; if (s >= 45) return 'C';
+    if (s >= 30) return 'D'; return 'F';
   }
   function getMyAllocations() {
     const tName = myTeacherName.toLowerCase().trim();
@@ -175,7 +181,7 @@
 
     if (tab === 'overview') {
       const displayAllocs = getMyAllocations();
-      const examWin = JSON.parse(localStorage.getItem('sgb_exam_window') || '{"open":true,"active_exam":"Terminal 2026"}');
+      const examWin = JSON.parse(localStorage.getItem('sgb_exam_window') || '{"open":true,"active_exam":"Terminal"}');
       const myRes = getMyResults();
       const returnedCount = myRes.filter(r => r.verified_status === 'Returned').length;
       const myAvg = myRes.length ? (myRes.reduce((s, r) => s + Number(r.score || 0), 0) / myRes.length).toFixed(1) : '0.0';
@@ -257,7 +263,7 @@
     }
     if (tab === 'score_entry') {
       const myAllocs = getMyAllocations();
-      const examWin = JSON.parse(localStorage.getItem('sgb_exam_window') || '{"open":true,"active_exam":"Terminal 2026"}');
+      const examWin = JSON.parse(localStorage.getItem('sgb_exam_window') || '{"open":true,"active_exam":"Terminal"}');
       const autoTrigger = myAllocs.length === 1;
 
       area.innerHTML = `
@@ -273,12 +279,7 @@
               ${myAllocs.length > 1 ? '<option value="">-- Chagua Kidato & Somo Lako --</option>' : ''}
               ${myAllocs.map(a => `<option value="${a.class_name}|${a.subject}">${a.class_name} — ${a.subject}</option>`).join('')}
             </select>
-            <select id="tcExamType">
-              <option value="Midterm">Midterm</option>
-              <option value="Terminal">Terminal</option>
-              <option value="Annual">Annual</option>
-              <option value="Mock">Mock / Pre-NECTA</option>
-            </select>
+            <select id="tcExamType">${examOptionsHtml(examWin.active_exam || 'Terminal')}</select>
             <button type="button" class="btn btn-blue" onclick="loadTeacherScoreGrid()">📋 Fungua Orodha</button>
           </div>
           <div id="tcGridArea"></div>`}
@@ -286,7 +287,6 @@
       if (autoTrigger && examWin.open) setTimeout(loadTeacherScoreGrid, 50);
       return;
     }
-
     if (tab === 'subj_analytics') {
       const myRes = getMyResults();
       const bySubjClass = {};
@@ -348,7 +348,7 @@
       area.innerHTML = `
         <div class="panel">
           <div class="form-bar">
-            <h3 style="margin:0;">📋 Mahudhurio ya Darasa (Roll Call) & Tahadhari ya Utoro (${SYSTEM_GATEWAY_PHONE})</h3>
+            <h3 style="margin:0;">📋 Mahudhurio ya Darasa (Roll Call) & Tahadhari ya Utoro</h3>
             ${formToolsHtml('🔍 Tafuta mwanafunzi au tarehe...')}
           </div>
           <form onsubmit="saveStudentAttendance(event)" style="display:grid; grid-template-columns:1.6fr 1fr 1fr 1.2fr auto; gap:8px; margin-bottom:12px;">
@@ -717,7 +717,7 @@
         <tbody>
         ${list.map(s => `<tr><td><b>${s.full_name}</b></td><td>${s.gender}</td><td>${s.class_name}</td><td>${s.prem_no}</td><td><input type="number" class="tc-sc-inp" data-name="${s.full_name}" min="0" max="100" placeholder="Alama"></td></tr>`).join('') || `<tr><td colspan="5">Hakuna wanafunzi waliosajiliwa kwenye kidato cha <b>${cls}</b> bado.</td></tr>`}
         </tbody></table>
-        ${list.length ? `<button type="submit" class="btn btn-green" style="margin-top:10px;">📤 Wasilisha Score Sheet (${cls} — ${subj}) Kwa Mtaaluma</button>` : ''}
+        ${list.length ? `<button type="submit" class="btn btn-green" style="margin-top:10px;">📤 Wasilisha Score Sheet (${cls} — ${subj} — ${exam}) Kwa Mtaaluma</button>` : ''}
       </form>`;
   }
 
@@ -732,7 +732,7 @@
         count++;
       }
     });
-    alert(`✅ Score Sheet yenye alama ${count} imetumwa kwa Mtaaluma kwa uhakiki!`);
+    alert(`✅ Score Sheet yenye alama ${count} (${exam}) imetumwa kwa Mtaaluma kwa uhakiki!`);
     openTab('subj_analytics');
   }
 
@@ -789,10 +789,11 @@
     const reg = getAllUnifiedStudents().find(s => (s.full_name || '').toLowerCase() === stName.toLowerCase());
     let phone = reg?.parent_phone || prompt(`Ingiza namba ya simu ya mzazi wa ${stName}:`);
     if (!phone || !phone.trim()) return;
-    const msg = `SHULE YA SEKONDARI SANGABUYE\nTaarifa ya Mahudhurio ya ${stName.toUpperCase()} tarehe ${dt}: ${status}.\nMawasiliano: ${SYSTEM_GATEWAY_PHONE}`;
+    const acadPhone = getAcadContactPhone();
+    const msg = `SHULE YA SEKONDARI SANGABUYE\nTaarifa ya Mahudhurio ya ${stName.toUpperCase()} tarehe ${dt}: ${status}.\nOfisi ya Taaluma: ${acadPhone}`;
     let intl = phone.replace(/\D/g, '');
     if (intl.startsWith('0')) intl = '255' + intl.slice(1);
-    SGB.insert('sms_outbox', { recipient_name: `Mzazi wa ${stName}`, phone: phone.trim(), sender_gateway: `${SYSTEM_GATEWAY_PHONE} (${channel})`, message: msg, status: 'Imetumwa' });
+    SGB.insert('sms_outbox', { recipient_name: `Mzazi wa ${stName}`, phone: phone.trim(), sender_gateway: `${acadPhone} (${channel})`, message: msg, status: 'Imetumwa' });
     if (channel === 'WA') window.open(`https://wa.me{intl}?text=${encodeURIComponent(msg)}`, '_blank');
     else window.open(`sms:${phone.trim()}?body=${encodeURIComponent(msg)}`, '_self');
   }
