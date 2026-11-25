@@ -3,146 +3,747 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mabweni, Malezi & Zahanati | Sangabuye SIS Portal</title>
-  <script src="core.js"></script>
+  <title>Bweni & Zahanati (Patron/Matron & Dispensary v11.0) | Sangabuye SIS</title>
+  <script src="core.js?v=7.5"></script>
   <style>
     * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
     body { margin: 0; background: #f1f5f9; display: flex; min-height: 100vh; color: #1e293b; }
-    .sidebar { width: 265px; background: #134e4a; color: white; display: flex; flex-direction: column; padding: 18px 12px; }
-    .sidebar h2 { font-size: 15px; margin: 0 0 4px; color: #fde68a; text-align: center; }
-    .sidebar p { font-size: 11px; text-align: center; color: #99f6e4; margin: 0 0 18px; }
-    .menu-btn { background: transparent; border: none; color: #ccfbf1; text-align: left; padding: 10px 12px; border-radius: 8px; cursor: pointer; font-size: 13px; margin-bottom: 4px; }
+    .sidebar { width: 265px; background: #0f294a; color: white; display: flex; flex-direction: column; padding: 12px 10px; overflow-y: auto; }
+    .sidebar h2 { font-size: 15.5px; margin: 0 0 2px; color: #38bdf8; text-align: center; }
+    .sidebar p { font-size: 11px; text-align: center; color: #94a3b8; margin: 0 0 10px; }
+    .grp-lbl { font-size: 10px; color: #94a3b8; text-transform: uppercase; margin: 7px 6px 3px; font-weight: bold; }
+    .menu-btn { background: transparent; border: none; color: #cbd5e1; text-align: left; padding: 6px 10px; border-radius: 7px; cursor: pointer; font-size: 11.8px; margin-bottom: 2px; }
     .menu-btn:hover, .menu-btn.active { background: #0d9488; color: white; font-weight: bold; }
     .main { flex: 1; display: flex; flex-direction: column; }
-    .topbar { background: white; padding: 14px 22px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
-    .content { padding: 22px; }
-    .panel { background: white; padding: 18px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 18px; }
-    input, select { padding: 9px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; width: 100%; }
-    table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 12.5px; }
-    th, td { padding: 8px; border: 1px solid #e2e8f0; text-align: left; }
-    th { background: #f8fafc; color: #134e4a; }
-    .btn { padding: 7px 12px; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold; }
-    .btn-teal { background: #0d9488; color: white; }
+    .topbar { background: white; padding: 10px 16px; display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
+    .content { padding: 18px; }
+    .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 16px; }
+    .card { background: white; padding: 14px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border-left: 4px solid #0d9488; }
+    .card h4 { margin: 0 0 5px; font-size: 10.5px; color: #64748b; text-transform: uppercase; }
+    .card .val { font-size: 18px; font-weight: bold; color: #0f294a; }
+    .panel { background: white; padding: 16px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 16px; }
+    .form-bar { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+    .form-tools { display: flex; gap: 6px; align-items: center; }
+    input, select, textarea { padding: 7.5px 9px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12.5px; width: 100%; }
+    table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 12px; }
+    th, td { padding: 6px 8px; border: 1px solid #e2e8f0; text-align: left; }
+    th { background: #f8fafc; color: #0f294a; }
+    .btn { padding: 7px 11px; border: none; border-radius: 6px; cursor: pointer; font-size: 11.5px; font-weight: bold; }
     .btn-green { background: #059669; color: white; }
+    .btn-blue { background: #1d4ed8; color: white; }
     .btn-amber { background: #d97706; color: white; }
-    .logout-btn { background: #dc2626; color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: bold; margin-top: auto; }
+    .btn-red { background: #dc2626; color: white; }
+    .btn-teal { background: #0d9488; color: white; }
   </style>
 </head>
 <body>
-
 <div class="sidebar">
-  <h2>MABWENI & ZAHANATI</h2>
-  <p>Matron / Patron / Nurse</p>
-  <button class="menu-btn active" onclick="openTab('hostels', this)">🛏️ 1. Usimamizi wa Mabweni & Vitanda</button>
-  <button class="menu-btn" onclick="openTab('sickbay', this)">🏥 2. Zahanati (Sickbay + SMS/WA)</button>
-  <button class="menu-btn" onclick="openTab('dorm_roll', this)">🌙 3. Roll Call ya Usiku Bwenini</button>
-  <button class="logout-btn" onclick="SGB.logout()">🚪 Toka (Logout)</button>
+  <h2>BWENI & ZAHANATI</h2>
+  <p id="mtSideName">Patron / Matron & Dispensary</p>
+
+  <div class="grp-lbl">A. Dashibodi & Mabweni</div>
+  <button class="menu-btn active" onclick="openTab('overview', this)">📊 1. Dashibodi & Charts</button>
+  <button class="menu-btn" onclick="openTab('dorms', this)">🛏️ 2. Mabweni, Vitanda & Viongozi</button>
+  <button class="menu-btn" onclick="openTab('roll_call', this)">📋 3. Roll Call ya Bweni (Usiku/Asubuhi)</button>
+  <button class="menu-btn" onclick="openTab('term_checkin', this)">🧳 4. Kufungua & Kufunga Shule</button>
+
+  <div class="grp-lbl">B. Zahanati & Afya ya Wanafunzi</div>
+  <button class="menu-btn" onclick="openTab('clinic', this)">🏥 5. Zahanati, Vipimo & Sick-Off</button>
+  <button class="menu-btn" onclick="openTab('chronic', this)">🧬 6. Afya ya Kudumu, Mzio & Damu</button>
+  <button class="menu-btn" onclick="openTab('medicines', this)">💊 7. Stoo ya Dawa & Expiry Alert</button>
+
+  <div class="grp-lbl">C. Ruhusa (Gate Pass) & Wageni</div>
+  <button class="menu-btn" onclick="openTab('gate_pass', this)">🪪 8. Vibali vya Kutoka (Gate Pass)</button>
+  <button class="menu-btn" onclick="openTab('gate_return', this)">🚪 9. Walioko Nje & Kurudi Langoni</button>
+  <button class="menu-btn" onclick="openTab('visitors', this)">👨‍👩‍👧 10. Wageni & Wazazi (Visiting Day)</button>
+
+  <div class="grp-lbl">D. Usafi, Chakula, Mali & Ujumbe</div>
+  <button class="menu-btn" onclick="openTab('hygiene', this)">🧹 11. Ukaguzi wa Usafi wa Mabweni</button>
+  <button class="menu-btn" onclick="openTab('dining', this)">🍽️ 12. Chakula & Lishe Maalum</button>
+  <button class="menu-btn" onclick="openTab('discipline', this)">🚨 13. Nidhamu & Matukio ya Bweni</button>
+  <button class="menu-btn" onclick="openTab('assets', this)">📦 14. Mali za Bweni & Matengenezo</button>
+  <button class="menu-btn" onclick="openTab('mt_messages', this)">💬 15. Ujumbe (Mkuu/Mtaaluma/Zamu)</button>
 </div>
 
 <div class="main">
   <div class="topbar">
-    <div><strong id="tabTitle">🛏️ 1. Usimamizi wa Mabweni & Vitanda</strong> <span id="syncTime" style="font-size:11px; color:#0d9488;"></span></div>
-    <div></div>
+    <div><strong id="tabTitle">📊 1. Dashibodi & Charts</strong> <span id="syncTime" style="font-size:11px; color:#059669;"></span></div>
+    <div style="display:flex; gap:8px; align-items:center; flex:1; max-width:460px;">
+      <input type="text" id="globalMtSearch" onkeyup="filterMatronTables(this.value)" placeholder="🔍 Tafuta popote kwa jina la mwanafunzi, bweni, dawa au kibali...">
+      <button type="button" class="btn btn-teal" style="white-space:nowrap;" onclick="refreshMatronNow()">🔄 Refresh</button>
+    </div>
   </div>
   <div class="content" id="viewArea"></div>
-  <datalist id="stList"></datalist>
 </div>
-
 <script>
-  const user = SGB.requireRole(['matron_patron', 'super_admin']);
+  const user = SGB.requireRole(['matron', 'patron', 'nurse', 'headmaster', 'super_admin', 'admin']);
   SGB.startSessionTimer();
 
-  function updateNames() {
-    const names = new Set();
-    SGB.select('users_profile').filter(u => u.role === 'student').forEach(u => names.add(u.full_name));
-    document.getElementById('stList').innerHTML = Array.from(names).map(n => `<option value="${n}">`).join('');
+  const myStaffName = user ? (user.full_name || user.username || 'Matron / Patron') : 'Matron / Patron';
+  if (document.getElementById('mtSideName')) document.getElementById('mtSideName').innerText = myStaffName;
+  let currentMtTab = 'overview';
+
+  function getSchoolContactPhone() {
+    return localStorage.getItem('sgb_academic_master_phone') || localStorage.getItem('sgb_system_gateway_phone') || '0615000305';
   }
 
+  function getAllUnifiedStudents() {
+    const map = {};
+    SGB.select('academic_students').forEach(s => {
+      const k = (s.full_name || '').trim().toLowerCase();
+      if (k) map[k] = { full_name: s.full_name.trim(), gender: (s.gender || 'M').toUpperCase().startsWith('F') ? 'F' : 'M', class_name: s.class_name || 'Form 1A', prem_no: s.prem_no || '-', parent_phone: s.parent_phone || '' };
+    });
+    SGB.select('users_profile').filter(u => (u.role || '').toLowerCase() === 'student').forEach(u => {
+      const k = (u.full_name || '').trim().toLowerCase();
+      if (k && !map[k]) {
+        map[k] = { full_name: u.full_name.trim(), gender: (u.gender || 'M').toUpperCase().startsWith('F') ? 'F' : 'M', class_name: u.class_name || u.department || 'Form 1A', prem_no: u.username || '-', parent_phone: u.phone || '' };
+      }
+    });
+    return Object.values(map);
+  }
+
+  function studentDatalistHtml(listId = 'mtStudentsDatalist') {
+    return `<datalist id="${listId}">${getAllUnifiedStudents().map(s => `<option value="${s.full_name}">`).join('')}</datalist>`;
+  }
+
+  function formToolsHtml(placeholder = '🔍 Tafuta kwenye fomu hii...') {
+    return `<div class="form-tools">
+      <input type="text" onkeyup="filterMatronTables(this.value)" placeholder="${placeholder}" style="width:220px;">
+      <button type="button" class="btn btn-teal" onclick="refreshMatronNow()">🔄 Refresh</button>
+    </div>`;
+  }
   function openTab(tab, btn) {
+    currentMtTab = tab;
     document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('active'));
     if (btn) btn.classList.add('active');
     if (btn) document.getElementById('tabTitle').innerText = btn.innerText;
-    updateNames();
     const area = document.getElementById('viewArea');
 
-    if (tab === 'hostels') {
-      const beds = SGB.select('hostel_beds');
+    if (tab === 'overview') {
+      const dorms = SGB.select('dorm_allocations');
+      const boysDorm = dorms.filter(d => d.gender === 'M').length;
+      const girlsDorm = dorms.filter(d => d.gender === 'F').length;
+      const visits = SGB.select('clinic_visits');
+      const sickBay = visits.filter(v => (v.action_taken || '').includes('Mapumziko') || (v.action_taken || '').includes('Rufaa')).length;
+      const passes = SGB.select('gate_passes');
+      const pendingPasses = passes.filter(p => p.status === 'Inasubiri Idhini').length;
+      const outStudents = passes.filter(p => p.status === 'Ameruhusiwa (Nje)').length;
+
+      // Grafu ya Mabweni
+      const byDorm = {};
+      dorms.forEach(d => {
+        const dn = d.dorm_name || 'Bweni';
+        byDorm[dn] = (byDorm[dn] || 0) + 1;
+      });
+      const maxDorm = Math.max(1, ...Object.values(byDorm));
+
+      // Grafu ya Magonjwa Zahanati
+      const byDisease = {};
+      visits.forEach(v => {
+        const diag = (v.diagnosis || 'Mengineyo').trim();
+        byDisease[diag] = (byDisease[diag] || 0) + 1;
+      });
+      const maxDis = Math.max(1, ...Object.values(byDisease));
+
       area.innerHTML = `
+        <div class="cards">
+          <div class="card"><h4>Wanafunzi wa Bweni</h4><div class="val">${dorms.length}</div><small>M: ${boysDorm} | F: ${girlsDorm}</small></div>
+          <div class="card" style="border-color:#0284c7;"><h4>Waliohudumiwa Zahanati</h4><div class="val">${visits.length}</div><small>Mapumziko/Rufaa: ${sickBay}</small></div>
+          <div class="card" style="border-color:#d97706;"><h4>Maombi ya Gate Pass</h4><div class="val">${pendingPasses}</div><small>Yanasubiri Idhini</small></div>
+          <div class="card" style="border-color:#dc2626;"><h4>Walioko Nje ya Shule</h4><div class="val">${outStudents}</div><small>Bado Hawajarudi</small></div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(320px, 1fr)); gap:14px; margin-bottom:16px;">
+          <div class="panel" style="margin-bottom:0; border-top:4px solid #0d9488;">
+            <h3 style="margin-top:0;">🛏️ Grafu ya Idadi ya Wanafunzi Kila Bweni</h3>
+            ${Object.keys(byDorm).length ? Object.entries(byDorm).map(([dn, cnt]) => {
+              const pct = Math.round((cnt / maxDorm) * 100);
+              return `<div style="margin-bottom:8px;">
+                <div style="display:flex; justify-content:space-between; font-size:12px;"><b>${dn}</b><span><b>${cnt}</b> wanafunzi</span></div>
+                <div style="background:#e2e8f0; height:13px; border-radius:6px; overflow:hidden;">
+                  <div style="width:${pct}%; background:#0d9488; height:100%;"></div>
+                </div>
+              </div>`;
+            }).join('') : '<p style="color:#64748b; font-size:12px;">Panga wanafunzi kwenye mabweni (Kichupo cha 2) ili grafu ichoreke.</p>'}
+          </div>
+
+          <div class="panel" style="margin-bottom:0; border-top:4px solid #1d4ed8;">
+            <h3 style="margin-top:0;">🏥 Takwimu za Afya & Magonjwa Zahanati</h3>
+            ${Object.keys(byDisease).length ? Object.entries(byDisease).map(([dg, cnt]) => {
+              const pct = Math.round((cnt / maxDis) * 100);
+              return `<div style="margin-bottom:8px;">
+                <div style="display:flex; justify-content:space-between; font-size:12px;"><b>${dg}</b><span>${cnt} kesi</span></div>
+                <div style="background:#e2e8f0; height:13px; border-radius:6px; overflow:hidden;">
+                  <div style="width:${pct}%; background:#1d4ed8; height:100%;"></div>
+                </div>
+              </div>`;
+            }).join('') : '<p style="color:#64748b; font-size:12px;">Rekodi wagonjwa zahanati (Kichupo cha 5) ili grafu ya afya ionekane.</p>'}
+          </div>
+        </div>
+
         <div class="panel">
-          <h3>Panga Wanafunzi Kwenye Mabweni & Vitanda (Hostel Allocation)</h3>
-          <form onsubmit="assignBed(event)" style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:15px;">
-            <input type="text" id="hbSt" list="stList" required placeholder="Jina la Mwanafunzi">
-            <input type="text" id="hbRoom" required placeholder="Bweni & Kitanda (Mfano: Serengeti - Bed 12)">
-            <button type="submit" class="btn btn-teal">🛏️ Panga Kitanda Sasa</button>
-          </form>
-          <table><tr><th>Mwanafunzi</th><th>Bweni & Namba ya Kitanda</th><th>Tarehe</th></tr>
-          ${beds.map(b => `<tr><td><b>${b.student_name}</b></td><td>${b.room_bed}</td><td>${b.created_at}</td></tr>`).join('') || '<tr><td colspan="3">Hakuna mwanafunzi aliyepangiwa bweni bado.</td></tr>'}
+          <div class="form-bar">
+            <h3 style="margin:0;">🚨 Ufuatiliaji wa Haraka: Wanafunzi Walioko Nje (Gate Pass) & Wagonjwa</h3>
+            ${formToolsHtml('🔍 Tafuta mwanafunzi...')}
+          </div>
+          <table>
+            <thead><tr><th>Mwanafunzi</th><th>Kidato</th><th>Kategoria</th><th>Maelezo / Sababu</th><th>Muda / Tarehe</th><th>Hali</th></tr></thead>
+            <tbody>
+            ${passes.filter(p => p.status === 'Ameruhusiwa (Nje)').map(p => `<tr>
+              <td><b>${p.student_name}</b></td><td>${p.class_name}</td><td>🪪 Gate Pass (Nje)</td><td>${p.reason}</td><td>Kurudi: ${p.return_time}</td><td><b style="color:#dc2626;">${p.status}</b></td>
+            </tr>`).join('')}
+            ${visits.slice(0, 6).map(v => `<tr>
+              <td><b>${v.student_name}</b></td><td>${v.class_name}</td><td>🏥 Zahanati</td><td>${v.diagnosis} (${v.medication})</td><td>${v.created_at}</td><td><b>${v.action_taken}</b></td>
+            </tr>`).join('')}
+            ${(!passes.some(p => p.status === 'Ameruhusiwa (Nje)') && !visits.length) ? '<tr><td colspan="6">Hakuna taarifa za dharura kwa sasa.</td></tr>' : ''}
+            </tbody>
           </table>
         </div>`;
+      applyMtSearch();
+      return;
     }
-
-    if (tab === 'sickbay') {
-      const sicks = SGB.select('sickbay_records');
+    if (tab === 'dorms') {
+      const dorms = SGB.select('dorm_allocations');
       area.innerHTML = `
         <div class="panel">
-          <h3>Zahanati ya Shule (Sickbay Log & Taarifa Kwa Mzazi)</h3>
-          <form onsubmit="addSickCase(event)" style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:15px;">
-            <input type="text" id="skSt" list="stList" required placeholder="Jina la Mwanafunzi">
-            <input type="text" id="skDiag" required placeholder="Dalili / Matibabu Aliyopewa">
-            <button type="submit" class="btn btn-teal">🏥 Hifadhi & Mjulishe Mzazi</button>
+          <div class="form-bar">
+            <h3 style="margin:0;">🛏️ Panga Mabweni, Vitanda & Viongozi wa Mabweni (Form 1–6)</h3>
+            ${formToolsHtml('🔍 Tafuta mwanafunzi au bweni...')}
+          </div>
+          <form onsubmit="assignDormBed(event)" style="display:grid; grid-template-columns:1.6fr 1fr 0.8fr 1fr 0.9fr auto; gap:7px; margin-bottom:12px;">
+            <input type="text" id="dmStudent" list="mtStudentsDatalist" required placeholder="Andika herufi za jina la mwanafunzi...">
+            <select id="dmName">
+              <option value="Bweni la Kilimanjaro">Bweni la Kilimanjaro</option>
+              <option value="Bweni la Meru">Bweni la Meru</option>
+              <option value="Bweni la Serengeti">Bweni la Serengeti</option>
+              <option value="Bweni la Victoria">Bweni la Victoria</option>
+              <option value="Bweni la Nyerere">Bweni la Nyerere</option>
+              <option value="Bweni la Karume">Bweni la Karume</option>
+            </select>
+            <input type="text" id="dmBed" required placeholder="Kitanda (mf. B-12)">
+            <select id="dmRole"><option value="Mwanafunzi wa Bweni">Mwanafunzi wa Bweni</option><option value="Kiongozi wa Bweni (Captain)">⭐ Kiongozi wa Bweni</option></select>
+            <select id="dmNet"><option value="Ana Chandarua & Godoro">Ana Chandarua</option><option value="Hana Chandarua">Hana Chandarua</option></select>
+            <button type="submit" class="btn btn-teal">✅ Panga</button>
           </form>
-          <table><tr><th>Mwanafunzi</th><th>Matibabu</th><th>Muda</th><th>Mjulishe Mzazi</th></tr>
-          ${sicks.map(s => {
-            const msg = `SANGABUYE ZAHANATI: Mzazi wa ${s.student_name}, mwanao amepata matibabu shuleni leo (${s.diagnosis}). Kwa maelezo zaidi piga 0784 755 173.`;
-            return `<tr><td><b>${s.student_name}</b></td><td>${s.diagnosis}</td><td>${s.created_at}</td>
-            <td><button class="btn btn-green" onclick="SGB.sendWhatsApp('', '${msg}')">💬 WhatsApp</button> <button class="btn btn-amber" onclick="SGB.sendSMS('', '${msg}')">📲 SMS</button></td></tr>`;
-          }).join('') || '<tr><td colspan="4">Hakuna rekodi ya zahanati bado.</td></tr>'}
+          ${studentDatalistHtml()}
+          <table>
+            <thead><tr><th>Mwanafunzi</th><th>Jinsia</th><th>Kidato</th><th>Bweni</th><th>Kitanda</th><th>Wadhifa</th><th>Vifaa</th><th>Kitendo</th></tr></thead>
+            <tbody>
+            ${dorms.map(d => `<tr>
+              <td><b>${d.student_name}</b></td><td>${d.gender}</td><td>${d.class_name}</td><td><b>${d.dorm_name}</b></td>
+              <td><b>${d.bed_no}</b></td><td>${d.dorm_role}</td><td>${d.bedding_status}</td>
+              <td><button class="btn btn-red" onclick="deleteDormAlloc('${d.id}')">Ondoa</button></td>
+            </tr>`).join('') || '<tr><td colspan="8">Hakuna wanafunzi waliopangwa mabwenini bado.</td></tr>'}
+            </tbody>
           </table>
         </div>`;
+      applyMtSearch();
+      return;
     }
 
-    if (tab === 'dorm_roll') {
-      const logs = SGB.select('dorm_rollcall');
+    if (tab === 'roll_call') {
+      const logs = SGB.select('dorm_roll_calls');
       area.innerHTML = `
         <div class="panel">
-          <h3>Roll Call ya Usiku Bwenini (Night Dormitory Roll Call)</h3>
-          <form onsubmit="addDormRoll(event)" style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:15px;">
-            <input type="text" id="drSt" list="stList" required placeholder="Jina la Mwanafunzi">
-            <select id="drStat"><option value="Yupo Bwenini (Present)">Yupo Bwenini (Present)</option><option value="Hayupo Bwenini (Missing)">Hayupo Bwenini (Missing)</option><option value="Yuko Zahanati (Sickbay)">Yuko Zahanati (Sickbay)</option></select>
-            <button type="submit" class="btn btn-teal">✅ Rekodi Mahudhurio ya Usiku</button>
+          <div class="form-bar">
+            <h3 style="margin:0;">📋 Roll Call ya Bweni (Usiku & Asubuhi)</h3>
+            ${formToolsHtml('🔍 Tafuta tarehe au bweni...')}
+          </div>
+          <form onsubmit="saveDormRollCall(event)" style="display:grid; grid-template-columns:1fr 1fr 1.6fr 1fr auto; gap:8px; margin-bottom:12px;">
+            <input type="date" id="rcDate" value="${new Date().toISOString().slice(0, 10)}" required>
+            <select id="rcSession"><option value="Usiku (Lights Out)">🌙 Usiku (Lights Out)</option><option value="Asubuhi (Morning)">☀️ Asubuhi (Morning)</option></select>
+            <input type="text" id="rcStudent" list="mtStudentsDatalist" required placeholder="Jina la Mwanafunzi">
+            <select id="rcStatus"><option value="Yupo Bwenini">✅ Yupo Bwenini</option><option value="Hayupo Bwenini (Mtoro)">🚨 Hayupo Bwenini</option><option value="Yuko Zahanati (Sick Bay)">🏥 Yuko Zahanati</option></select>
+            <button type="submit" class="btn btn-green">💾 Rekodi</button>
           </form>
-          <table><tr><th>Mwanafunzi</th><th>Hali Bwenini</th><th>Muda</th></tr>
-          ${logs.map(l => `<tr><td><b>${l.student_name}</b></td><td><b>${l.status}</b></td><td>${l.created_at}</td></tr>`).join('') || '<tr><td colspan="3">Hakuna rekodi ya usiku bado.</td></tr>'}
+          ${studentDatalistHtml()}
+          <table><thead><tr><th>Tarehe</th><th>Muda</th><th>Mwanafunzi</th><th>Bweni</th><th>Hali</th></tr></thead>
+          <tbody>${logs.slice(0, 40).map(r => `<tr><td>${r.rc_date}</td><td>${r.session}</td><td><b>${r.student_name}</b></td><td>${r.dorm_name || '-'}</td><td><b style="color:${r.status.includes('Hayupo') ? '#dc2626' : '#059669'};">${r.status}</b></td></tr>`).join('') || '<tr><td colspan="5">Hakuna Roll Call iliyorekodiwa leo.</td></tr>'}</tbody></table>
+        </div>`;
+      applyMtSearch();
+      return;
+    }
+
+    if (tab === 'term_checkin') {
+      const checks = SGB.select('boarding_clearance');
+      area.innerHTML = `
+        <div class="panel">
+          <div class="form-bar">
+            <h3 style="margin:0;">🧳 Ukaguzi wa Kuripoti (Opening) & Kukabidhi Mali (Closing Clearance)</h3>
+            ${formToolsHtml('🔍 Tafuta mwanafunzi...')}
+          </div>
+          <form onsubmit="saveBoardingClearance(event)" style="display:grid; grid-template-columns:1.6fr 1fr 1.5fr auto; gap:8px; margin-bottom:12px;">
+            <input type="text" id="bcStudent" list="mtStudentsDatalist" required placeholder="Jina la Mwanafunzi">
+            <select id="bcType"><option value="Ameripoti Bwenini (Opening)">📥 Ameripoti Bwenini (Opening)</option><option value="Amekabidhi Mali Salama (Closing)">📤 Amekabidhi Mali Salama (Closing)</option></select>
+            <input type="text" id="bcNote" value="Kitanda, Godoro & Mali za Bweni ziko salama" placeholder="Maelezo ya ukaguzi">
+            <button type="submit" class="btn btn-teal">✅ Thibitisha</button>
+          </form>
+          ${studentDatalistHtml()}
+          <table><thead><tr><th>Tarehe</th><th>Mwanafunzi</th><th>Kidato</th><th>Hatua</th><th>Maelezo</th></tr></thead>
+          <tbody>${checks.map(c => `<tr><td>${c.created_at}</td><td><b>${c.student_name}</b></td><td>${c.class_name}</td><td><b>${c.check_type}</b></td><td>${c.note}</td></tr>`).join('') || '<tr><td colspan="5">Hakuna rekodi za ukaguzi bado.</td></tr>'}</tbody></table>
+        </div>`;
+      applyMtSearch();
+      return;
+    }
+    if (tab === 'clinic') {
+      const visits = SGB.select('clinic_visits');
+      area.innerHTML = `
+        <div class="panel" style="border-left:4px solid #0284c7;">
+          <div class="form-bar">
+            <h3 style="margin:0;">🏥 Zahanati ya Shule: Matibabu, Vipimo & Kibali cha Mapumziko (Sick-Off)</h3>
+            ${formToolsHtml('🔍 Tafuta mgonjwa au ugonjwa...')}
+          </div>
+          <form onsubmit="saveClinicVisit(event)" style="display:grid; grid-template-columns:1.5fr 1fr 1fr 1.2fr 1.2fr auto; gap:7px; margin-bottom:12px;">
+            <input type="text" id="clStudent" list="mtStudentsDatalist" required placeholder="Jina la Mgonjwa">
+            <input type="text" id="clDiag" required placeholder="Ugonjwa / Dalili (mf. Malaria)">
+            <input type="text" id="clTest" placeholder="Vipimo (mf. MRDT +ve)">
+            <input type="text" id="clMed" required placeholder="Dawa Alizopewa">
+            <select id="clAction">
+              <option value="Amerudi Darasani">Amerudi Darasani</option>
+              <option value="Mapumziko Bwenini (Sick-Off 24h)">🛏️ Mapumziko Bwenini (Sick-Off)</option>
+              <option value="Rufaa Hospitali ya Wilaya/Mkoa">🚑 Rufaa Hospitali</option>
+            </select>
+            <button type="submit" class="btn btn-blue">💾 Hifadhi</button>
+          </form>
+          ${studentDatalistHtml()}
+          <table>
+            <thead><tr><th>Muda</th><th>Mwanafunzi</th><th>Kidato</th><th>Ugonjwa</th><th>Vipimo</th><th>Dawa</th><th>Hatua / Sick-Off</th><th>Taarifa Kwa Mzazi</th></tr></thead>
+            <tbody>
+            ${visits.map(v => `<tr>
+              <td>${v.created_at}</td><td><b>${v.student_name}</b></td><td>${v.class_name}</td>
+              <td><b>${v.diagnosis}</b></td><td>${v.lab_test || '-'}</td><td>${v.medication}</td><td><b>${v.action_taken}</b></td>
+              <td style="white-space:nowrap;">
+                <button class="btn btn-green" style="padding:3px 7px;" onclick="sendHealthParentMsg('${v.student_name}','${v.diagnosis}','${v.action_taken}','WA')">💬 WA</button>
+                <button class="btn btn-blue" style="padding:3px 7px;" onclick="sendHealthParentMsg('${v.student_name}','${v.diagnosis}','${v.action_taken}','SMS')">📱 SMS</button>
+              </td>
+            </tr>`).join('') || '<tr><td colspan="8">Hakuna rekodi za matibabu zahanati bado.</td></tr>'}
+            </tbody>
           </table>
         </div>`;
+      applyMtSearch();
+      return;
     }
-  }
 
-  function assignBed(e) {
-    e.preventDefault();
-    SGB.insert('hostel_beds', { student_name: document.getElementById('hbSt').value.trim(), room_bed: document.getElementById('hbRoom').value.trim() });
-    openTab('hostels');
-  }
-
-  function addSickCase(e) {
-    e.preventDefault();
-    const st = document.getElementById('skSt').value.trim();
-    const diag = document.getElementById('skDiag').value.trim();
-    SGB.insert('sickbay_records', { student_name: st, diagnosis: diag });
-    const msg = `SANGABUYE ZAHANATI: Mzazi wa ${st}, mwanao amepata matibabu shuleni leo (${diag}). Kwa maelezo zaidi wasiliana na Mkuu wa Shule 0784 755 173.`;
-    if (confirm(`🏥 Rekodi imehifadhiwa! Je, ungependa kumtumia mzazi wa ${st} taarifa kwa WhatsApp sasa hivi?`)) {
-      SGB.sendWhatsApp('', msg);
+    if (tab === 'chronic') {
+      const chronics = SGB.select('chronic_health');
+      area.innerHTML = `
+        <div class="panel" style="border-left:4px solid #dc2626;">
+          <div class="form-bar">
+            <h3 style="margin:0;">🧬 Faili la Afya ya Kudumu, Mzio (Allergies) & Kundi la Damu</h3>
+            ${formToolsHtml('🔍 Tafuta mwanafunzi au hali ya afya...')}
+          </div>
+          <form onsubmit="saveChronicHealth(event)" style="display:grid; grid-template-columns:1.5fr 1.2fr 0.8fr 1.5fr auto; gap:8px; margin-bottom:12px;">
+            <input type="text" id="chStudent" list="mtStudentsDatalist" required placeholder="Jina la Mwanafunzi">
+            <input type="text" id="chCond" required placeholder="Hali (mf. Pumu / Asthma / Sickle Cell)">
+            <select id="chBlood"><option value="O+">O+</option><option value="O-">O-</option><option value="A+">A+</option><option value="A-">A-</option><option value="B+">B+</option><option value="B-">B-</option><option value="AB+">AB+</option><option value="AB-">AB-</option></select>
+            <input type="text" id="chAllergy" placeholder="Mzio wa Dawa/Chakula & Huduma ya Kwanza">
+            <button type="submit" class="btn btn-red">💾 Hifadhi Faili</button>
+          </form>
+          ${studentDatalistHtml()}
+          <table><thead><tr><th>Mwanafunzi</th><th>Kidato</th><th>Hali ya Afya</th><th>Blood Group</th><th>Mzio & Huduma ya Kwanza</th></tr></thead>
+          <tbody>${chronics.map(c => `<tr><td><b>${c.student_name}</b></td><td>${c.class_name}</td><td style="color:#dc2626;"><b>${c.condition_name}</b></td><td><b>${c.blood_group}</b></td><td>${c.allergy_notes}</td></tr>`).join('') || '<tr><td colspan="5">Hakuna faili la afya maalum lililosajiliwa bado.</td></tr>'}</tbody></table>
+        </div>`;
+      applyMtSearch();
+      return;
     }
-    openTab('sickbay');
+
+    if (tab === 'medicines') {
+      const meds = SGB.select('dispensary_medicines');
+      area.innerHTML = `
+        <div class="panel">
+          <div class="form-bar">
+            <h3 style="margin:0;">💊 Stoo ya Dawa & Vifaa Tiba Zahanati (Stock & Expiry Alert)</h3>
+            ${formToolsHtml('🔍 Tafuta dawa...')}
+          </div>
+          <form onsubmit="saveMedicineStock(event)" style="display:grid; grid-template-columns:1.5fr 1fr 0.8fr 1fr auto; gap:8px; margin-bottom:12px;">
+            <input type="text" id="mdName" required placeholder="Jina la Dawa (mf. Paracetamol 500mg)">
+            <select id="mdUnit"><option value="Vidonge (Tablets)">Vidonge (Tablets)</option><option value="Chupa (Syrup)">Chupa (Syrup)</option><option value="Kipimo (Doses)">Kipimo (Doses)</option><option value="Pakiti / Box">Pakiti / Box</option></select>
+            <input type="number" id="mdQty" min="0" required placeholder="Idadi">
+            <input type="date" id="mdExpiry" required title="Tarehe ya Kuisha Muda (Expiry)">
+            <button type="submit" class="btn btn-green">➕ Ongeza Stoo</button>
+          </form>
+          <table><thead><tr><th>Jina la Dawa</th><th>Kipimo</th><th>Idadi Iliyopo</th><th>Tarehe ya Kuisha (Expiry)</th><th>Hali</th></tr></thead>
+          <tbody>${meds.map(m => `<tr><td><b>${m.med_name}</b></td><td>${m.unit}</td><td><b>${m.quantity}</b></td><td>${m.expiry_date}</td><td><b style="color:${Number(m.quantity) < 20 ? '#dc2626' : '#059669'};">${Number(m.quantity) < 20 ? '⚠️ Inakaribia Kuisha' : '✅ Inatosha'}</b></td></tr>`).join('') || '<tr><td colspan="5">Hakuna dawa zilizosajiliwa kwenye stoo ya zahanati bado.</td></tr>'}</tbody></table>
+        </div>`;
+      applyMtSearch();
+      return;
+    }
+    if (tab === 'gate_pass') {
+      const passes = SGB.select('gate_passes');
+      area.innerHTML = `
+        <div class="panel" style="border-left:4px solid #d97706;">
+          <div class="form-bar">
+            <h3 style="margin:0;">🪪 Vibali vya Kutoka Nje ya Shule (Gate Pass — QR Code)</h3>
+            ${formToolsHtml('🔍 Tafuta mwanafunzi au sababu...')}
+          </div>
+          <form onsubmit="issueGatePass(event)" style="display:grid; grid-template-columns:1.5fr 1.5fr 1fr 1fr auto; gap:8px; margin-bottom:12px;">
+            <input type="text" id="gpStudent" list="mtStudentsDatalist" required placeholder="Jina la Mwanafunzi">
+            <input type="text" id="gpReason" required placeholder="Sababu (mf. Matibabu / Msiba / Ruhusa ya Mzazi)">
+            <input type="text" id="gpEscort" placeholder="Mchukuzi (Mzazi/Mlezi)">
+            <input type="datetime-local" id="gpReturn" required title="Muda wa Kurudi">
+            <button type="submit" class="btn btn-amber">🪪 Toa Gate Pass</button>
+          </form>
+          ${studentDatalistHtml()}
+          <table>
+            <thead><tr><th>Mwanafunzi</th><th>Kidato</th><th>Sababu</th><th>Mchukuzi</th><th>Muda wa Kurudi</th><th>Hali</th><th>Hatua & Mzazi</th></tr></thead>
+            <tbody>
+            ${passes.map(p => `<tr>
+              <td><b>${p.student_name}</b></td><td>${p.class_name}</td><td>${p.reason}</td><td>${p.escort_name || '-'}</td><td>${p.return_time}</td>
+              <td><b style="color:${p.status === 'Ameruhusiwa (Nje)' ? '#dc2626' : p.status === 'Amerudi Shuleni' ? '#059669' : '#d97706'};">${p.status}</b></td>
+              <td style="white-space:nowrap;">
+                ${p.status === 'Inasubiri Idhini' ? `<button class="btn btn-green" style="padding:3px 7px;" onclick="approvePendingGatePass('${p.id}')">✅ Idhinisha</button>` : ''}
+                <button class="btn btn-blue" style="padding:3px 7px;" onclick="printGatePassSlip('${p.id}')">🖨️ Slip</button>
+                <button class="btn btn-teal" style="padding:3px 7px;" onclick="notifyGatePassParent('${p.student_name}','${p.reason}','${p.return_time}','WA')">💬 WA</button>
+              </td>
+            </tr>`).join('') || '<tr><td colspan="7">Hakuna vibali vya Gate Pass bado.</td></tr>'}
+            </tbody>
+          </table>
+          <div id="gpSlipBox" style="margin-top:12px;"></div>
+        </div>`;
+      applyMtSearch();
+      return;
+    }
+
+    if (tab === 'gate_return') {
+      const outList = SGB.select('gate_passes').filter(p => p.status === 'Ameruhusiwa (Nje)');
+      const returnedList = SGB.select('gate_passes').filter(p => p.status === 'Amerudi Shuleni');
+      area.innerHTML = `
+        <div class="panel">
+          <div class="form-bar">
+            <h3 style="margin:0;">🚪 Ufuatiliaji wa Wanafunzi Walioko Nje & Kurudi Langoni</h3>
+            ${formToolsHtml('🔍 Tafuta mwanafunzi...')}
+          </div>
+          <table>
+            <thead><tr><th>Mwanafunzi</th><th>Kidato</th><th>Sababu</th><th>Alitoka</th><th>Muda Aliotakiwa Kurudi</th><th>Thibitisha Kurudi</th></tr></thead>
+            <tbody>
+            ${outList.map(p => `<tr>
+              <td><b>${p.student_name}</b></td><td>${p.class_name}</td><td>${p.reason}</td><td>${p.created_at}</td><td><b>${p.return_time}</b></td>
+              <td><button class="btn btn-green" onclick="markStudentReturnedGate('${p.id}','${p.student_name}')">✅ Amerudi Shuleni</button></td>
+            </tr>`).join('') || '<tr><td colspan="6">Hakuna mwanafunzi aliye nje ya shule kwa sasa.</td></tr>'}
+            </tbody>
+          </table>
+          <h4 style="margin-top:16px;">✅ Waliorudi Shuleni Hivi Karibuni:</h4>
+          <table><thead><tr><th>Mwanafunzi</th><th>Kidato</th><th>Sababu</th><th>Muda Alioripoti Langoni</th></tr></thead>
+          <tbody>${returnedList.slice(0, 15).map(r => `<tr><td><b>${r.student_name}</b></td><td>${r.class_name}</td><td>${r.reason}</td><td style="color:#059669;"><b>${r.returned_at || '-'}</b></td></tr>`).join('') || '<tr><td colspan="4">Hakuna rekodi za waliorudi bado.</td></tr>'}</tbody></table>
+        </div>`;
+      applyMtSearch();
+      return;
+    }
+
+    if (tab === 'visitors') {
+      const vis = SGB.select('student_visitors');
+      area.innerHTML = `
+        <div class="panel">
+          <div class="form-bar">
+            <h3 style="margin:0;">👨‍👩‍👧 Kumbukumbu za Wageni & Wazazi (Visiting Day Log)</h3>
+            ${formToolsHtml('🔍 Tafuta mgeni au mwanafunzi...')}
+          </div>
+          <form onsubmit="saveStudentVisitor(event)" style="display:grid; grid-template-columns:1.4fr 1.2fr 1fr 1.4fr auto; gap:8px; margin-bottom:12px;">
+            <input type="text" id="vsName" required placeholder="Jina la Mgeni / Mzazi">
+            <input type="text" id="vsRelation" required placeholder="Uhusiano (Baba/Mama/Mlezi)">
+            <input type="tel" id="vsPhone" required placeholder="Simu ya Mgeni">
+            <input type="text" id="vsStudent" list="mtStudentsDatalist" required placeholder="Mwanafunzi Aliyemtembelea">
+            <button type="submit" class="btn btn-teal">➕ Sajili Mgeni</button>
+          </form>
+          ${studentDatalistHtml()}
+          <table><thead><tr><th>Muda</th><th>Mgeni</th><th>Uhusiano</th><th>Simu</th><th>Mwanafunzi</th></tr></thead>
+          <tbody>${vis.map(v => `<tr><td>${v.created_at}</td><td><b>${v.visitor_name}</b></td><td>${v.relation}</td><td>${v.phone}</td><td><b>${v.student_name}</b></td></tr>`).join('') || '<tr><td colspan="5">Hakuna wageni waliosajiliwa bado.</td></tr>'}</tbody></table>
+        </div>`;
+      applyMtSearch();
+      return;
+    }
+    if (tab === 'hygiene') {
+      const hygs = SGB.select('dorm_hygiene');
+      area.innerHTML = `
+        <div class="panel">
+          <div class="form-bar">
+            <h3 style="margin:0;">🧹 Ukaguzi wa Usafi wa Mabweni & Mazingira</h3>
+            ${formToolsHtml('🔍 Tafuta bweni...')}
+          </div>
+          <form onsubmit="saveDormHygiene(event)" style="display:grid; grid-template-columns:1.2fr 0.8fr 2fr auto; gap:8px; margin-bottom:12px;">
+            <select id="hgDorm"><option value="Bweni la Kilimanjaro">Bweni la Kilimanjaro</option><option value="Bweni la Meru">Bweni la Meru</option><option value="Bweni la Serengeti">Bweni la Serengeti</option><option value="Bweni la Victoria">Bweni la Victoria</option><option value="Bweni la Nyerere">Bweni la Nyerere</option><option value="Bweni la Karume">Bweni la Karume</option></select>
+            <input type="number" id="hgScore" min="0" max="100" required placeholder="Alama %">
+            <input type="text" id="hgNote" required placeholder="Maoni ya ukaguzi (Vitanda, Vyoo, Mazingira)">
+            <button type="submit" class="btn btn-green">💾 Hifadhi</button>
+          </form>
+          <table><thead><tr><th>Tarehe</th><th>Bweni</th><th>Alama (%)</th><th>Daraja</th><th>Maoni</th></tr></thead>
+          <tbody>${hygs.map(h => `<tr><td>${h.created_at}</td><td><b>${h.dorm_name}</b></td><td><b>${h.score}%</b></td><td><b>${h.score >= 80 ? 'A (Safi Sana)' : h.score >= 65 ? 'B (Safi)' : 'C (Ongeza Usafi)'}</b></td><td>${h.note}</td></tr>`).join('') || '<tr><td colspan="5">Hakuna ukaguzi wa usafi bado.</td></tr>'}</tbody></table>
+        </div>`;
+      applyMtSearch();
+      return;
+    }
+
+    if (tab === 'dining') {
+      const diets = SGB.select('special_diets');
+      area.innerHTML = `
+        <div class="panel">
+          <div class="form-bar">
+            <h3 style="margin:0;">🍽️ Orodha ya Wanafunzi Wenye Lishe Maalum (Special Diet / Medical Diet)</h3>
+            ${formToolsHtml('🔍 Tafuta mwanafunzi...')}
+          </div>
+          <form onsubmit="saveSpecialDiet(event)" style="display:grid; grid-template-columns:1.5fr 1.5fr 1.5fr auto; gap:8px; margin-bottom:12px;">
+            <input type="text" id="sdStudent" list="mtStudentsDatalist" required placeholder="Jina la Mwanafunzi">
+            <input type="text" id="sdType" required placeholder="Aina ya Lishe (mf. Bila Maharage / Vidonda vya Tumbo)">
+            <input type="text" id="sdApproved" value="Imethibitishwa na Zahanati" placeholder="Uthibitisho">
+            <button type="submit" class="btn btn-teal">➕ Weka Orodhani</button>
+          </form>
+          ${studentDatalistHtml()}
+          <table><thead><tr><th>Mwanafunzi</th><th>Kidato</th><th>Aina ya Lishe Maalum</th><th>Uthibitisho</th></tr></thead>
+          <tbody>${diets.map(d => `<tr><td><b>${d.student_name}</b></td><td>${d.class_name}</td><td><b>${d.diet_type}</b></td><td>${d.approved_by}</td></tr>`).join('') || '<tr><td colspan="4">Hakuna mwanafunzi mwenye lishe maalum aliyesajiliwa bado.</td></tr>'}</tbody></table>
+        </div>`;
+      applyMtSearch();
+      return;
+    }
+
+    if (tab === 'discipline') {
+      const discs = SGB.select('discipline_logs').filter(d => (d.reported_by || '').toLowerCase() === myStaffName.toLowerCase());
+      area.innerHTML = `
+        <div class="panel">
+          <div class="form-bar">
+            <h3 style="margin:0;">🚨 Nidhamu ya Bweni & Taarifa za Matukio (Inakwenda Kwa Mkuu wa Shule)</h3>
+            ${formToolsHtml('🔍 Tafuta rekodi...')}
+          </div>
+          <form onsubmit="saveBoardingDiscipline(event)" style="display:grid; grid-template-columns:1.5fr 1.2fr 2fr auto; gap:8px; margin-bottom:12px;">
+            <input type="text" id="bdStudent" list="mtStudentsDatalist" required placeholder="Jina la Mwanafunzi">
+            <select id="bdType"><option value="Pongezi ya Nidhamu Bwenini">🌟 Pongezi Bwenini</option><option value="Kuchelewa Prep / Lights Out">⚠️ Kuchelewa Prep</option><option value="Uharibifu wa Mali za Bweni">🚨 Uharibifu wa Mali</option></select>
+            <input type="text" id="bdNote" required placeholder="Maelezo ya tukio">
+            <button type="submit" class="btn btn-amber">💾 Hifadhi</button>
+          </form>
+          ${studentDatalistHtml()}
+          <table><thead><tr><th>Tarehe</th><th>Mwanafunzi</th><th>Aina</th><th>Maelezo</th></tr></thead>
+          <tbody>${discs.map(d => `<tr><td>${d.created_at}</td><td><b>${d.student_name}</b></td><td><b>${d.incident_type}</b></td><td>${d.notes}</td></tr>`).join('') || '<tr><td colspan="4">Hakuna matukio ya nidhamu ya bweni bado.</td></tr>'}</tbody></table>
+        </div>`;
+      applyMtSearch();
+      return;
+    }
+
+    if (tab === 'assets') {
+      const assets = SGB.select('dorm_assets');
+      area.innerHTML = `
+        <div class="panel">
+          <div class="form-bar">
+            <h3 style="margin:0;">📦 Mali za Bweni & Maombi ya Matengenezo</h3>
+            ${formToolsHtml('🔍 Tafuta kifaa au bweni...')}
+          </div>
+          <form onsubmit="saveDormAsset(event)" style="display:grid; grid-template-columns:1.2fr 1.4fr 0.8fr 1.2fr auto; gap:8px; margin-bottom:12px;">
+            <select id="asDorm"><option value="Bweni la Kilimanjaro">Bweni la Kilimanjaro</option><option value="Bweni la Meru">Bweni la Meru</option><option value="Bweni la Serengeti">Bweni la Serengeti</option><option value="Bweni la Victoria">Bweni la Victoria</option><option value="Zahanati ya Shule">Zahanati ya Shule</option></select>
+            <input type="text" id="asItem" required placeholder="Kifaa (mf. Vitanda vya Chuma / Taa)">
+            <input type="number" id="asQty" min="1" required placeholder="Idadi">
+            <select id="asCond"><option value="Vizuri (Vinatumika)">✅ Vizuri</option><option value="Vinahitaji Matengenezo">🔧 Vinahitaji Matengenezo</option></select>
+            <button type="submit" class="btn btn-blue">💾 Hifadhi</button>
+          </form>
+          <table><thead><tr><th>Eneo / Bweni</th><th>Kifaa</th><th>Idadi</th><th>Hali</th></tr></thead>
+          <tbody>${assets.map(a => `<tr><td><b>${a.dorm_name}</b></td><td><b>${a.item_name}</b></td><td>${a.quantity}</td><td><b>${a.condition}</b></td></tr>`).join('') || '<tr><td colspan="4">Hakuna mali zilizosajiliwa bado.</td></tr>'}</tbody></table>
+        </div>`;
+      applyMtSearch();
+      return;
+    }
+
+    const sLow = myStaffName.toLowerCase();
+    const msgs = SGB.select('direct_messages').filter(m => (m.sender || '').toLowerCase() === sLow || (m.recipient || '').toLowerCase() === sLow || (m.recipient || '').toLowerCase().includes('matron') || (m.recipient || '').toLowerCase().includes('patron'));
+    area.innerHTML = `
+      <div class="panel">
+        <div class="form-bar">
+          <h3 style="margin:0;">💬 Mawasiliano ya Moja Kwa Moja (Mkuu, Mtaaluma & Mwalimu wa Zamu)</h3>
+          ${formToolsHtml('🔍 Tafuta ujumbe...')}
+        </div>
+        <form onsubmit="sendMtDirectMsg(event)" style="display:grid; grid-template-columns:1fr 1.5fr 2.5fr auto; gap:8px; margin-bottom:12px;">
+          <select id="mtMsgTo"><option value="Headmaster">Mkuu wa Shule</option><option value="Academic">Ofisi ya Mtaaluma</option><option value="Teacher on Duty">Mwalimu wa Zamu</option></select>
+          <input type="text" id="mtMsgSubj" required placeholder="Mada (mf. Taarifa ya Mgonjwa / Ruhusa)">
+          <input type="text" id="mtMsgBody" required placeholder="Andika ujumbe wako...">
+          <button type="submit" class="btn btn-teal">📤 Tuma</button>
+        </form>
+        <table><thead><tr><th>Muda</th><th>Kutoka</th><th>Kwenda</th><th>Mada</th><th>Ujumbe</th></tr></thead>
+        <tbody>${msgs.map(m => `<tr><td>${m.created_at}</td><td><b>${m.sender}</b></td><td>${m.recipient}</td><td><b>${m.subject}</b></td><td>${m.body}</td></tr>`).join('') || '<tr><td colspan="5">Huna ujumbe wowote bado.</td></tr>'}</tbody></table>
+      </div>`;
+    applyMtSearch();
+  }
+  function filterMatronTables(query) {
+    const q = (query || '').trim().toLowerCase();
+    document.querySelectorAll('#viewArea table tbody tr').forEach(tr => {
+      tr.style.display = tr.innerText.toLowerCase().includes(q) ? '' : 'none';
+    });
   }
 
-  function addDormRoll(e) {
+  function applyMtSearch() {
+    const q = document.getElementById('globalMtSearch')?.value || '';
+    if (q.trim()) filterMatronTables(q);
+  }
+
+  async function refreshMatronNow() {
+    await SGB.pullFromCloud(true);
+    openTab(currentMtTab);
+    const st = document.getElementById('syncTime');
+    if (st) st.innerText = ` (Imesasishwa: ${new Date().toLocaleTimeString()})`;
+  }
+
+  function findStudentMeta(name) {
+    return getAllUnifiedStudents().find(s => (s.full_name || '').toLowerCase() === (name || '').trim().toLowerCase()) || { class_name: 'Form 1A', gender: 'M', parent_phone: '' };
+  }
+
+  function assignDormBed(e) {
     e.preventDefault();
-    SGB.insert('dorm_rollcall', { student_name: document.getElementById('drSt').value.trim(), status: document.getElementById('drStat').value });
-    openTab('dorm_roll');
+    const stName = document.getElementById('dmStudent').value.trim();
+    const meta = findStudentMeta(stName);
+    SGB.insert('dorm_allocations', { student_name: stName, gender: meta.gender, class_name: meta.class_name, dorm_name: document.getElementById('dmName').value, bed_no: document.getElementById('dmBed').value.trim(), dorm_role: document.getElementById('dmRole').value, bedding_status: document.getElementById('dmNet').value });
+    openTab('dorms');
   }
 
-  openTab('hostels', document.querySelector('.menu-btn'));
+  function deleteDormAlloc(id) {
+    const list = SGB.select('dorm_allocations').filter(x => String(x.id) !== String(id));
+    if (SGB.forceReplaceCloud) SGB.forceReplaceCloud('dorm_allocations', list);
+    else { localStorage.setItem('sgb_dorm_allocations', JSON.stringify(list)); SGB.pushToCloud('dorm_allocations'); }
+    openTab('dorms');
+  }
+  function saveDormRollCall(e) {
+    e.preventDefault();
+    const stName = document.getElementById('rcStudent').value.trim();
+    const dormRec = SGB.select('dorm_allocations').find(d => (d.student_name || '').toLowerCase() === stName.toLowerCase());
+    SGB.insert('dorm_roll_calls', { rc_date: document.getElementById('rcDate').value, session: document.getElementById('rcSession').value, student_name: stName, dorm_name: dormRec ? dormRec.dorm_name : '-', status: document.getElementById('rcStatus').value, recorded_by: myStaffName });
+    openTab('roll_call');
+  }
+
+  function saveBoardingClearance(e) {
+    e.preventDefault();
+    const stName = document.getElementById('bcStudent').value.trim();
+    const meta = findStudentMeta(stName);
+    SGB.insert('boarding_clearance', { student_name: stName, class_name: meta.class_name, check_type: document.getElementById('bcType').value, note: document.getElementById('bcNote').value.trim(), recorded_by: myStaffName });
+    openTab('term_checkin');
+  }
+  function saveClinicVisit(e) {
+    e.preventDefault();
+    const stName = document.getElementById('clStudent').value.trim();
+    const meta = findStudentMeta(stName);
+    SGB.insert('clinic_visits', { student_name: stName, class_name: meta.class_name, diagnosis: document.getElementById('clDiag').value.trim(), lab_test: document.getElementById('clTest').value.trim(), medication: document.getElementById('clMed').value.trim(), action_taken: document.getElementById('clAction').value, treated_by: myStaffName });
+    openTab('clinic');
+  }
+
+  function sendHealthParentMsg(stName, diag, action, channel) {
+    const meta = findStudentMeta(stName);
+    let phone = meta.parent_phone || prompt(`Ingiza namba ya simu ya mzazi wa ${stName}:`);
+    if (!phone || !phone.trim()) return;
+    const schoolPhone = getSchoolContactPhone();
+    const msg = `SHULE YA SEKONDARI SANGABUYE (ZAHANATI)\nTaarifa ya Afya ya ${stName.toUpperCase()}: Amepatiwa matibabu ya ${diag}. Hatua: ${action}.\nMawasiliano ya Shule: ${schoolPhone}`;
+    let intl = phone.replace(/\D/g, '');
+    if (intl.startsWith('0')) intl = '255' + intl.slice(1);
+    SGB.insert('sms_outbox', { recipient_name: `Mzazi wa ${stName}`, phone: phone.trim(), sender_gateway: `${schoolPhone} (${channel})`, message: msg, status: 'Imetumwa' });
+    if (channel === 'WA') window.open(`https://wa.me{intl}?text=${encodeURIComponent(msg)}`, '_blank');
+    else window.open(`sms:${phone.trim()}?body=${encodeURIComponent(msg)}`, '_self');
+  }
+
+  function saveChronicHealth(e) {
+    e.preventDefault();
+    const stName = document.getElementById('chStudent').value.trim();
+    const meta = findStudentMeta(stName);
+    SGB.insert('chronic_health', { student_name: stName, class_name: meta.class_name, condition_name: document.getElementById('chCond').value.trim(), blood_group: document.getElementById('chBlood').value, allergy_notes: document.getElementById('chAllergy').value.trim() });
+    openTab('chronic');
+  }
+
+  function saveMedicineStock(e) {
+    e.preventDefault();
+    SGB.insert('dispensary_medicines', { med_name: document.getElementById('mdName').value.trim(), unit: document.getElementById('mdUnit').value, quantity: Number(document.getElementById('mdQty').value || 0), expiry_date: document.getElementById('mdExpiry').value });
+    openTab('medicines');
+  }
+  function issueGatePass(e) {
+    e.preventDefault();
+    const stName = document.getElementById('gpStudent').value.trim();
+    const meta = findStudentMeta(stName);
+    SGB.insert('gate_passes', { student_name: stName, class_name: meta.class_name, reason: document.getElementById('gpReason').value.trim(), escort_name: document.getElementById('gpEscort').value.trim(), return_time: document.getElementById('gpReturn').value.replace('T', ' '), status: 'Ameruhusiwa (Nje)', approved_by: myStaffName });
+    openTab('gate_pass');
+  }
+
+  function approvePendingGatePass(id) {
+    SGB.update('gate_passes', id, { status: 'Ameruhusiwa (Nje)', approved_by: myStaffName });
+    alert('✅ Ombi la Gate Pass limeidhinishwa!');
+    openTab('gate_pass');
+  }
+
+  function markStudentReturnedGate(id, stName) {
+    const nowStr = new Date().toLocaleString('sw-TZ');
+    SGB.update('gate_passes', id, { status: 'Amerudi Shuleni', returned_at: nowStr });
+    alert(`✅ ${stName} amerekodiwa kurudi shuleni salama (${nowStr})!`);
+    openTab('gate_return');
+  }
+
+  function notifyGatePassParent(stName, reason, retTime, channel) {
+    const meta = findStudentMeta(stName);
+    let phone = meta.parent_phone || prompt(`Ingiza namba ya simu ya mzazi wa ${stName}:`);
+    if (!phone || !phone.trim()) return;
+    const schoolPhone = getSchoolContactPhone();
+    const msg = `SHULE YA SEKONDARI SANGABUYE (GATE PASS)\nMwanao ${stName.toUpperCase()} amepewa kibali cha kutoka nje ya shule.\nSababu: ${reason} | Muda wa Kurudi: ${retTime}.\nOfisi ya Bweni: ${schoolPhone}`;
+    let intl = phone.replace(/\D/g, '');
+    if (intl.startsWith('0')) intl = '255' + intl.slice(1);
+    SGB.insert('sms_outbox', { recipient_name: `Mzazi wa ${stName}`, phone: phone.trim(), sender_gateway: `${schoolPhone} (${channel})`, message: msg, status: 'Imetumwa' });
+    window.open(`https://wa.me{intl}?text=${encodeURIComponent(msg)}`, '_blank');
+  }
+  function printGatePassSlip(id) {
+    const p = SGB.select('gate_passes').find(x => String(x.id) === String(id));
+    if (!p) return;
+    const qr = SGB.qrImg(`GATE-PASS:${p.student_name}|CLS:${p.class_name}|RET:${p.return_time}`);
+    const slipHtml = `
+      <div style="border:2px solid #0f294a; padding:16px; max-width:460px; background:#fff; line-height:1.6;">
+        <div style="text-align:center; border-bottom:2px solid #0f294a; padding-bottom:6px; margin-bottom:10px;">
+          <b>SHULE YA SEKONDARI SANGABUYE</b><br>
+          <span style="background:#0d9488; color:#fff; padding:2px 8px; border-radius:4px; font-size:11px;">KIBALI RASMI CHA KUTOKA NJE (GATE PASS)</span>
+        </div>
+        <p style="font-size:12.5px;">
+          <b>Jina la Mwanafunzi:</b> ${p.student_name.toUpperCase()}<br>
+          <b>Kidato:</b> ${p.class_name}<br>
+          <b>Sababu ya Ruhusa:</b> ${p.reason}<br>
+          <b>Mchukuzi / Mlezi:</b> ${p.escort_name || '-'}<br>
+          <b>Muda wa Kurudi Shuleni:</b> <b>${p.return_time}</b><br>
+          <b>Aliyeidhinisha:</b> ${p.approved_by || myStaffName}
+        </p>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:14px;">
+          <img src="${qr}" style="height:64px;">
+          <div style="text-align:right; font-size:11px;">Sahihi & Muhuri:<br><br>____________________</div>
+        </div>
+      </div>`;
+    const box = document.getElementById('gpSlipBox');
+    if (box) box.innerHTML = slipHtml;
+    const w = window.open('', '', 'width=550,height=500');
+    w.document.write('<html><head><title>Gate Pass</title><style>body{font-family:sans-serif;padding:20px;}</style></head><body>' + slipHtml + '</body></html>');
+    w.document.close(); w.focus(); setTimeout(() => { w.print(); w.close(); }, 300);
+  }
+  function saveStudentVisitor(e) {
+    e.preventDefault();
+    SGB.insert('student_visitors', { visitor_name: document.getElementById('vsName').value.trim(), relation: document.getElementById('vsRelation').value.trim(), phone: document.getElementById('vsPhone').value.trim(), student_name: document.getElementById('vsStudent').value.trim(), logged_by: myStaffName });
+    openTab('visitors');
+  }
+
+  function saveDormHygiene(e) {
+    e.preventDefault();
+    SGB.insert('dorm_hygiene', { dorm_name: document.getElementById('hgDorm').value, score: Number(document.getElementById('hgScore').value || 0), note: document.getElementById('hgNote').value.trim(), inspected_by: myStaffName });
+    openTab('hygiene');
+  }
+
+  function saveSpecialDiet(e) {
+    e.preventDefault();
+    const stName = document.getElementById('sdStudent').value.trim();
+    const meta = findStudentMeta(stName);
+    SGB.insert('special_diets', { student_name: stName, class_name: meta.class_name, diet_type: document.getElementById('sdType').value.trim(), approved_by: document.getElementById('sdApproved').value.trim() });
+    openTab('dining');
+  }
+
+  function saveBoardingDiscipline(e) {
+    e.preventDefault();
+    SGB.insert('discipline_logs', { student_name: document.getElementById('bdStudent').value.trim(), incident_type: document.getElementById('bdType').value, notes: document.getElementById('bdNote').value.trim(), reported_by: myStaffName });
+    openTab('discipline');
+  }
+
+  function saveDormAsset(e) {
+    e.preventDefault();
+    SGB.insert('dorm_assets', { dorm_name: document.getElementById('asDorm').value, item_name: document.getElementById('asItem').value.trim(), quantity: Number(document.getElementById('asQty').value || 1), condition: document.getElementById('asCond').value });
+    openTab('assets');
+  }
+
+  function sendMtDirectMsg(e) {
+    e.preventDefault();
+    SGB.insert('direct_messages', { sender: myStaffName, recipient: document.getElementById('mtMsgTo').value, subject: document.getElementById('mtMsgSubj').value.trim(), body: document.getElementById('mtMsgBody').value.trim() });
+    openTab('mt_messages');
+  }
+
+  openTab('overview', document.querySelector('.menu-btn'));
 </script>
 </body>
 </html>
