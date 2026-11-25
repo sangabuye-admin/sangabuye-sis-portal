@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashibodi ya Mwalimu (Teacher Portal v9.7 — Form 1-6) | Sangabuye SIS</title>
+  <title>Dashibodi ya Mwalimu (Teacher Portal v9.8 — Form 1-6) | Sangabuye SIS</title>
   <script src="core.js?v=7.5"></script>
   <style>
     * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
@@ -63,7 +63,7 @@
 
 <div class="main">
   <div class="topbar">
-    <div><strong id="tabTitle">📊 1. Muhtasari & Graphs</strong> <span id="syncTime" style="font-size:11px; color:#059669;"></span></div>
+    <div><strong id="tabTitle">📊  Muhtasari & Graphs</strong> <span id="syncTime" style="font-size:11px; color:#059669;"></span></div>
     <div style="display:flex; gap:8px; align-items:center; flex:1; max-width:460px;">
       <input type="text" id="globalTcSearch" onkeyup="filterTeacherTables(this.value)" placeholder="🔍 Tafuta popote kwa herufi za jina, kidato, somo...">
       <button type="button" class="btn btn-blue" style="white-space:nowrap;" onclick="refreshTeacherNow()">🔄 Refresh</button>
@@ -525,6 +525,52 @@
       return;
     }
 
+    if (tab === 'payroll_imprest') {
+      const tLow = myTeacherName.toLowerCase();
+      const slips = SGB.select('staff_payroll').filter(s =>
+        (s.staff_name || '').toLowerCase().includes(tLow) || tLow.includes((s.staff_name || '').toLowerCase())
+      );
+      const imprests = SGB.select('staff_imprest').filter(i => (i.staff_name || '').toLowerCase() === tLow);
+
+      area.innerHTML = `
+        <div class="panel" style="border-left:4px solid #1d4ed8;">
+          <div class="form-bar">
+            <h3 style="margin:0;">💼 1. Hati Zangu za Mshahara (Salary Slips — Bofya Print Kufungua Slip)</h3>
+            ${formToolsHtml('🔍 Tafuta mwezi au mshahara...')}
+          </div>
+          <table>
+            <thead><tr><th>Mwezi</th><th>Mtumishi</th><th>Cheo</th><th>Basic Salary</th><th>Net Pay</th><th>Hali</th><th>Salary Slip</th></tr></thead>
+            <tbody>
+            ${slips.map(s => `<tr>
+              <td><b>${s.month_year}</b></td><td><b>${s.staff_name}</b></td><td>${s.role_title}</td>
+              <td>${SGB.formatTZS(s.basic_salary)}</td><td style="color:#059669;"><b>${SGB.formatTZS(s.net_pay)}</b></td><td><b>${s.audit_status}</b></td>
+              <td><button type="button" class="btn btn-blue" onclick="openTeacherSalarySlip('${s.id}')">🖨️ Print Salary Slip</button></td>
+            </tr>`).join('') || '<tr><td colspan="7">Hakuna Salary Slip iliyotolewa kwa jina lako na Mhasibu bado.</td></tr>'}
+            </tbody>
+          </table>
+          <div id="tcSlipPreviewBox" style="margin-top:12px;"></div>
+        </div>
+
+        <div class="panel" style="border-left:4px solid #059669;">
+          <div class="form-bar">
+            <h3 style="margin:0;">🧾 2. Omba Masurufu ya Safari / Kazi (Staff Imprest Request)</h3>
+            ${formToolsHtml('🔍 Tafuta maombi yako ya masurufu...')}
+          </div>
+          <form onsubmit="tcRequestImprest(event)" style="display:grid; grid-template-columns:2fr 1fr auto; gap:8px; margin-bottom:10px;">
+            <input type="text" id="tcImpPurpose" required placeholder="Sababu ya masurufu (mf. Safari ya Michezo / Semina)">
+            <input type="number" id="tcImpAmt" required placeholder="Kiasi (TZS)">
+            <button type="submit" class="btn btn-green">📤 Tuma Kwa Mhasibu</button>
+          </form>
+          <table>
+            <thead><tr><th>Tarehe</th><th>Sababu</th><th>Kiasi</th><th>Hali</th></tr></thead>
+            <tbody>
+            ${imprests.map(i => `<tr><td>${i.created_at}</td><td>${i.purpose}</td><td><b>${SGB.formatTZS(i.amount)}</b></td><td><b>${i.status}</b></td></tr>`).join('') || '<tr><td colspan="4">Huna maombi ya masurufu uliyotuma bado.</td></tr>'}
+            </tbody>
+          </table>
+        </div>`;
+      applyTcSearch();
+      return;
+    }
     if (tab === 'ca_tracker') {
       const myStudents = getMyAssignedStudents();
       const myAllocs = getMyAllocations();
@@ -576,36 +622,6 @@
       applyTcSearch();
       return;
     }
-
-    const tLow = myTeacherName.toLowerCase();
-    const slips = SGB.select('staff_payroll').filter(s => (s.staff_name || '').toLowerCase().includes(tLow) || tLow.includes((s.staff_name || '').toLowerCase()));
-    const imprests = SGB.select('staff_imprest').filter(i => (i.staff_name || '').toLowerCase() === tLow);
-    area.innerHTML = `
-      <div class="panel">
-        <div class="form-bar">
-          <h3 style="margin:0;">💼 1. Hati Zangu za Mshahara (Salary Slips — Bofya Print Kufungua Slip)</h3>
-          ${formToolsHtml('🔍 Tafuta mwezi...')}
-        </div>
-        <table><thead><tr><th>Mwezi</th><th>Mtumishi</th><th>Cheo</th><th>Basic Salary</th><th>Net Pay</th><th>Hali</th><th>Salary Slip</th></tr></thead>
-        <tbody>${slips.map(s => `<tr>
-          <td><b>${s.month_year}</b></td><td><b>${s.staff_name}</b></td><td>${s.role_title}</td>
-          <td>${SGB.formatTZS(s.basic_salary)}</td><td style="color:#059669;"><b>${SGB.formatTZS(s.net_pay)}</b></td><td><b>${s.audit_status}</b></td>
-          <td><button type="button" class="btn btn-blue" onclick="openTeacherSalarySlip('${s.id}')">🖨️ Print Salary Slip</button></td>
-        </tr>`).join('') || '<tr><td colspan="7">Hakuna Salary Slip iliyotolewa kwa jina lako bado.</td></tr>'}</tbody></table>
-        <div id="tcSlipPreviewBox" style="margin-top:12px;"></div>
-      </div>
-
-      <div class="panel">
-        <h3>🧾 2. Omba Masurufu ya Safari / Kazi (Staff Imprest Request)</h3>
-        <form onsubmit="tcRequestImprest(event)" style="display:grid; grid-template-columns:2fr 1fr auto; gap:8px; margin-bottom:10px;">
-          <input type="text" id="tcImpPurpose" required placeholder="Sababu ya masurufu (mf. Safari ya Michezo / Semina)">
-          <input type="number" id="tcImpAmt" required placeholder="Kiasi (TZS)">
-          <button type="submit" class="btn btn-green">📤 Tuma Kwa Mhasibu</button>
-        </form>
-        <table><thead><tr><th>Tarehe</th><th>Sababu</th><th>Kiasi</th><th>Hali</th></tr></thead>
-        <tbody>${imprests.map(i => `<tr><td>${i.created_at}</td><td>${i.purpose}</td><td><b>${SGB.formatTZS(i.amount)}</b></td><td><b>${i.status}</b></td></tr>`).join('') || '<tr><td colspan="4">Huna maombi ya masurufu bado.</td></tr>'}</tbody></table>
-      </div>`;
-    applyTcSearch();
   }
   function filterTeacherTables(query) {
     const q = (query || '').trim().toLowerCase();
