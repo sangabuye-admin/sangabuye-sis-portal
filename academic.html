@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ofisi ya Mtaaluma (Academic Master v10.0 — Form 1-6) | Sangabuye SIS</title>
+  <title>Ofisi ya Mtaaluma (Academic Master v10.1 — Form 1-6) | Sangabuye SIS</title>
   <script src="core.js?v=7.5"></script>
   <style>
     * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
@@ -92,7 +92,6 @@
   localStorage.setItem('sgb_system_gateway_phone', SYSTEM_GATEWAY_PHONE);
   let currentActiveTab = 'overview';
 
-  // Orodha Sanifu ya Vidato (Inasomana 100% na Dashibodi ya Mwalimu)
   const STANDARD_CLASSES = [
     'Form 1A', 'Form 1B', 'Form 1C', 'Form 1D',
     'Form 2A', 'Form 2B', 'Form 2C', 'Form 2D',
@@ -108,12 +107,17 @@
 
   function normClass(str) {
     return String(str || '').toLowerCase()
-      .replace(/form|kidato|stream|mkondo/g, '')
+      .replace(/kidato cha kwanza|kwanza/g, '1')
+      .replace(/kidato cha pili|pili/g, '2')
+      .replace(/kidato cha tatu|tatu/g, '3')
+      .replace(/kidato cha nne|nne/g, '4')
+      .replace(/kidato cha tano|tano/g, '5')
+      .replace(/kidato cha sita|sita/g, '6')
+      .replace(/form|kidato|cha|stream|mkondo/g, '')
       .replace(/\bvi\b/g, '6').replace(/\bv\b/g, '5').replace(/\biv\b/g, '4')
       .replace(/\biii\b/g, '3').replace(/\bii\b/g, '2').replace(/\bi\b/g, '1')
       .replace(/[^a-z0-9]/g, '');
   }
-
   function getUnifiedStudents() {
     const map = {};
     SGB.select('academic_students').forEach(s => {
@@ -134,8 +138,8 @@
   }
 
   function isALevelClass(cls) {
-    const c = (cls || '').toLowerCase();
-    return c.includes('5') || c.includes('6') || c.includes('v') || c.includes('vi');
+    const n = normClass(cls);
+    return n.startsWith('5') || n.startsWith('6');
   }
 
   function gradeFromScore(sc, isALevel = false) {
@@ -317,8 +321,8 @@
               <td><b>${s.prem_no || '-'}</b></td><td><b>${s.full_name}</b></td><td><b>${s.gender}</b></td>
               <td><b>${s.class_name}</b></td><td>${s.combination || 'O-Level'}</td><td><b>${s.parent_phone || '-'}</b></td>
               <td style="white-space:nowrap;">
-                <button class="btn btn-amber" onclick="transferStudentStream('${s.id}','${s.class_name}','${s.combination || 'O-Level'}')">🔄 Hamisha</button>
-                <button class="btn btn-red" onclick="deleteAcadStudent('${s.id}')">Futa</button>
+                <button class="btn btn-amber" onclick="transferStudentStream('${s.id}','${(s.full_name || '').replace(/'/g, '')}','${s.class_name}','${s.combination || 'O-Level'}')">🔄 Hamisha</button>
+                <button class="btn btn-red" onclick="deleteAcadStudent('${s.id}','${(s.full_name || '').replace(/'/g, '')}')">Futa</button>
               </td>
             </tr>`).join('') || '<tr><td colspan="7">Hakuna wanafunzi waliosajiliwa bado.</td></tr>'}
             </tbody>
@@ -476,7 +480,6 @@
       applyActiveSearchFilter();
       return;
     }
-
     if (tab === 'subject_rank') {
       const results = SGB.select('exam_results');
       const bySubj = {};
@@ -799,7 +802,6 @@
     }
     document.getElementById('a4ReportsContainer').innerHTML = targets.map(st => buildSingleA4ReportHtml(st, opts)).join('');
   }
-
   function renderLeavingCert() {
     const raw = document.getElementById('lcStudentPick')?.value;
     if (!raw) { alert('⚠️ Chagua mwanafunzi kwanza.'); return; }
@@ -845,8 +847,8 @@
     const combSel = document.getElementById('stComb');
     if (!combSel) return;
     const parts = cls.split(' ');
-    if (parts.length >= 3 && ['5', '6'].includes(parts[1])) {
-      combSel.value = parts[2];
+    if (parts.length >= 3 && ['5', '6'].includes(parts)) {
+      combSel.value = parts;
     } else {
       combSel.value = 'O-Level';
     }
@@ -864,23 +866,50 @@
     });
     openTab('students_prem');
   }
-
-  function transferStudentStream(id, oldClass, oldComb) {
-    const newClass = prompt(`Ingiza Kidato/Mkondo mpya (mf. Form 2B au Form 5 PCB — sasa ni ${oldClass}):`, oldClass);
+  function transferStudentStream(id, fullName, oldClass, oldComb) {
+    const newClass = prompt(`Ingiza Kidato/Mkondo mpya wa ${fullName} (mf. Form 1B au Form 5 PCB — sasa ni ${oldClass}):`, oldClass);
     if (!newClass || !newClass.trim()) return;
     const newComb = prompt(`Ingiza Tahasusi mpya (sasa ni ${oldComb}):`, oldComb) || oldComb;
-    SGB.update('academic_students', id, { class_name: newClass.trim(), combination: newComb.trim() });
+    const nLow = (fullName || '').trim().toLowerCase();
+
+    const acadList = SGB.select('academic_students').map(x =>
+      (String(x.id) === String(id) || (nLow && (x.full_name || '').trim().toLowerCase() === nLow))
+        ? { ...x, class_name: newClass.trim(), combination: newComb.trim() } : x
+    );
+    if (!acadList.some(x => (x.full_name || '').trim().toLowerCase() === nLow)) {
+      acadList.push({ id: id || Date.now(), full_name: fullName, gender: 'M', class_name: newClass.trim(), combination: newComb.trim(), prem_no: '-' });
+    }
+    localStorage.setItem('sgb_academic_students', JSON.stringify(acadList));
+    SGB.pushToCloud('academic_students');
+
+    const userList = SGB.select('users_profile').map(u =>
+      (String(u.id) === String(id) || (nLow && (u.full_name || '').trim().toLowerCase() === nLow))
+        ? { ...u, class_name: newClass.trim(), department: newClass.trim(), combination: newComb.trim() } : u
+    );
+    localStorage.setItem('sgb_users_profile', JSON.stringify(userList));
+    SGB.pushToCloud('users_profile');
+
     alert('✅ Mwanafunzi amehamishwa mkondo/tahasusi!');
     openTab('students_prem');
   }
+  function deleteAcadStudent(id, fullName = '') {
+    if (!confirm(`Je, una uhakika unataka kumfuta mwanafunzi ${fullName} kabisa?`)) return;
+    const nLow = (fullName || '').trim().toLowerCase();
 
-  function deleteAcadStudent(id) {
-    const list = SGB.select('academic_students').filter(x => String(x.id) !== String(id));
-    localStorage.setItem('sgb_academic_students', JSON.stringify(list));
+    const acadList = SGB.select('academic_students').filter(x =>
+      String(x.id) !== String(id) && (!nLow || (x.full_name || '').trim().toLowerCase() !== nLow)
+    );
+    localStorage.setItem('sgb_academic_students', JSON.stringify(acadList));
     SGB.pushToCloud('academic_students');
+
+    const userList = SGB.select('users_profile').filter(u =>
+      String(u.id) !== String(id) && (!nLow || (u.full_name || '').trim().toLowerCase() !== nLow)
+    );
+    localStorage.setItem('sgb_users_profile', JSON.stringify(userList));
+    SGB.pushToCloud('users_profile');
+
     openTab('students_prem');
   }
-
   function downloadStTemplate() {
     const csv = "Jina Kamili,Jinsia (M/F),Kidato,Tahasusi,PREM No,Simu ya Mzazi\nAsha Juma Mwita,F,Form 5 PCM,PCM,2026001122,0712345678";
     const a = document.createElement('a'); a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv); a.download = 'Template_Wanafunzi_Form1_6.csv'; a.click();
@@ -914,7 +943,6 @@
     SGB.pushToCloud('subject_allocations');
     openTab('allocations');
   }
-
   function verifyScoreSheet(cls, subj, exam, newStatus) {
     const all = SGB.select('exam_results').map(r => (r.class_name === cls && r.subject === subj && r.exam_type === exam) ? { ...r, verified_status: newStatus } : r);
     localStorage.setItem('sgb_exam_results', JSON.stringify(all));
@@ -950,7 +978,6 @@
     alert('✅ Alama zote zimehifadhiwa!');
     openTab('merit');
   }
-
   function downloadMarksCsvTemplate() {
     const csv = "Jina la Mwanafunzi,Kidato,Somo,Mtihani,Alama\nAsha Juma Mwita,Form 5 PCM,Physics,Terminal,82";
     const a = document.createElement('a'); a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv); a.download = 'Template_Alama_Masomo.csv'; a.click();
@@ -975,7 +1002,6 @@
     };
     reader.readAsText(file);
   }
-
   function filterAcademicTables(query) {
     const q = (query || '').trim().toLowerCase();
     document.querySelectorAll('#viewArea table tbody tr').forEach(tr => {
@@ -994,7 +1020,6 @@
     const st = document.getElementById('syncTime');
     if (st) st.innerText = ` (Imesasishwa: ${new Date().toLocaleTimeString()})`;
   }
-
   function sendStudentResultMsg(studentName, channel) {
     const st = computeStudentSummaries().find(x => x.name === studentName);
     if (!st) return;
@@ -1023,7 +1048,6 @@
     SGB.insert('school_timetable', { day_name: document.getElementById('ttDay').value, time_slot: document.getElementById('ttTime').value.trim(), class_name: document.getElementById('ttCls').value, subject: document.getElementById('ttSubj').value.trim(), teacher_name: document.getElementById('ttTeacher').value.trim() });
     openTab('timetable');
   }
-
   function addSyllabusLog(e) {
     e.preventDefault();
     SGB.insert('syllabus_tracker', { class_name: document.getElementById('syCls').value, subject: document.getElementById('sySubj').value.trim(), teacher_name: document.getElementById('syTeacher').value.trim(), percent: Number(document.getElementById('syPct').value || 0) });
@@ -1035,7 +1059,6 @@
     SGB.insert('lesson_plans', { teacher_name: document.getElementById('lpTeacher').value.trim(), class_name: document.getElementById('lpClass').value, subject: document.getElementById('lpSubj').value.trim(), doc_type: document.getElementById('lpType').value, status: 'Inasubiri Uhakiki' });
     openTab('lesson_audit');
   }
-
   function promoteAllStudents() {
     if (!confirm('Je, una uhakika unataka kupandisha wanafunzi wote (Form 1–6) darasa linalofuata?')) return;
     const upgraded = SGB.select('academic_students').map(s => {
@@ -1054,7 +1077,6 @@
     alert('✅ Wanafunzi wote (Form 1–6) wamepandishwa madarasa!');
     openTab('students_prem');
   }
-
   function downloadMeritCsv() {
     const list = computeStudentSummaries();
     let csv = "Nafasi,Mwanafunzi,Jinsia,Kidato,Ngazi,Jumla,Wastani,Points,Division\n";
