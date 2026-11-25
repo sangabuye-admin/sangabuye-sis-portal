@@ -155,11 +155,13 @@
       const curVal = window._activeChildName || selEl.value;
       selEl.innerHTML = kids.map(k => `<option value="${k.full_name}" ${k.full_name === curVal ? 'selected' : ''}>👶 ${k.full_name} (${k.class_name})</option>`).join('') || '<option value="">Hakuna Mtoto Bado</option>';
     }
-    const chosenName = window._activeChildName || (kids ? kids.full_name : '');
-    const child = kids.find(k => k.full_name === chosenName) || kids || { full_name: 'Mwanafunzi', class_name: 'Form 1A', combination: 'O-Level', gender: 'M', prem_no: '-', parent_phone: '-' };
-    const dorm = SGB.select('dorm_allocations').find(d => (d.student_name || '').trim().toLowerCase() === child.full_name.toLowerCase());
+    const firstKid = kids.length > 0 ? kids[0] : null;
+    const chosenName = window._activeChildName || (firstKid ? firstKid.full_name : '');
+    const child = kids.find(k => k.full_name === chosenName) || firstKid || { full_name: 'Mwanafunzi', class_name: 'Form 1A', combination: 'O-Level', gender: 'M', prem_no: '-', parent_phone: '-' };
+    const dorm = SGB.select('dorm_allocations').find(d => (d.student_name || '').trim().toLowerCase() === (child.full_name || '').toLowerCase());
     return { ...child, dorm_info: dorm ? `${dorm.dorm_name} (Kitanda: ${dorm.bed_no})` : 'Kutwa (Day Scholar)' };
   }
+
 
   function selectActiveChild(name) {
     window._activeChildName = name;
