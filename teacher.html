@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashibodi ya Mwalimu (Teacher Portal v9.8 — Form 1-6) | Sangabuye SIS</title>
+  <title>Dashibodi ya Mwalimu (Teacher Portal v9.9 — Form 1-6) | Sangabuye SIS</title>
   <script src="core.js?v=7.5"></script>
   <style>
     * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
@@ -41,29 +41,29 @@
   <p id="tcSideName">Teacher Portal | Form 1–6</p>
 
   <div class="grp-lbl">A. Taaluma & Alama</div>
-  <button class="menu-btn active" onclick="openTab('overview', this)">📊  Muhtasari & Graphs</button>
-  <button class="menu-btn" onclick="openTab('score_entry', this)">✍️  Jaza & Tuma Score Sheet</button>
-  <button class="menu-btn" onclick="openTab('subj_analytics', this)">📈  Uchambuzi wa Somo (A–F)</button>
-  <button class="menu-btn" onclick="openTab('remedial', this)">🆘  Wanafunzi wa Remedial (D/F)</button>
+  <button class="menu-btn active" onclick="openTab('overview', this)">📊 1. Muhtasari & Graphs</button>
+  <button class="menu-btn" onclick="openTab('score_entry', this)">✍️ 2. Jaza & Tuma Score Sheet</button>
+  <button class="menu-btn" onclick="openTab('subj_analytics', this)">📈 3. Uchambuzi wa Somo (A–F)</button>
+  <button class="menu-btn" onclick="openTab('remedial', this)">🆘 4. Wanafunzi wa Remedial (D/F)</button>
 
   <div class="grp-lbl">B. Darasa, Mahudhurio & Zamu</div>
-  <button class="menu-btn" onclick="openTab('attendance', this)">📋  Mahudhurio (Roll Call)</button>
-  <button class="menu-btn" onclick="openTab('homework', this)">📝  Mazoezi (PDF) & Sahihisha</button>
-  <button class="menu-btn" onclick="openTab('discipline', this)">⚖️  Nidhamu & Maoni ya Darasa</button>
-  <button class="menu-btn" onclick="openTab('tod_duty', this)">🛡️  Ripoti ya Mwalimu wa Zamu</button>
+  <button class="menu-btn" onclick="openTab('attendance', this)">📋 5. Mahudhurio (Roll Call)</button>
+  <button class="menu-btn" onclick="openTab('homework', this)">📝 6. Mazoezi (PDF) & Sahihisha</button>
+  <button class="menu-btn" onclick="openTab('discipline', this)">⚖️ 7. Nidhamu & Maoni ya Darasa</button>
+  <button class="menu-btn" onclick="openTab('tod_duty', this)">🛡️ 8. Ripoti ya Mwalimu wa Zamu</button>
 
   <div class="grp-lbl">C. Maandalio, Ratiba & Fedha</div>
-  <button class="menu-btn" onclick="openTab('schemes', this)">📑  Schemes, Lesson Plans & Silabasi</button>
-  <button class="menu-btn" onclick="openTab('timetable_lib', this)">📅  Ratiba Yangu & Maktaba</button>
-  <button class="menu-btn" onclick="openTab('leave_swap', this)">🏖️  Omba Ruhusa / Badili Kipindi</button>
-  <button class="menu-btn" onclick="openTab('payroll_imprest', this)">💼  Salary Slip & Masurufu</button>
-  <button class="menu-btn" onclick="openTab('ca_tracker', this)">🧪  Mazoezi Endelevu (CA / Tests)</button>
-  <button class="menu-btn" onclick="openTab('tc_messages', this)">💬  Ujumbe (Mkuu/Mtaaluma/Mhasibu)</button>
+  <button class="menu-btn" onclick="openTab('schemes', this)">📑 9. Schemes, Lesson Plans & Silabasi</button>
+  <button class="menu-btn" onclick="openTab('timetable_lib', this)">📅 10. Ratiba Yangu & Maktaba</button>
+  <button class="menu-btn" onclick="openTab('leave_swap', this)">🏖️ 11. Omba Ruhusa / Badili Kipindi</button>
+  <button class="menu-btn" onclick="openTab('payroll_imprest', this)">💼 12. Salary Slip & Masurufu</button>
+  <button class="menu-btn" onclick="openTab('ca_tracker', this)">🧪 13. Mazoezi Endelevu (CA / Tests)</button>
+  <button class="menu-btn" onclick="openTab('tc_messages', this)">💬 14. Ujumbe (Mkuu/Mtaaluma/Mhasibu)</button>
 </div>
 
 <div class="main">
   <div class="topbar">
-    <div><strong id="tabTitle">📊  Muhtasari & Graphs</strong> <span id="syncTime" style="font-size:11px; color:#059669;"></span></div>
+    <div><strong id="tabTitle">📊 1. Muhtasari & Graphs</strong> <span id="syncTime" style="font-size:11px; color:#059669;"></span></div>
     <div style="display:flex; gap:8px; align-items:center; flex:1; max-width:460px;">
       <input type="text" id="globalTcSearch" onkeyup="filterTeacherTables(this.value)" placeholder="🔍 Tafuta popote kwa herufi za jina, kidato, somo...">
       <button type="button" class="btn btn-blue" style="white-space:nowrap;" onclick="refreshTeacherNow()">🔄 Refresh</button>
@@ -85,6 +85,14 @@
     return c.includes('5') || c.includes('6') || c.includes('v') || c.includes('vi');
   }
 
+  function normClass(str) {
+    return String(str || '').toLowerCase()
+      .replace(/form|kidato|stream|mkondo/g, '')
+      .replace(/\bvi\b/g, '6').replace(/\bv\b/g, '5').replace(/\biv\b/g, '4')
+      .replace(/\biii\b/g, '3').replace(/\bii\b/g, '2').replace(/\bi\b/g, '1')
+      .replace(/[^a-z0-9]/g, '');
+  }
+
   function gradeFromScore(sc, isALevel = false) {
     const s = Number(sc);
     if (isALevel) {
@@ -102,7 +110,6 @@
     if (s >= 30) return 'D';
     return 'F';
   }
-
   function getMyAllocations() {
     const tName = myTeacherName.toLowerCase().trim();
     const uName = (user?.username || '').toLowerCase().trim();
@@ -119,17 +126,32 @@
     return all.filter(r => {
       const byMe = (r.teacher_name || '').toLowerCase().trim() === tName;
       const inMyAlloc = myAllocs.some(a =>
-        (a.class_name || '').toLowerCase() === (r.class_name || '').toLowerCase() &&
+        normClass(a.class_name) === normClass(r.class_name) &&
         (a.subject || '').toLowerCase() === (r.subject || '').toLowerCase()
       );
       return byMe || inMyAlloc;
     });
   }
 
+  function getAllUnifiedStudents() {
+    const map = {};
+    SGB.select('academic_students').forEach(s => {
+      const k = (s.full_name || '').trim().toLowerCase();
+      if (k) map[k] = { full_name: s.full_name.trim(), class_name: s.class_name || '', prem_no: s.prem_no || '-', parent_phone: s.parent_phone || '' };
+    });
+    SGB.select('users_profile').filter(u => (u.role || '').toLowerCase() === 'student').forEach(u => {
+      const k = (u.full_name || '').trim().toLowerCase();
+      if (k && !map[k]) {
+        map[k] = { full_name: u.full_name.trim(), class_name: u.class_name || u.department || '', prem_no: u.username || '-', parent_phone: u.phone || '' };
+      }
+    });
+    return Object.values(map);
+  }
+
   function getMyAssignedStudents() {
-    const myClasses = Array.from(new Set(getMyAllocations().map(a => (a.class_name || '').toLowerCase().trim())));
-    if (!myClasses.length) return new Array();
-    return SGB.select('academic_students').filter(s => myClasses.includes((s.class_name || '').toLowerCase().trim()));
+    const myNormClasses = Array.from(new Set(getMyAllocations().map(a => normClass(a.class_name)).filter(Boolean)));
+    if (!myNormClasses.length) return new Array();
+    return getAllUnifiedStudents().filter(s => myNormClasses.includes(normClass(s.class_name)));
   }
 
   function formToolsHtml(placeholder = '🔍 Tafuta kwenye fomu hii...') {
@@ -680,14 +702,16 @@
     const exam = document.getElementById('tcExamType')?.value;
     if (!val) { alert('⚠️ Chagua Kidato & Somo lako kwanza.'); return; }
     const [cls, subj] = val.split('|');
-    const list = SGB.select('academic_students').filter(s => (s.class_name || '').toLowerCase() === cls.toLowerCase());
+    const targetNorm = normClass(cls);
+    const list = getAllUnifiedStudents().filter(s => normClass(s.class_name) === targetNorm);
+
     document.getElementById('tcGridArea').innerHTML = `
       <form onsubmit="submitTeacherScoreSheet(event, '${cls}', '${subj}', '${exam}')">
-        <table><thead><tr><th>Mwanafunzi</th><th>PREM</th><th>Alama (0-100)</th></tr></thead>
+        <table><thead><tr><th>Mwanafunzi</th><th>Kidato</th><th>PREM / Reg</th><th>Alama (0-100)</th></tr></thead>
         <tbody>
-        ${list.map(s => `<tr><td><b>${s.full_name}</b></td><td>${s.prem_no}</td><td><input type="number" class="tc-sc-inp" data-name="${s.full_name}" min="0" max="100" placeholder="Alama"></td></tr>`).join('') || '<tr><td colspan="3">Hakuna wanafunzi waliosajiliwa kwenye kidato hiki bado.</td></tr>'}
+        ${list.map(s => `<tr><td><b>${s.full_name}</b></td><td>${s.class_name}</td><td>${s.prem_no}</td><td><input type="number" class="tc-sc-inp" data-name="${s.full_name}" min="0" max="100" placeholder="Alama"></td></tr>`).join('') || `<tr><td colspan="4">Hakuna wanafunzi waliosajiliwa kwenye kidato cha <b>${cls}</b> bado.</td></tr>`}
         </tbody></table>
-        <button type="submit" class="btn btn-green" style="margin-top:10px;">📤 Wasilisha Score Sheet (${cls} — ${subj}) Kwa Mtaaluma</button>
+        ${list.length ? `<button type="submit" class="btn btn-green" style="margin-top:10px;">📤 Wasilisha Score Sheet (${cls} — ${subj}) Kwa Mtaaluma</button>` : ''}
       </form>`;
   }
 
@@ -741,7 +765,7 @@
     if (st) {
       const clsInp = document.getElementById('caClass');
       if (clsInp) clsInp.value = st.class_name;
-      const myAllocs = getMyAllocations().filter(a => (a.class_name || '').toLowerCase() === (st.class_name || '').toLowerCase());
+      const myAllocs = getMyAllocations().filter(a => normClass(a.class_name) === normClass(st.class_name));
       const subjSel = document.getElementById('caSubj');
       if (subjSel && myAllocs.length) {
         subjSel.innerHTML = myAllocs.map(a => `<option value="${a.subject}">${a.subject}</option>`).join('');
@@ -756,7 +780,7 @@
   }
 
   function alertParentAttendance(stName, status, dt, channel) {
-    const reg = SGB.select('academic_students').find(s => (s.full_name || '').toLowerCase() === stName.toLowerCase());
+    const reg = getAllUnifiedStudents().find(s => (s.full_name || '').toLowerCase() === stName.toLowerCase());
     let phone = reg?.parent_phone || prompt(`Ingiza namba ya simu ya mzazi wa ${stName}:`);
     if (!phone || !phone.trim()) return;
     const msg = `SHULE YA SEKONDARI SANGABUYE\nTaarifa ya Mahudhurio ya ${stName.toUpperCase()} tarehe ${dt}: ${status}.\nMawasiliano: ${SYSTEM_GATEWAY_PHONE}`;
