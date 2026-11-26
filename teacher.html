@@ -574,38 +574,94 @@
       </form>`;
   }
 
-  function downloadTeacherScoreExcel(cls, subj, exam) {
-    if (typeof XLSX === 'undefined') { alert('⚠️ Maktaba ya Excel inapakia, subiri sekunde 2 jaribu tena.'); return; }
-    const list = getAllUnifiedStudents().filter(s => normClass(s.class_name) === normClass(cls));
-    if (!list.length) { alert(`⚠️ Hakuna wanafunzi kwenye ${cls}.`); return; }
-    const rows = [['Jina la Mwanafunzi', 'PREM No', 'Kidato', 'Somo', 'Mtihani', 'Alama (0-100)']];
-    list.forEach(s => rows.push([s.full_name, s.prem_no || '-', s.class_name, subj, exam, '']));
-    const wb = XLSX.utils.book_new();
-    const ws = XLSX.utils.aoa_to_sheet(rows);
-    const safeSheet = subj.replace(/[\\/?*[\]:]/g, '').trim().slice(0, 28) || 'ScoreSheet';
-    XLSX.utils.book_append_sheet(wb, ws, safeSheet);
-    XLSX.writeFile(wb, `${cls}_${subj}_${exam}.xlsx`.replace(/\s+/g, '_'));
+  function escTcXml(str) {
+    return String(str ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  function downloadTeacherScoreExcel(cls, subj, exam, wholeForm = false) {
+    const numMatch = normClass(cls).match(/^[1-6]/);
+    const formDigit = numMatch ? numMatch.at(0) : '';
+    const list = wholeForm && formDigit
+      ? getAllUnifiedStudents().filter(s => normClass(s.class_name).startsWith(formDigit))
+      : getAllUnifiedStudents().filter(s => normClass(s.class_name) === normClass(cls));
+
+    if (!list.length) {
+      alert(`⚠️ Hakuna wanafunzi waliosajiliwa kwenye ${wholeForm ? 'Form ' + formDigit + ' Nzima' : cls}.`);
+      return;
+    }
+
+    const sheetLabel = escTcXml(subj.replace(/[\\/?*[\]:]/g, '').trim().slice(0, 28) || 'ScoreSheet');
+    let xml = `<?xml version="1.0"?><?mso-application progid="Excel.Sheet"?><Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"><Worksheet ss:Name="${sheetLabel}"><Table>`;
+    xml += `<Row><Cell><Data ss:Type="String">Jina la Mwanafunzi</Data></Cell><Cell><Data ss:Type="String">PREM No</Data></Cell><Cell><Data ss:Type="String">Kidato</Data></Cell><Cell><Data ss:Type="String">Somo</Data></Cell><Cell><Data ss:Type="String">Mtihani</Data></Cell><Cell><Data ss:Type="String">Alama (0-100)</Data></Cell></Row>`;
+    list.forEach(s => {
+      xml += `<Row><Cell><Data ss:Type="String">${escTcXml(s.full_name)}</Data></Cell><Cell><Data ss:Type="String">${escTcXml(s.prem_no || '-')}</Data></Cell><Cell><Data ss:Type="String">${escTcXml(s.class_name)}</Data></Cell><Cell><Data ss:Type="String">${escTcXml(subj)}</Data></Cell><Cell><Data ss:Type="String">${escTcXml(exam)}</Data></Cell><Cell><Data ss:Type="String"></Data></Cell></Row>`;
+    });
+    xml += `</Table></Worksheet></Workbook>`;
+
+    const blob = new Blob([xml], { type: 'application/vnd.ms-excel;charset=utf-8;' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    const tag = wholeForm ? `Form_${formDigit}_Nzima` : cls.replace(/\s+/g, '_');
+    a.download = `${tag}_${subj.replace(/\s+/g, '_')}_${exam.replace(/\s+/g, '_')}.xls`;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
   }
 
   function uploadTeacherScoreExcel(cls, subj, exam) {
-    if (typeof XLSX === 'undefined') { alert('⚠️ Maktaba ya Excel haijapakia bado.'); return; }
     const file = document.getElementById('tcExcelUploadInp')?.files?.item(0);
-    if (!file) { alert('⚠️ Chagua faili la Excel (.xlsx) lililojazwa alama kwanza.'); return; }
+    if (!file) { alert('⚠️ Chagua faili la Excel (.xls au .xlsx) lililojazwa alama kwanza.'); return; }
     const reader = new FileReader();
     reader.onload = (ev) => {
-      const wb = XLSX.read(new Uint8Array(ev.target.result), { type: 'array' });
-      const rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames.at(0)], { header: 1 });
+      const buf = ev.target.result;
+      const headText = new TextDecoder().decode(new Uint8Array(buf).slice(0, 200));
+      const parsedRows = new Array();
+
+      if (headText.includes('<Workbook') || headText.includes('<?xml')) {
+        const doc = new DOMParser().parseFromString(new TextDecoder().decode(new Uint8Array(buf)), 'text/xml');
+        Array.from(doc.getElementsByTagName('Row')).slice(1).forEach(row => {
+          const cells = Array.from(row.getElementsByTagName('Cell')).map(c => c.textContent.trim());
+          if (cells.at(0) && cells.at(5) !== undefined && cells.at(5) !== '') {
+            parsedRows.push({ name: cells.at(0), cls: cells.at(2) || cls, subj: cells.at(3) || subj, exam: cells.at(4) || exam, score: Number(cells.at(5)) });
+          }
+        });
+      } else if (typeof XLSX !== 'undefined' && XLSX.read) {
+        const wb = XLSX.read(new Uint8Array(buf), { type: 'array' });
+        const rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames.at(0)], { header: 1 });
+        rows.slice(1).forEach(r => {
+          if (r.at(0) && r.at(5) !== undefined && r.at(5) !== '') {
+            parsedRows.push({ name: String(r.at(0)).trim(), cls: String(r.at(2) || cls).trim(), subj: String(r.at(3) || subj).trim(), exam: String(r.at(4) || exam).trim(), score: Number(r.at(5)) });
+          }
+        });
+      }
+
       const scoreMap = {};
-      rows.slice(1).forEach(r => {
-        if (r.at(0) && r.at(5) !== undefined && r.at(5) !== null && String(r.at(5)).trim() !== '') {
-          scoreMap[String(r.at(0)).trim().toLowerCase()] = Number(r.at(5));
-        }
-      });
+      parsedRows.forEach(item => { if (!isNaN(item.score)) scoreMap[item.name.toLowerCase()] = item.score; });
+
       let filled = 0;
       document.querySelectorAll('.tc-sc-inp').forEach(inp => {
         const val = scoreMap[(inp.dataset.name || '').trim().toLowerCase()];
         if (val !== undefined && !isNaN(val)) { inp.value = val; filled++; }
       });
+
+      const distinctClasses = Array.from(new Set(parsedRows.map(x => normClass(x.cls)).filter(Boolean)));
+      if (distinctClasses.length > 1 && confirm(`Faili hili lina alama za mikondo ${distinctClasses.length} ya kidato kizima (${parsedRows.length} wanafunzi). Je, ungependa kuzituma zote kwa Mtaaluma sasa hivi?`)) {
+        let allResults = SGB.select('exam_results');
+        parsedRows.forEach(item => {
+          if (isNaN(item.score)) return;
+          allResults = allResults.filter(r => !(normClass(r.class_name) === normClass(item.cls) && (r.subject || '').toLowerCase() === item.subj.toLowerCase() && (r.exam_type || '').toLowerCase() === item.exam.toLowerCase() && (r.student_name || '').toLowerCase() === item.name.toLowerCase()));
+          allResults.unshift({
+            id: Date.now() + Math.floor(Math.random() * 10000),
+            created_at: new Date().toLocaleString('sw-TZ'),
+            student_name: item.name, class_name: item.cls, subject: item.subj, exam_type: item.exam,
+            score: item.score, grade: gradeFromScore(item.score, isALevelClass(item.cls)),
+            teacher_name: myTeacherName, verified_status: 'Pending'
+          });
+        });
+        saveTableClean('exam_results', allResults);
+        alert(`✅ Alama ${parsedRows.length} za mikondo yote zimetumwa kwa Mtaaluma!`);
+        openTab('subj_analytics');
+        return;
+      }
+
       alert(`✅ Alama ${filled} kutoka Excel zimejazwa kwenye jedwali! Bofya "Wasilisha Score Sheet" kuzituma kwa Mtaaluma.`);
     };
     reader.readAsArrayBuffer(file);
@@ -620,6 +676,7 @@
     SGB.pushToCloud('unlock_requests');
     alert('✅ Ombi lako limetumwa kwa Mtaaluma! Akikubali, dirisha litafunguka kwako peke yako.');
   }
+
   function submitTeacherScoreSheet(e, cls, subj, exam) {
     e.preventDefault();
     const aLevel = isALevelClass(cls);
