@@ -3,25 +3,26 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ofisi ya Mkuu wa Shule (Headmaster v8.0) | Sangabuye SIS</title>
+  <title>Ofisi ya Mkuu wa Shule (Headmaster v9.0) | Sangabuye SIS</title>
   <script src="core.js?v=7.5"></script>
   <style>
     * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
-    body { margin: 0; background: #f1f5f9; display: flex; min-height: 100vh; color: #1e293b; }
-    .sidebar { width: 265px; background: #0f294a; color: white; display: flex; flex-direction: column; padding: 14px 10px; overflow-y: auto; }
+    body { margin: 0; background: #f1f5f9; display: flex; min-height: 100vh; color: #1e293b; overflow-x: hidden; }
+    .sidebar { width: 265px; flex-shrink: 0; background: #0f294a; color: white; display: flex; flex-direction: column; padding: 14px 10px; overflow-y: auto; transition: all 0.25s ease; }
+    .sidebar.collapsed { width: 0; padding: 0; overflow: hidden; }
     .sidebar h2 { font-size: 16px; margin: 0 0 2px; color: #fde68a; text-align: center; }
     .sidebar p { font-size: 11px; text-align: center; color: #cbd5e1; margin: 0 0 12px; }
-    .menu-btn { background: transparent; border: none; color: #e2e8f0; text-align: left; padding: 8px 11px; border-radius: 7px; cursor: pointer; font-size: 12.5px; margin-bottom: 3px; }
+    .menu-btn { background: transparent; border: none; color: #e2e8f0; text-align: left; padding: 7.5px 11px; border-radius: 7px; cursor: pointer; font-size: 12.2px; margin-bottom: 3px; width: 100%; }
     .menu-btn:hover, .menu-btn.active { background: #1d4ed8; color: white; font-weight: bold; }
-    .main { flex: 1; display: flex; flex-direction: column; }
-    .topbar { background: white; padding: 11px 18px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
-    .content { padding: 18px; }
+    .main { flex: 1; display: flex; flex-direction: column; min-width: 0; overflow-x: hidden; }
+    .topbar { background: white; padding: 11px 18px; display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
+    .content { padding: 18px; min-width: 0; }
     .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(175px, 1fr)); gap: 12px; margin-bottom: 16px; }
     .card { background: white; padding: 14px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border-left: 4px solid #1d4ed8; }
     .card h4 { margin: 0 0 5px; font-size: 11px; color: #64748b; text-transform: uppercase; }
     .card .val { font-size: 18px; font-weight: bold; color: #0f294a; }
-    .panel { background: white; padding: 16px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 16px; }
-    input, select, textarea { padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12.5px; width: 100%; }
+    .panel { background: white; padding: 16px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 16px; overflow-x: auto; max-width: 100%; }
+    input, select, textarea { padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12.5px; width: 100%; min-width: 0; }
     table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; }
     th, td { padding: 7px 8px; border: 1px solid #e2e8f0; text-align: left; }
     th { background: #f8fafc; color: #0f294a; }
@@ -30,26 +31,46 @@
     .btn-blue { background: #1d4ed8; color: white; }
     .btn-amber { background: #d97706; color: white; }
     .btn-red { background: #dc2626; color: white; }
+    #hmMenuToggle { background: #0f294a; color: #fff; border: none; padding: 6px 10px; border-radius: 6px; font-size: 16px; cursor: pointer; font-weight: bold; }
+    @media (max-width: 900px) {
+      .sidebar { position: fixed; left: -275px; top: 0; bottom: 0; z-index: 9999; width: 265px; padding: 14px 10px; box-shadow: 4px 0 18px rgba(0,0,0,0.35); }
+      .sidebar.open { left: 0; }
+      .sidebar.collapsed { left: -275px; width: 265px; padding: 14px 10px; }
+      #viewArea form { grid-template-columns: 1fr !important; }
+    }
   </style>
 </head>
 <body>
-<div class="sidebar">
-  <h2>MKUU WA SHULE</h2>
+<div class="sidebar" id="hmSidebar">
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+    <h2 style="flex:1;">MKUU WA SHULE</h2>
+    <button type="button" onclick="toggleHmSidebar()" style="background:transparent;border:none;color:#cbd5e1;font-size:16px;cursor:pointer;">✖</button>
+  </div>
   <p>Ilemela MC | Sangabuye Sec</p>
-  <button class="menu-btn active" onclick="openTab('overview', this)">📊 1. Muhtasari Mkuu wa Shule</button>
-  <button class="menu-btn" onclick="openTab('vouchers', this)">💸 2. Idhinisha Vocha za FFARS</button>
-  <button class="menu-btn" onclick="openTab('procurement', this)">🤝 3. Idhinisha Manunuzi</button>
-  <button class="menu-btn" onclick="openTab('payroll_audit', this)">💼 4. Pre-Audit ya Mishahara</button>
-  <button class="menu-btn" onclick="openTab('unlock_req', this)">🔓 5. Maombi ya Kufungua Hesabu</button>
-  <button class="menu-btn" onclick="openTab('lib_settings', this)">📚 6. Mipangilio ya Maktaba</button>
-  <button class="menu-btn" onclick="openTab('academics_info', this)">🎓 7. Taaluma & Matangazo</button>
-  <button class="menu-btn" onclick="openTab('audit_trail', this)">🛡️ 8. Kumbukumbu za Ukaguzi</button>
+  <button type="button" class="menu-btn active" onclick="openTab('overview', this)">📊 1. Muhtasari Mkuu wa Shule</button>
+  <button type="button" class="menu-btn" onclick="openTab('vouchers', this)">💸 2. Idhinisha Vocha za FFARS</button>
+  <button type="button" class="menu-btn" onclick="openTab('procurement', this)">🤝 3. Idhinisha Manunuzi</button>
+  <button type="button" class="menu-btn" onclick="openTab('payroll_audit', this)">💼 4. Pre-Audit ya Mishahara</button>
+  <button type="button" class="menu-btn" onclick="openTab('unlock_req', this)">🔓 5. Maombi ya Kufungua Hesabu</button>
+  <button type="button" class="menu-btn" onclick="openTab('lib_settings', this)">📚 6. Mipangilio ya Maktaba</button>
+  <button type="button" class="menu-btn" onclick="openTab('academics_info', this)">🎓 7. Taaluma & Matangazo</button>
+  <button type="button" class="menu-btn" onclick="openTab('audit_trail', this)">🛡️ 8. Kumbukumbu za Ukaguzi</button>
+  <button type="button" class="menu-btn" onclick="openTab('tod_reports', this)">📋 9. Ripoti za Mwalimu wa Zamu</button>
+  <button type="button" class="menu-btn" onclick="openTab('staff_leaves', this)">🏖️ 10. Ruhusa za Walimu & Kikasha</button>
+  <button type="button" class="menu-btn" onclick="openTab('discipline_hm', this)">⚖️ 11. Nidhamu & Kamati</button>
+  <button type="button" class="menu-btn" onclick="openTab('staff_reset', this)">👥 12. Watumishi & Futa Data</button>
 </div>
 
 <div class="main">
   <div class="topbar">
-    <div><strong id="tabTitle">📊 1. Muhtasari Mkuu wa Shule</strong> <span id="syncTime" style="font-size:11px; color:#059669;"></span></div>
-    <div></div>
+    <div style="display:flex; align-items:center; gap:8px;">
+      <button type="button" id="hmMenuToggle" onclick="toggleHmSidebar()" title="Fungua/Funga Menyu">☰</button>
+      <strong id="tabTitle">📊 1. Muhtasari Mkuu wa Shule</strong> <span id="syncTime" style="font-size:11px; color:#059669;"></span>
+    </div>
+    <div style="display:flex; gap:8px; align-items:center; flex:1; max-width:440px; min-width:200px;">
+      <input type="text" id="globalHmSearch" onkeyup="filterHmTables(this.value)" placeholder="🔍 Tafuta vocha, mwalimu, mwanafunzi, ripoti...">
+      <button type="button" class="btn btn-blue" style="white-space:nowrap;" onclick="refreshHmNow()">🔄 Refresh</button>
+    </div>
   </div>
   <div class="content" id="viewArea"></div>
 </div>
@@ -57,7 +78,25 @@
   const user = SGB.requireRole(['headmaster', 'super_admin', 'director']);
   SGB.startSessionTimer();
 
-  function openTab(tab, btn) {
+  const myHmName = user ? (user.full_name || user.username || 'Mkuu wa Shule') : 'Mkuu wa Shule';
+  let currentHmTab = 'overview';
+
+  window.toggleHmSidebar = function() {
+    const sb = document.getElementById('hmSidebar');
+    if (!sb) return;
+    if (window.innerWidth <= 900) sb.classList.toggle('open');
+    else sb.classList.toggle('collapsed');
+  };
+
+  async function saveTablePermanent(table, arr) {
+    localStorage.setItem('sgb_' + table, JSON.stringify(arr));
+    if (SGB.forceReplaceCloud) await SGB.forceReplaceCloud(table, arr);
+    else if (SGB.pushToCloud) await SGB.pushToCloud(table);
+  }
+
+  window.openTab = function(tab, btn) {
+    currentHmTab = tab;
+    document.getElementById('hmSidebar')?.classList.remove('open');
     document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('active'));
     if (btn) btn.classList.add('active');
     if (btn) document.getElementById('tabTitle').innerText = btn.innerText;
@@ -69,7 +108,11 @@
       const procs = SGB.select('procurement_committee');
       const pays = SGB.select('staff_payroll');
       const books = SGB.select('library_books');
-      const students = SGB.select('users_profile').filter(u => u.role === 'student');
+      const acadSt = SGB.select('academic_students');
+      const profSt = SGB.select('users_profile').filter(u => u.role === 'student');
+      const totalStudentsCount = Math.max(acadSt.length, profSt.length);
+      const todCount = SGB.select('tod_duty_reports').length;
+      const leaveReqs = SGB.select('direct_messages').filter(m => (m.recipient || '').toLowerCase().includes('headmaster') || (m.recipient || '').toLowerCase().includes('mkuu')).length;
 
       const totalIn = recs.reduce((s, r) => s + Number(r.amount_paid || 0), 0);
       const totalOut = vchs.filter(v => v.status === 'Paid').reduce((s, v) => s + Number(v.amount || 0), 0)
@@ -85,17 +128,20 @@
         <div class="cards">
           <div class="card" style="border-color:#059669;"><h4>Salio la Fedha Shuleni</h4><div class="val">TZS ${(totalIn - totalOut).toLocaleString()}</div></div>
           <div class="card" style="border-color:#d97706;"><h4>Maombi Yanayosubiri Idhini</h4><div class="val">${pendingVch + pendingProc + pendingPay}</div></div>
-          <div class="card"><h4>Wanafunzi Waliosajiliwa</h4><div class="val">${students.length}</div></div>
+          <div class="card"><h4>Wanafunzi Waliosajiliwa</h4><div class="val">${totalStudentsCount}</div></div>
           <div class="card" style="border-color:#7c3aed;"><h4>Jumla ya Vitabu Maktaba</h4><div class="val">${totalBooks}</div></div>
+          <div class="card" style="border-color:#0284c7;"><h4>Ripoti za Zamu (TOD)</h4><div class="val">${todCount}</div></div>
         </div>
 
         <div class="panel">
-          <h3>📋 Muhtasari wa Maombi Yanayosubiri Sahihi ya Mkuu wa Shule</h3>
+          <h3>📋 Muhtasari wa Maombi & Ripoti Zinazosubiri Mkuu wa Shule</h3>
           <table>
-            <tr><th>Kitengo</th><th>Idadi Inayosubiri</th><th>Hatua ya Haraka</th></tr>
-            <tr><td>💸 Vocha za Matumizi (FFARS PV)</td><td><b>${pendingVch}</b></td><td><button class="btn btn-blue" onclick="openTab('vouchers')">Kagua Vocha</button></td></tr>
-            <tr><td>🤝 Vikao vya Kamati ya Manunuzi</td><td><b>${pendingProc}</b></td><td><button class="btn btn-blue" onclick="openTab('procurement')">Kagua Manunuzi</button></td></tr>
-            <tr><td>💼 Pre-Audit ya Mishahara</td><td><b>${pendingPay}</b></td><td><button class="btn btn-blue" onclick="openTab('payroll_audit')">Kagua Mishahara</button></td></tr>
+            <tr><th>Kitengo</th><th>Idadi</th><th>Hatua ya Haraka</th></tr>
+            <tr><td>💸 Vocha za Matumizi (FFARS PV)</td><td><b>${pendingVch}</b></td><td><button type="button" class="btn btn-blue" onclick="openTab('vouchers')">Kagua Vocha</button></td></tr>
+            <tr><td>🤝 Vikao vya Kamati ya Manunuzi</td><td><b>${pendingProc}</b></td><td><button type="button" class="btn btn-blue" onclick="openTab('procurement')">Kagua Manunuzi</button></td></tr>
+            <tr><td>💼 Pre-Audit ya Mishahara</td><td><b>${pendingPay}</b></td><td><button type="button" class="btn btn-blue" onclick="openTab('payroll_audit')">Kagua Mishahara</button></td></tr>
+            <tr><td>📋 Ripoti za Mwalimu wa Zamu (TOD)</td><td><b>${todCount}</b></td><td><button type="button" class="btn btn-green" onclick="openTab('tod_reports')">Soma Ripoti za Zamu</button></td></tr>
+            <tr><td>🏖️ Ruhusa za Walimu & Ujumbe</td><td><b>${leaveReqs}</b></td><td><button type="button" class="btn btn-amber" onclick="openTab('staff_leaves')">Fungua Kikasha</button></td></tr>
           </table>
         </div>`;
       return;
@@ -115,10 +161,10 @@
               <td>${v.source_fund || 'Kutwa'}</td>
               <td><b>${Number(v.amount).toLocaleString()}</b></td>
               <td><b>${v.status}</b></td>
-              <td>
+              <td style="white-space:nowrap;">
                 ${(v.status || '').includes('Pending') ? `
-                  <button class="btn btn-green" onclick="approveVoucher('${v.id}')">✅ Idhinisha</button>
-                  <button class="btn btn-red" onclick="rejectVoucher('${v.id}')">✕ Kataa</button>
+                  <button type="button" class="btn btn-green" onclick="approveVoucher('${v.id}')">✅ Idhinisha</button>
+                  <button type="button" class="btn btn-red" onclick="rejectVoucher('${v.id}')">✕ Kataa</button>
                 ` : '✓ Tayari'}
               </td>
             </tr>`).join('') || '<tr><td colspan="8">Hakuna vocha zilizotumwa bado.</td></tr>'}
@@ -141,10 +187,10 @@
               <td>${p.minutes_summary}</td>
               <td><b>${Number(p.estimated_budget).toLocaleString()}</b></td>
               <td><b>${p.status}</b></td>
-              <td>
+              <td style="white-space:nowrap;">
                 ${(p.status || '').includes('Pending') ? `
-                  <button class="btn btn-green" onclick="approveProcurement('${p.id}')">✅ Idhinisha Manunuzi</button>
-                  <button class="btn btn-red" onclick="rejectProcurement('${p.id}')">✕ Kataa</button>
+                  <button type="button" class="btn btn-green" onclick="approveProcurement('${p.id}')">✅ Idhinisha Manunuzi</button>
+                  <button type="button" class="btn btn-red" onclick="rejectProcurement('${p.id}')">✕ Kataa</button>
                 ` : '✓ Tayari'}
               </td>
             </tr>`).join('') || '<tr><td colspan="7">Hakuna vikao vya manunuzi bado.</td></tr>'}
@@ -152,24 +198,25 @@
         </div>`;
       return;
     }
+
     if (tab === 'payroll_audit') {
       const staff = SGB.select('staff_payroll');
       area.innerHTML = `
         <div class="panel">
           <h3>💼 Pre-Audit ya Mishahara ya Watumishi</h3>
-          <button class="btn btn-green" style="margin-bottom:10px;" onclick="approveAllPayroll()">✅ Idhinisha Watumishi Wote Wanaosubiri</button>
+          <button type="button" class="btn btn-green" style="margin-bottom:10px;" onclick="approveAllPayroll()">✅ Idhinisha Watumishi Wote Wanaosubiri</button>
           <table>
             <tr><th>Mtumishi</th><th>Kazi</th><th>Chanzo</th><th>Gross</th><th>Makato</th><th>Net Pay (TZS)</th><th>Hali</th><th>Hatua</th></tr>
             ${staff.map(s => `<tr>
-              <td><b>${s.name}</b></td>
-              <td>${s.job_title || '-'}</td>
+              <td><b>${s.name || s.staff_name}</b></td>
+              <td>${s.job_title || s.role_title || '-'}</td>
               <td>${s.source_fund || 'Kutwa'}</td>
-              <td>${Number(s.gross).toLocaleString()}</td>
+              <td>${Number(s.gross || s.basic_salary || 0).toLocaleString()}</td>
               <td>${(Number(s.nssf || 0) + Number(s.paye || 0)).toLocaleString()}</td>
               <td><b>${Number(s.net_pay).toLocaleString()}</b></td>
               <td><b>${s.status}</b></td>
               <td>
-                ${(s.status || '').includes('Pending') ? `<button class="btn btn-green" onclick="approveSinglePayroll('${s.id}')">✅ Idhinisha</button>` : '✓ Tayari'}
+                ${(s.status || '').includes('Pending') ? `<button type="button" class="btn btn-green" onclick="approveSinglePayroll('${s.id}')">✅ Idhinisha</button>` : '✓ Tayari'}
               </td>
             </tr>`).join('') || '<tr><td colspan="8">Hakuna orodha ya mishahara bado.</td></tr>'}
           </table>
@@ -192,7 +239,7 @@
               <td><b>${l.status}</b></td>
               <td>${l.unlock_requested ? '<span style="color:#d97706;font-weight:bold;">📩 Ameomba Kufunguliwa</span>' : '-'}</td>
               <td>
-                ${l.status === 'Locked' ? `<button class="btn btn-amber" onclick="unlockAccountPeriod('${l.id}')">🔓 Fungua Hesabu</button>` : '✓ Imefunguliwa'}
+                ${l.status === 'Locked' ? `<button type="button" class="btn btn-amber" onclick="unlockAccountPeriod('${l.id}')">🔓 Fungua Hesabu</button>` : '✓ Imefunguliwa'}
               </td>
             </tr>`).join('') || '<tr><td colspan="7">Hakuna vipindi vilivyofungwa bado.</td></tr>'}
           </table>
@@ -223,26 +270,34 @@
             </div>
           </form>
         </div>
-
         <div class="panel">
           <h3>💡 Mapendekezo ya Vitabu Kutoka Kwa Mkutubi, Walimu & Wanafunzi</h3>
           <table>
             <tr><th>Tarehe</th><th>Kitabu Kilichopendekezwa</th><th>Mwandishi / Somo</th><th>Aliyependekeza</th><th>Hali</th><th>Hatua ya Mkuu</th></tr>
             ${sugs.map(s => `<tr>
               <td>${s.created_at}</td><td><b>${s.book_title}</b></td><td>${s.author_subject}</td><td>${s.suggested_by}</td><td><b>${s.status}</b></td>
-              <td>
-                <button class="btn btn-green" onclick="SGB.update('library_suggestions','${s.id}',{status:'Imeidhinishwa na Mkuu'}); openTab('lib_settings')">✅ Idhinisha</button>
-                <button class="btn btn-red" onclick="SGB.update('library_suggestions','${s.id}',{status:'Imekataliwa'}); openTab('lib_settings')">✕ Kataa</button>
+              <td style="white-space:nowrap;">
+                <button type="button" class="btn btn-green" onclick="SGB.update('library_suggestions','${s.id}',{status:'Imeidhinishwa na Mkuu'}); openTab('lib_settings')">✅ Idhinisha</button>
+                <button type="button" class="btn btn-red" onclick="SGB.update('library_suggestions','${s.id}',{status:'Imekataliwa'}); openTab('lib_settings')">✕ Kataa</button>
               </td>
             </tr>`).join('') || '<tr><td colspan="6">Hakuna mapendekezo ya vitabu bado.</td></tr>'}
           </table>
         </div>`;
       return;
     }
+
     if (tab === 'academics_info') {
       const news = SGB.select('school_announcements');
       const results = SGB.select('exam_results');
+      const savedHmRem = localStorage.getItem('sgb_hm_general_remark') || 'Hongera kwa juhudi zako. Endelea kusoma kwa bidii na kuzingatia nidhamu.';
       area.innerHTML = `
+        <div class="panel" style="border-left:4px solid #059669;">
+          <h3>✍️ Maoni ya Jumla ya Mkuu wa Shule Kwenye Ripoti za Muhula (A4 Reports)</h3>
+          <form onsubmit="saveHmReportRemark(event)" style="display:grid; grid-template-columns:1fr auto; gap:8px;">
+            <input type="text" id="hmGenRemInp" value="${savedHmRem}" required placeholder="Andika maoni ya jumla yatakayochapishwa chini ya kila ripoti ya mwanafunzi...">
+            <button type="submit" class="btn btn-green">💾 Hifadhi Kwenye Ripoti</button>
+          </form>
+        </div>
         <div class="panel">
           <h3>📢 Tangazo Rasmi la Mkuu wa Shule (Linaonekana Kwa Wazazi, Walimu & Wanafunzi)</h3>
           <form onsubmit="postSchoolNotice(event)" style="display:grid; gap:8px; margin-bottom:14px;">
@@ -257,63 +312,132 @@
         <div class="panel">
           <h3>🎓 Muhtasari wa Matokeo ya Mitihani Yaliyowekwa (${results.length} Rekodi)</h3>
           <table><tr><th>Mwanafunzi</th><th>Kidato</th><th>Somo</th><th>Alama</th><th>Daraja</th></tr>
-          ${results.slice(0, 15).map(r => `<tr><td><b>${r.student_name}</b></td><td>${r.class_name}</td><td>${r.subject}</td><td><b>${r.score}</b></td><td>${r.grade || '-'}</td></tr>`).join('') || '<tr><td colspan="5">Hakuna matokeo yaliyowekwa bado.</td></tr>'}
+          ${results.slice(0, 20).map(r => `<tr><td><b>${r.student_name}</b></td><td>${r.class_name}</td><td>${r.subject}</td><td><b>${r.score}</b></td><td>${r.grade || '-'}</td></tr>`).join('') || '<tr><td colspan="5">Hakuna matokeo yaliyowekwa bado.</td></tr>'}
           </table>
         </div>`;
       return;
     }
 
-    const logs = SGB.select('audit_logs');
+    if (tab === 'audit_trail') {
+      const logs = SGB.select('audit_logs');
+      area.innerHTML = `
+        <div class="panel">
+          <h3>🛡️ Kumbukumbu za Ukaguzi wa Mfumo (System Audit Trail)</h3>
+          <table><tr><th>Muda</th><th>Mtumiaji</th><th>Kitendo Kilichofanyika</th></tr>
+          ${logs.slice(0, 50).map(l => `<tr><td>${l.time}</td><td><b>${l.actor}</b></td><td>${l.action}</td></tr>`).join('') || '<tr><td colspan="3">Hakuna kumbukumbu bado.</td></tr>'}
+          </table>
+        </div>`;
+      return;
+    }
+    if (tab === 'tod_reports') {
+      const tods = SGB.select('tod_duty_reports');
+      area.innerHTML = `
+        <div class="panel" style="border-left:4px solid #059669;">
+          <h3>📋 9. Ripoti za Mwalimu wa Zamu (Teacher on Duty — TOD)</h3>
+          <table><tr><th>Tarehe</th><th>Mwalimu wa Zamu</th><th>Usafi</th><th>Chakula & Bweni</th><th>Muhtasari wa Matukio ya Siku</th></tr>
+          ${tods.map(r => `<tr><td><b>${r.duty_date}</b></td><td><b>${r.teacher_name}</b></td><td>${r.cleanliness}</td><td>${r.boarding_status}</td><td>${r.summary}</td></tr>`).join('') || '<tr><td colspan="5">Hakuna ripoti za mwalimu wa zamu zilizotumwa bado.</td></tr>'}
+          </table>
+        </div>`;
+      return;
+    }
+
+    if (tab === 'staff_leaves') {
+      const msgs = SGB.select('direct_messages').filter(m =>
+        (m.recipient || '').toLowerCase().includes('headmaster') ||
+        (m.recipient || '').toLowerCase().includes('mkuu') ||
+        (m.sender || '').toLowerCase().includes('mkuu')
+      );
+      area.innerHTML = `
+        <div class="panel">
+          <h3>🏖️ 10. Maombi ya Ruhusa / Likizo ya Walimu & Kikasha cha Mkuu wa Shule</h3>
+          <form onsubmit="sendHmMessage(event)" style="display:grid; grid-template-columns:1fr 1fr 2fr auto; gap:8px; margin-bottom:12px;">
+            <select id="hmMsgTo"><option value="Walimu Wote">Walimu Wote</option><option value="Academic">Ofisi ya Mtaaluma</option><option value="Accountant">Ofisi ya Mhasibu</option></select>
+            <input type="text" id="hmMsgSubj" required placeholder="Mada ya Ujumbe">
+            <input type="text" id="hmMsgBody" required placeholder="Andika maagizo au majibu ya ruhusa...">
+            <button type="submit" class="btn btn-blue">📤 Tuma</button>
+          </form>
+          <table><tr><th>Muda</th><th>Kutoka</th><th>Kwenda</th><th>Mada</th><th>Maelezo</th><th>Hatua ya Mkuu</th></tr>
+          ${msgs.map(m => `<tr><td>${m.created_at}</td><td><b>${m.sender}</b></td><td>${m.recipient}</td><td><b>${m.subject}</b></td><td>${m.body}</td><td style="white-space:nowrap;">
+            ${(m.subject || '').toLowerCase().includes('ombi') && !m.hm_reply ? `
+              <button type="button" class="btn btn-green" onclick="respondTeacherLeave('${m.id}','${m.sender}','IMEKUBALIWA (Approved)')">✅ Kubali</button>
+              <button type="button" class="btn btn-red" onclick="respondTeacherLeave('${m.id}','${m.sender}','IMEKATALIWA (Rejected)')">✕ Kataa</button>
+            ` : `<b>${m.hm_reply || '✓'}</b>`}
+          </td></tr>`).join('') || '<tr><td colspan="6">Hakuna maombi wala ujumbe bado.</td></tr>'}
+          </table>
+        </div>`;
+      return;
+    }
+
+    if (tab === 'discipline_hm') {
+      const discs = SGB.select('discipline_logs');
+      area.innerHTML = `
+        <div class="panel" style="border-left:4px solid #dc2626;">
+          <h3>⚖️ 11. Kesi za Nidhamu & Maamuzi ya Kamati ya Nidhamu</h3>
+          <table><tr><th>Tarehe</th><th>Mwanafunzi</th><th>Aina ya Tukio</th><th>Maelezo</th><th>Aliyeripoti</th><th>Maamuzi ya Mkuu</th></tr>
+          ${discs.map(d => `<tr><td>${d.created_at}</td><td><b>${d.student_name}</b></td><td><b>${d.incident_type}</b></td><td>${d.notes}</td><td>${d.reported_by}</td><td>
+            ${d.hm_decision ? `<b>${d.hm_decision}</b>` : `<button type="button" class="btn btn-amber" onclick="recordHmDisciplineDecision('${d.id}')">✍️ Weka Maamuzi</button>`}
+          </td></tr>`).join('') || '<tr><td colspan="6">Hakuna kesi za kinidhamu zilizoripotiwa bado.</td></tr>'}
+          </table>
+        </div>`;
+      return;
+    }
+
+    const staffUsers = SGB.select('users_profile').filter(u => (u.role || '').toLowerCase() !== 'student');
     area.innerHTML = `
       <div class="panel">
-        <h3>🛡️ Kumbukumbu za Ukaguzi wa Mfumo (System Audit Trail)</h3>
-        <table><tr><th>Muda</th><th>Mtumiaji</th><th>Kitendo Kilichofanyika</th></tr>
-        ${logs.slice(0, 40).map(l => `<tr><td>${l.time}</td><td><b>${l.actor}</b></td><td>${l.action}</td></tr>`).join('') || '<tr><td colspan="3">Hakuna kumbukumbu bado.</td></tr>'}
+        <h3>👥 12A. Orodha ya Watumishi & Walimu Waliosajiliwa (${staffUsers.length})</h3>
+        <table><tr><th>Jina Kamili</th><th>Username</th><th>Cheo / Role</th><th>Simu</th></tr>
+        ${staffUsers.map(u => `<tr><td><b>${u.full_name || u.username}</b></td><td>${u.username}</td><td><b>${(u.role || '').toUpperCase()}</b></td><td>${u.phone || u.phone_number || '-'}</td></tr>`).join('') || '<tr><td colspan="4">Hakuna watumishi waliosajiliwa bado.</td></tr>'}
         </table>
+      </div>
+
+      <div class="panel" style="border:2px solid #dc2626; background:#fef2f2;">
+        <h3 style="color:#991b1b; margin-top:0;">⚠️ 12B. Eneo la Hatari: Futa Kumbukumbu za Matangazo, Zamu, Nidhamu & Ukaguzi (Permanent Wipe)</h3>
+        <p style="font-size:12.5px; color:#7f1d1d;">Kitufe hiki kitafuta kabisa matangazo, ripoti za zamu, kesi za nidhamu, ujumbe na kumbukumbu za ukaguzi kote kwenye <b>Kompyuta/Simu NA Cloud Database</b> (hata ukibonyeza Refresh hazitarudi tena). Mfumo utakuomba <b>Nywila (Password) ya Mkuu wa Shule MARA MBILI</b>.</p>
+        <button type="button" class="btn btn-red" style="padding:10px 16px; font-size:13px;" onclick="wipeAllHmDataPermanent()">🗑️ Futa Data za Majaribio (Ofisi ya Mkuu)</button>
       </div>`;
-  }
-  function approveVoucher(id) {
-    SGB.update('expense_vouchers', id, { status: 'Approved', approved_by: 'Mkuu wa Shule' });
+  };
+  window.approveVoucher = function(id) {
+    SGB.update('expense_vouchers', id, { status: 'Approved', approved_by: myHmName });
     alert('✅ Vocha ya FFARS imeidhinishwa! Mhasibu anaweza kuilipa sasa.');
     openTab('vouchers');
-  }
+  };
 
-  function rejectVoucher(id) {
+  window.rejectVoucher = function(id) {
     SGB.update('expense_vouchers', id, { status: 'Rejected by HM' });
     openTab('vouchers');
-  }
+  };
 
-  function approveProcurement(id) {
-    SGB.update('procurement_committee', id, { status: 'Approved', approved_by: 'Mkuu wa Shule' });
+  window.approveProcurement = function(id) {
+    SGB.update('procurement_committee', id, { status: 'Approved', approved_by: myHmName });
     alert('✅ Kikao cha Kamati ya Manunuzi kimeidhinishwa!');
     openTab('procurement');
-  }
+  };
 
-  function rejectProcurement(id) {
+  window.rejectProcurement = function(id) {
     SGB.update('procurement_committee', id, { status: 'Rejected by HM' });
     openTab('procurement');
-  }
+  };
 
-  function approveSinglePayroll(id) {
-    SGB.update('staff_payroll', id, { status: 'Pre-Audited & Approved' });
+  window.approveSinglePayroll = function(id) {
+    SGB.update('staff_payroll', id, { status: 'Pre-Audited & Approved', audit_status: 'Pre-Audited & Approved' });
     openTab('payroll_audit');
-  }
+  };
 
-  function approveAllPayroll() {
+  window.approveAllPayroll = function() {
     SGB.select('staff_payroll').filter(s => (s.status || '').includes('Pending')).forEach(s => {
-      SGB.update('staff_payroll', s.id, { status: 'Pre-Audited & Approved' });
+      SGB.update('staff_payroll', s.id, { status: 'Pre-Audited & Approved', audit_status: 'Pre-Audited & Approved' });
     });
     alert('✅ Mishahara yote imeidhinishwa (Pre-Audited)!');
     openTab('payroll_audit');
-  }
+  };
 
-  function unlockAccountPeriod(id) {
+  window.unlockAccountPeriod = function(id) {
     SGB.update('account_locks', id, { status: 'Unlocked', unlock_requested: false });
     alert('🔓 Hesabu za kipindi hicho zimefunguliwa kwa ajili ya Mhasibu!');
     openTab('unlock_req');
-  }
-
-  function saveHmLibSettings(e) {
+  };
+  window.saveHmLibSettings = function(e) {
     e.preventDefault();
     const newCfg = {
       fine_per_day: Number(document.getElementById('hmFineDay').value || 500),
@@ -328,32 +452,110 @@
     SGB.logAction('Mkuu wa Shule amesasisha mipangilio ya Maktaba');
     alert('✅ Mipangilio ya Maktaba imehifadhiwa na kusambazwa hewani!');
     openTab('lib_settings');
-  }
+  };
 
-  function sendLibOverdueReminders(count) {
+  window.sendLibOverdueReminders = function(count) {
     if (count === 0) {
       alert('✅ Hakuna mwanafunzi wala mwalimu aliyechelewa kurudisha kitabu sasa.');
       return;
     }
     SGB.insert('direct_messages', {
-      sender: 'Mkuu wa Shule',
+      sender: myHmName,
       recipient: 'Mkutubi / Walimu',
       subject: `UKUMBUSHO WA VITABU VILIVYOCHELEWESHWA (${count})`,
       body: `Kuna wasomaji ${count} waliochelewesha vitabu vya maktaba. Tafadhali hakikisha vinarejeshwa mara moja.`
     });
     alert(`📧 Ukumbusho umetumwa kwa Mkutubi kwa ajili ya wasomaji ${count} waliochelewesha vitabu!`);
-  }
+  };
 
-  function postSchoolNotice(e) {
+  window.saveHmReportRemark = function(e) {
+    e.preventDefault();
+    const rem = document.getElementById('hmGenRemInp').value.trim();
+    localStorage.setItem('sgb_hm_general_remark', rem);
+    SGB.pushToCloud('hm_general_remark');
+    alert('✅ Maoni ya Mkuu wa Shule yamehifadhiwa! Yatachapishwa kwenye Ripoti za Muhula za wanafunzi.');
+  };
+
+  window.postSchoolNotice = function(e) {
     e.preventDefault();
     SGB.insert('school_announcements', {
       title: document.getElementById('ntTitle').value.trim(),
       body: document.getElementById('ntBody').value.trim(),
-      author: 'Mkuu wa Shule'
+      author: myHmName
     });
     alert('✅ Tangazo limechapishwa kwa jumuiya ya shule!');
     openTab('academics_info');
-  }
+  };
+  window.respondTeacherLeave = function(msgId, teacherName, decision) {
+    SGB.update('direct_messages', msgId, { hm_reply: decision });
+    SGB.insert('direct_messages', {
+      sender: myHmName,
+      recipient: teacherName,
+      subject: `JIBU LA OMBI LAKO: ${decision}`,
+      body: `Ofisi ya Mkuu wa Shule imepitia ombi lako na uamuzi ni: ${decision}.`
+    });
+    alert(`✅ Majibu (${decision}) yametumwa kwa ${teacherName}!`);
+    openTab('staff_leaves');
+  };
+
+  window.sendHmMessage = function(e) {
+    e.preventDefault();
+    SGB.insert('direct_messages', {
+      sender: myHmName,
+      recipient: document.getElementById('hmMsgTo').value,
+      subject: document.getElementById('hmMsgSubj').value.trim(),
+      body: document.getElementById('hmMsgBody').value.trim()
+    });
+    alert('✅ Ujumbe umetumwa!');
+    openTab('staff_leaves');
+  };
+
+  window.recordHmDisciplineDecision = function(id) {
+    const dec = prompt('Andika uamuzi wa Mkuu wa Shule / Kamati ya Nidhamu (mf. Onyo Kali, Mzazi Aitwe, Kusimamishwa Wiki 2):');
+    if (!dec || !dec.trim()) return;
+    SGB.update('discipline_logs', id, { hm_decision: dec.trim() });
+    alert('✅ Uamuzi wa kinidhamu umehifadhiwa!');
+    openTab('discipline_hm');
+  };
+  window.wipeAllHmDataPermanent = async function() {
+    const storedPass = (user && user.password) ? String(user.password) : '';
+    const p1 = prompt('⚠️ HATUA YA 1/2: Ingiza Nywila (Password) yako ya Mkuu wa Shule ili kufuta data za majaribio:');
+    if (!p1 || !p1.trim()) return;
+    if (storedPass && p1.trim() !== storedPass) {
+      alert('❌ Nywila (Password) ya kwanza si sahihi! Kufuta kumesitishwa.');
+      return;
+    }
+
+    const p2 = prompt('⚠️ HATUA YA 2/2 (UTHIBITISHO WA MWISHO): Ingiza Nywila (Password) yako TENA mara ya pili:');
+    if (!p2 || p2.trim() !== p1.trim()) {
+      alert('❌ Nywila ya pili haikulingana na ya kwanza! Kufuta kumesitishwa.');
+      return;
+    }
+
+    const hmTables = ['school_announcements', 'tod_duty_reports', 'discipline_logs', 'direct_messages', 'audit_logs'];
+    for (const tbl of hmTables) {
+      await saveTablePermanent(tbl, new Array());
+      if (SGB.sb && SGB.sb.from) {
+        try { await SGB.sb.from(tbl).delete().neq('id', 0); } catch (err) {}
+      }
+    }
+    alert('✅ Data zote za majaribio za Ofisi ya Mkuu wa Shule zimefutwa kabisa kote kwenye Kompyuta na Cloud!');
+    openTab('overview', document.querySelector('.menu-btn'));
+  };
+
+  window.filterHmTables = function(q) {
+    const low = (q || '').toLowerCase();
+    document.querySelectorAll('#viewArea table tbody tr').forEach(tr => {
+      tr.style.display = tr.innerText.toLowerCase().includes(low) ? '' : 'none';
+    });
+  };
+
+  window.refreshHmNow = async function() {
+    await SGB.pullFromCloud(true);
+    openTab(currentHmTab);
+    const st = document.getElementById('syncTime');
+    if (st) st.innerText = ` (Imesasishwa: ${new Date().toLocaleTimeString()})`;
+  };
 
   openTab('overview', document.querySelector('.menu-btn'));
 </script>
