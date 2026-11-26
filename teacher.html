@@ -523,13 +523,14 @@
     const w = window.open('', '', 'width=750,height=600');
     w.document.write('<html><head><title>Salary Slip</title><style>body{font-family:sans-serif;padding:20px;}table{width:100%;border-collapse:collapse;}th,td{border:1px solid #000;padding:6px;font-size:12px;}</style></head><body>' + slipHtml + '</body></html>');
     w.document.close(); w.focus(); setTimeout(() => { w.print(); w.close(); }, 300);
-  }
   function loadTeacherScoreGrid() {
     const val = document.getElementById('tcAllocPick')?.value;
     const exam = document.getElementById('tcExamType')?.value;
     if (!val) { alert('⚠️ Chagua Kidato & Somo lako kwanza.'); return; }
     const [cls, subj] = val.split('|');
     const targetNorm = normClass(cls);
+    const numMatch = targetNorm.match(/^[1-6]/);
+    const formDigit = numMatch ? numMatch.at(0) : '';
     const list = getAllUnifiedStudents().filter(s => normClass(s.class_name) === targetNorm);
     const openForMe = isWindowOpenForMe();
 
@@ -543,14 +544,15 @@
 
     document.getElementById('tcGridArea').innerHTML = `
       <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center; background:#f8fafc; border:1px solid #cbd5e1; padding:9px; border-radius:8px; margin-bottom:10px;">
-        <button type="button" class="btn btn-blue" onclick="downloadTeacherScoreExcel('${cls}', '${subj}', '${exam}')">⬇️ Pakua Excel (.xlsx)</button>
-        ${!isReadOnly ? `<input type="file" id="tcExcelUploadInp" accept=".xlsx,.xls,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel" style="max-width:230px;">
-        <button type="button" class="btn btn-green" onclick="uploadTeacherScoreExcel('${cls}', '${subj}', '${exam}')">📤 Pakia Excel (.xlsx)</button>` : ''}
-        ${!openForMe && !isApprovedLocked ? `<button type="button" class="btn btn-amber" onclick="requestTeacherWindowUnlock()">🔓 Omba Mtaaluma Akufungulie Wewe Pekee</button>` : ''}
+        <button type="button" class="btn btn-blue" onclick="downloadTeacherScoreExcel('${cls}', '${subj}', '${exam}', false)">⬇️ Pakua Excel (${cls})</button>
+        ${formDigit ? `<button type="button" class="btn btn-amber" onclick="downloadTeacherScoreExcel('${cls}', '${subj}', '${exam}', true)">⬇️ Pakua Excel (Form ${formDigit} Nzima)</button>` : ''}
+        ${!isReadOnly ? `<input type="file" id="tcExcelUploadInp" accept=".xls,.xlsx,.xml" style="max-width:230px;">
+        <button type="button" class="btn btn-green" onclick="uploadTeacherScoreExcel('${cls}', '${subj}', '${exam}')">📤 Pakia Excel</button>` : ''}
+        ${!openForMe && !isApprovedLocked ? `<button type="button" class="btn btn-red" onclick="requestTeacherWindowUnlock()">🔓 Omba Mtaaluma Akufungulie Wewe Pekee</button>` : ''}
       </div>
 
-      ${isApprovedLocked ? '<p style="background:#ecfdf5; border:1px solid #059669; color:#065f46; padding:8px 12px; border-radius:6px; font-weight:bold;">🔒 Score Sheet hii imeshathibitishwa na kufungwa na Mtaaluma (Approved). Unaweza kuona alama za mwisho hapa chini.</p>' : ''}
-      ${!openForMe && !isApprovedLocked ? '<p style="background:#fef2f2; border:1px solid #dc2626; color:#991b1b; padding:8px 12px; border-radius:6px; font-weight:bold;">🔒 Dirisha la kuingiza alama limefungwa na Mtaaluma. Bofya kitufe cha njano hapo juu kuomba akufungulie wewe peke yako.</p>' : ''}
+      ${isApprovedLocked ? '<p style="background:#ecfdf5; border:1px solid #059669; color:#065f46; padding:8px 12px; border-radius:6px; font-weight:bold;">🔒 Score Sheet hii imeshathibitishwa na kufungwa na Mtaaluma (Approved).</p>' : ''}
+      ${!openForMe && !isApprovedLocked ? '<p style="background:#fef2f2; border:1px solid #dc2626; color:#991b1b; padding:8px 12px; border-radius:6px; font-weight:bold;">🔒 Dirisha la kuingiza alama limefungwa na Mtaaluma. Bofya kitufe chekundu hapo juu kuomba akufungulie wewe peke yako.</p>' : ''}
 
       <form onsubmit="submitTeacherScoreSheet(event, '${cls}', '${subj}', '${exam}')">
         <table><thead><tr><th>Mwanafunzi</th><th>Jinsia</th><th>Kidato</th><th>PREM</th><th>Alama (0-100)</th><th>Hali / Marekebisho</th></tr></thead>
@@ -571,6 +573,7 @@
         ${list.length && !isReadOnly ? `<button type="submit" class="btn btn-green" style="margin-top:10px;">📤 Wasilisha Score Sheet (${cls} — ${subj} — ${exam}) Kwa Mtaaluma</button>` : ''}
       </form>`;
   }
+
   function downloadTeacherScoreExcel(cls, subj, exam) {
     if (typeof XLSX === 'undefined') { alert('⚠️ Maktaba ya Excel inapakia, subiri sekunde 2 jaribu tena.'); return; }
     const list = getAllUnifiedStudents().filter(s => normClass(s.class_name) === normClass(cls));
