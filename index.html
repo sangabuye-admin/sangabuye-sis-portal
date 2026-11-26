@@ -458,18 +458,27 @@
 </script>
 <script>
   window.addEventListener('DOMContentLoaded', function() {
-    const loginBtn = document.querySelector('button[type="submit"], button');
-    if (loginBtn && !document.getElementById('sgbManualLink')) {
+    const oldBox = document.getElementById('sgbManualLink');
+    if (oldBox) oldBox.remove();
+
+    const allBtns = Array.from(document.querySelectorAll('button[type="submit"], button'));
+    const ingiaBtn = allBtns.find(b => (b.innerText || '').trim().toUpperCase().includes('INGIA')) || allBtns[allBtns.length - 1];
+
+    if (ingiaBtn) {
+      const sl = String.fromCharCode(47);
+      const demoUrl = 'https:' + sl + sl + 'sangabuye-admin.github.io' + sl + 'sangabuye-sis-demo' + sl;
+
       const box = document.createElement('div');
       box.id = 'sgbManualLink';
-      box.style.cssText = 'text-align:center; margin-top:10px; width:100%; display:flex; justify-content:center; gap:6px; flex-wrap:wrap;';
-      const demoUrl = 'https://github.io' + 'sangabuye-sis-demo/';
-      box.innerHTML = '<a href="manual.html" target="_blank" style="display:inline-flex; align-items:center; gap:4px; padding:5px 11px; background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; border-radius:20px; font-weight:600; text-decoration:none; font-size:11.5px;">📘 Mwongozo (PDF)</a>' +
-                      '<a href="' + demoUrl + '" target="_blank" style="display:inline-flex; align-items:center; gap:4px; padding:5px 11px; background:#ecfdf5; color:#065f46; border:1px solid #6ee7b7; border-radius:20px; font-weight:600; text-decoration:none; font-size:11.5px;">🎓 Mfumo wa Demo</a>';
-      loginBtn.parentElement.appendChild(box);
+      box.style.cssText = 'display:flex; flex-direction:row; justify-content:center; align-items:center; gap:8px; flex-wrap:nowrap; margin-top:12px; width:100%;';
+
+      box.innerHTML =
+        '<a href="manual.html" target="_blank" style="display:inline-flex; align-items:center; justify-content:center; gap:4px; padding:6px 12px; background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; border-radius:20px; font-weight:600; text-decoration:none; font-size:11.5px; white-space:nowrap;">📘 Mwongozo (PDF)</a>' +
+        '<a href="' + demoUrl + '" target="_blank" style="display:inline-flex; align-items:center; justify-content:center; gap:4px; padding:6px 12px; background:#ecfdf5; color:#065f46; border:1px solid #6ee7b7; border-radius:20px; font-weight:600; text-decoration:none; font-size:11.5px; white-space:nowrap;">🎓 Mfumo wa Demo</a>';
+
+      ingiaBtn.insertAdjacentElement('afterend', box);
     }
   });
 </script>
-
 </body>
 </html>
