@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mwongozo Kamili wa Mtumiaji (A4 User Manual) | Sangabuye SIS Portal</title>
+  <style>
+    * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
+    body { margin: 0; background: #e2e8f0; color: #1e293b; line-height: 1.55; }
+    .toolbar { position: sticky; top: 0; z-index: 999; background: #0f294a; color: white; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; box-shadow: 0 3px 10px rgba(0,0,0,0.25); }
+    .btn-print { background: linear-gradient(135deg, #059669, #10b981); color: white; border: none; padding: 10px 18px; border-radius: 8px; font-weight: bold; font-size: 13.5px; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
+    .btn-back { background: #1e3a8a; color: white; text-decoration: none; padding: 9px 15px; border-radius: 8px; font-weight: bold; font-size: 13px; }
+    .book-wrap { max-width: 210mm; margin: 20px auto; background: white; padding: 18mm 16mm; box-shadow: 0 8px 30px rgba(0,0,0,0.15); border-radius: 6px; }
+    .cover { text-align: center; border: 3px double #0f294a; padding: 28px 20px; border-radius: 12px; background: linear-gradient(180deg, #f8fafc 0%, #eff6ff 100%); margin-bottom: 24px; }
+    .cover .coat { font-size: 46px; margin-bottom: 6px; }
+    .cover h4 { margin: 0; color: #0f294a; letter-spacing: 0.8px; font-size: 13px; text-transform: uppercase; }
+    .cover h1 { margin: 8px 0 6px; color: #064e3b; font-size: 24px; }
+    .cover .sub { display: inline-block; background: #1d4ed8; color: white; padding: 5px 16px; border-radius: 20px; font-size: 12.5px; font-weight: bold; margin: 8px 0 14px; }
+    .badge-row { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+    .badge { padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: bold; }
+    .b-blue { background: #dbeafe; color: #1e40af; }
+    .b-green { background: #d1fae5; color: #065f46; }
+    .b-amber { background: #fef3c7; color: #92400e; }
+    .b-purple { background: #ede9fe; color: #5b21b6; }
+    .sec-head { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 8px; color: white; margin: 22px 0 12px; page-break-after: avoid; }
+    .sh-navy { background: linear-gradient(90deg, #0f294a, #1d4ed8); }
+    .sh-green { background: linear-gradient(90deg, #064e3b, #059669); }
+    .sh-purple { background: linear-gradient(90deg, #4c1d95, #7c3aed); }
+    .sh-amber { background: linear-gradient(90deg, #92400e, #d97706); }
+    .sh-teal { background: linear-gradient(90deg, #115e59, #0d9488); }
+    .sh-red { background: linear-gradient(90deg, #7f1d1d, #dc2626); }
+    .sec-head .ico { font-size: 22px; background: rgba(255,255,255,0.18); padding: 5px 9px; border-radius: 8px; }
+    .sec-head h2 { margin: 0; font-size: 15.5px; }
+    .sec-head small { display: block; font-size: 11px; opacity: 0.9; }
+    table { width: 100%; border-collapse: collapse; margin: 10px 0 14px; font-size: 11.8px; }
+    th, td { border: 1px solid #cbd5e1; padding: 7px 9px; text-align: left; vertical-align: top; }
+    th { background: #f1f5f9; color: #0f294a; font-weight: bold; }
+    .step-box { background: #f8fafc; border-left: 4px solid #1d4ed8; padding: 10px 14px; border-radius: 0 8px 8px 0; margin: 10px 0; font-size: 12.2px; }
+    .tip-box { background: #ecfdf5; border: 1px solid #6ee7b7; border-left: 4px solid #059669; padding: 10px 14px; border-radius: 6px; margin: 10px 0; font-size: 12px; color: #064e3b; }
+    .warn-box { background: #fef2f2; border: 1px solid #fca5a5; border-left: 4px solid #dc2626; padding: 10px 14px; border-radius: 6px; margin: 10px 0; font-size: 12px; color: #7f1d1d; }
+    .ico-pill { display: inline-block; padding: 2px 7px; border-radius: 5px; font-weight: bold; font-size: 11px; margin-right: 4px; }
+    .page-break { page-break-before: always; }
+    @media print {
+      body { background: white; }
+      .toolbar { display: none !important; }
+      .book-wrap { margin: 0; padding: 0; box-shadow: none; max-width: 100%; }
+      @page { size: A4 portrait; margin: 12mm; }
+    }
+  </style>
+</head>
+<body>
+<div class="toolbar">
+  <div><strong>📘 KIJITABU CHA MWONGOZO WA MTUMIAJI — SANGABUYE SIS PORTAL</strong></div>
+  <div style="display:flex; gap:10px;">
+    <a href="index.html" class="btn-back">🏠 Rudi Login</a>
+    <button class="btn-print" onclick="window.print()">🖨️ Chapisha / Pakua Kijitabu (A4 PDF)</button>
+  </div>
+</div>
+
+<div class="book-wrap">
+  <div class="cover">
+    <div class="coat">🇹🇿 🏫</div>
+    <h4>Jamhuri ya Muungano wa Tanzania</h4>
+    <h4>Ofisi ya Rais — TAMISEMI | Halmashauri ya Manispaa ya Ilemela</h4>
+    <h1>SHULE YA SEKONDARI SANGABUYE</h1>
+    <div class="sub">MWONGOZO KAMILI WA MTUMIAJI (USER MANUAL & OPERATIONS GUIDE)</div>
+    <p style="font-size:12.5px; color:#334155; max-width:560px; margin:0 auto;">
+      Mfumo Jumuishi wa Kidijitali wa Usimamizi wa Taaluma, Fedha (FFARS), Walimu, Maktaba, Wanafunzi na Wazazi (Form 1 – Form 6 | O-Level & A-Level).
+    </p>
+    <div class="badge-row">
+      <span class="badge b-blue">🔐 Usalama & Udhibiti</span>
+      <span class="badge b-green">☁️ Cloud Live Sync</span>
+      <span class="badge b-amber">🧾 FFARS & Risiti za QR</span>
+      <span class="badge b-purple">🎓 NECTA Div I–0 & Ripoti A4</span>
+    </div>
+    <p style="font-size:11px; color:#64748b; margin-top:16px;">Toleo Rasmi la Uzinduzi (v17.0) | S.L.P 11898, Ilemela - Mwanza</p>
+  </div>
+
+  <div class="step-box" style="border-color:#059669;">
+    <strong style="color:#064e3b; font-size:13.5px;">📑 YALIYOMO KWENYE KIJITABU HIKI:</strong>
+    <table style="margin-top:6px;">
+      <tr><th>Sehemu</th><th>Moduli / Mada Husika</th><th>Walengwa Wakuu</th></tr>
+      <tr><td><b>Sehemu ya 1</b></td><td>🔐 Ukurasa wa Kuingia (<code>index.html</code>) & Vitufe vya Upau wa Juu</td><td>Watumiaji Wote wa Mfumo</td></tr>
+      <tr><td><b>Sehemu ya 2</b></td><td>🏛️ Ofisi ya Mkuu wa Shule (<code>headmaster.html</code> — Vichupo 12)</td><td>Mkuu wa Shule / Makamu Mkuu</td></tr>
+      <tr><td><b>Sehemu ya 3</b></td><td>🎓 Ofisi ya Mtaaluma (<code>academic.html</code> — O-Level & A-Level)</td><td>Mtaaluma Mkuu & Kamati ya Taaluma</td></tr>
+      <tr><td><b>Sehemu ya 4</b></td><td>👩‍🏫 Dashibodi ya Walimu (<code>teacher.html</code> — Vichupo 14)</td><td>Walimu Wote wa Masomo & Madarasa</td></tr>
+      <tr><td><b>Sehemu ya 5</b></td><td>💰 Ofisi ya Mhasibu (<code>accountant.html</code> — Vichupo 14 & FFARS)</td><td>Mhasibu wa Shule / Boharia</td></tr>
+      <tr><td><b>Sehemu ya 6</b></td><td>📚 Maktaba (<code>librarian.html</code>) & 👨‍👩‍👧 Mwanafunzi/Mzazi (<code>student.html</code>)</td><td>Mkutubi, Wanafunzi & Wazazi</td></tr>
+      <tr><td><b>Sehemu ya 7</b></td><td>🛡️ Usalama wa Data (PDPA), Backup & Orodha ya Uzinduzi</td><td>Uongozi wa Shule & ICT Focal Person</td></tr>
+    </table>
+  </div>
+  <div class="sec-head sh-navy">
+    <div class="ico">🔐</div>
+    <div><h2>SEHEMU YA 1: UKURASA WA KUINGIA (LOGIN PAGE) & UPAA WA JUU</h2><small>Faili: index.html & core.js — Hatua za mwanzo kwa kila mtumiaji</small></div>
+  </div>
+
+  <div class="step-box">
+    <b>1.1 Hatua za Kuingia Kwenye Mfumo:</b>
+    <ol style="margin:6px 0; padding-left:20px;">
+      <li>Fungua kivinjari (<i>Google Chrome</i>, <i>Microsoft Edge</i>, au <i>Safari</i>) kwenye kompyuta au simu na ufungue kiungo cha <b>Sangabuye SIS Portal</b>.</li>
+      <li>Ingiza <b>Jina la Mtumiaji (Username)</b> na <b>Nywila (Password)</b> uliyokabidhiwa na Mkuu wa Shule au Msimamizi wa Mfumo.</li>
+      <li>Mfumo unatambua cheo chako (<i>Role</i>) kiotomatiki na kukupeleka kwenye dashibodi yako bila kuhitaji kuchagua menyu nyingi.</li>
+    </ol>
+  </div>
+
+  <table>
+    <tr><th>Ikoni & Kitufe</th><th>Kazi Yake Kwenye Kila Dashibodi</th><th>Muda Sahihi wa Kukitumia</th></tr>
+    <tr><td><span class="ico-pill b-blue">☰</span> <b>Menyu</b></td><td>Hufungua au kufunga orodha ya vichupo (Sidebar) pembeni mwa skrini.</td><td>Unapotumia simu ya mkononi au unapotaka nafasi kubwa ya jedwali.</td></tr>
+    <tr><td><span class="ico-pill b-green">☁️ Cloud Live</span></td><td>Huonyesha mfumo umeunganishwa na wingu (Supabase) na data zinahifadhiwa moja kwa moja.</td><td>Kila wakati kabla ya kuingiza alama au malipo makubwa.</td></tr>
+    <tr><td><span class="ico-pill b-purple">💬 Ujumbe</span></td><td>Kikasha cha siri cha mawasiliano. Huonyesha <b>ujumbe wako binafsi pekee</b> (uliotumwa kwako au na wewe).</td><td>Kutuma taarifa za haraka kwa Mkuu wa Shule, Mtaaluma, au Mhasibu.</td></tr>
+    <tr><td><span class="ico-pill b-blue">🔄 Refresh</span></td><td>Huvuta taarifa mpya zilizowekwa na watumishi wengine hewani bila kufunga ukurasa.</td><td>Baada ya mwalimu au mhasibu kutuma ripoti mpya.</td></tr>
+    <tr><td><span class="ico-pill b-amber">💾 Backup</span></td><td>Hupakua nakala ya akiba (JSON) ya kumbukumbu za mfumo kwenye kompyuta/simu.</td><td>Kila Ijumaa jioni au baada ya kumaliza kuingiza matokeo/malipo.</td></tr>
+    <tr><td><span class="ico-pill" style="background:#fee2e2;color:#991b1b;">🚪 Logout</span></td><td>Hufunga kikao chako kwa usalama ili mtu mwingine asitumie akaunti yako.</td><td><b>Lazima</b> ubofye unapomaliza kazi kwenye kompyuta ya ofisi.</td></tr>
+  </table>
+
+  <div class="page-break"></div>
+
+  <div class="sec-head sh-navy">
+    <div class="ico">🏛️</div>
+    <div><h2>SEHEMU YA 2: OFISI YA MKUU WA SHULE (HEADMASTER OFFICE)</h2><small>Faili: headmaster.html — Udhibiti mkuu wa fedha, taaluma, nidhamu na watumishi</small></div>
+  </div>
+
+  <table>
+    <tr><th>Vichupo (1 – 12)</th><th>Maelezo ya Kina ya Utendaji & Maamuzi</th></tr>
+    <tr><td><b>📊 1. Muhtasari Mkuu</b></td><td>Huonyesha salio halisi la fedha shuleni (Mapato minus Matumizi), idadi ya maombi yanayosubiri saini ya Mkuu, idadi ya wanafunzi, vitabu vya maktaba, na ripoti za zamu.</td></tr>
+    <tr><td><b>💸 2. Idhinisha Vocha (FFARS)</b></td><td>Hupokea vocha za matumizi kutoka kwa Mhasibu. Mkuu hukagua maelezo na kiasi, kisha hubofya <b>✅ Idhinisha</b> (ili Mhasibu alipe) au <b>✕ Kataa</b>.</td></tr>
+    <tr><td><b>🤝 3. Idhinisha Manunuzi</b></td><td>Hukagua muhtasari wa kikao cha Kamati ya Manunuzi, mahitaji na bajeti. Ikishaidhinishwa, Mhasibu anaweza kuchapisha FFARS PV yake.</td></tr>
+    <tr><td><b>💼 4. Pre-Audit ya Mishahara</b></td><td>Hukagua orodha ya mishahara/posho za watumishi kabla ya malipo kufanyika (<i>Pre-Audit</i>) na kuidhinisha kwa mkupuo au mmoja mmoja.</td></tr>
+    <tr><td><b>🔓 5. Kufungua Hesabu</b></td><td>Mhasibu akifunga hesabu za mwezi na kuomba zifunguliwe kwa marekebisho maalum, ni Mkuu wa Shule pekee anayefungua hapa.</td></tr>
+    <tr><td><b>📚 6. Mipangilio ya Maktaba</b></td><td>Huamua kiwango cha faini kwa siku, ukomo wa vitabu kwa mwanafunzi, idadi ya siku za kuazima, na kuidhinisha mapendekezo ya vitabu vipya.</td></tr>
+    <tr><td><b>🎓 7. Taaluma & Matangazo</b></td><td>Huandika <b>Maoni ya Jumla ya Mkuu wa Shule</b> yanayochapishwa chini ya kila Ripoti ya Muhula (A4), na huchapisha <b>Matangazo Rasmi</b> kwa shule nzima.</td></tr>
+    <tr><td><b>🛡️ 8. Kumbukumbu za Ukaguzi</b></td><td>Huonyesha <i>Audit Trail</i> — kumbukumbu za kila kitendo kilichofanyika kwenye mfumo, nani alifanya, na saa ngapi.</td></tr>
+    <tr><td><b>📋 9. Ripoti za Mwalimu wa Zamu</b></td><td>Husoma ripoti za kila siku za walimu wa zamu (<i>TOD</i>) kuhusu usafi wa mazingira, chakula, bweni, na usalama wa wanafunzi.</td></tr>
+    <tr><td><b>🏖️ 10. Ruhusa za Walimu</b></td><td>Hupokea maombi ya ruhusa au likizo za walimu na kuyajibu kwa kubofya <b>✅ Kubali</b> au <b>✕ Kataa</b> (majibu hurudi kwa mwalimu husika).</td></tr>
+    <tr><td><b>⚖️ 11. Nidhamu & Kamati</b></td><td>Hupokea kesi kubwa za kinidhamu zilizoripotiwa na walimu na kurekodi maamuzi ya Kamati ya Nidhamu ya Shule.</td></tr>
+    <tr><td><b>👥 12. Watumishi & Futa Data</b></td><td>Huonyesha orodha ya watumishi wote, na lina kitufe cha kufuta data za majaribio kinachoomba <b>Nywila ya Mkuu Mara Mbili</b>.</td></tr>
+  </table>
+  <div class="sec-head sh-purple">
+    <div class="ico">🎓</div>
+    <div><h2>SEHEMU YA 3: OFISI YA MTAALUMA (ACADEMIC OFFICE)</h2><small>Faili: academic.html — Usajili, Ugawaji Masomo, NECTA Divisions & Ripoti za Muhula A4</small></div>
+  </div>
+
+  <div class="step-box" style="border-color:#7c3aed;">
+    <b>3.1 Mtiririko wa Hatua 6 za Kazi ya Mtaaluma Kila Muhula:</b>
+    <ol style="margin:6px 0; padding-left:20px;">
+      <li><b>Usajili wa Wanafunzi (Bulk Excel / Mmoja Mmoja):</b> Ingiza wanafunzi kwa mikondo yote (<code>Form 1A–1F</code>, <code>Form 2A–2F</code>, <code>Form 3A–3F</code>, <code>Form 4A–4F</code>, na <code>Form 5–6 Combinations</code>) ukiambatanisha Jinsia (<code>M/F</code>), Namba ya PREM, Kategoria (<code>Kutwa/Hostel</code>), na Simu ya Mzazi.</li>
+      <li><b>Upangaji wa Masomo (Subject Allocations):</b> Mpangie kila mwalimu darasa/mkondo na somo analofundisha. <i>Kumbuka: Mwalimu hawezi kujaza alama kama hajapangiwa somo hapa.</i></li>
+      <li><b>Kufungua Dirisha la Mitihani:</b> Chagua aina ya mtihani (<code>Midterm</code>, <code>Terminal</code>, <code>Annual</code>, <code>Mock</code>), weka tarehe ya mwisho (<i>Deadline</i>), na ufungue. Unaweza pia kumfungulia <b>mwalimu mmoja pekee</b> aliyeomba idhini baada ya muda kuisha.</li>
+      <li><b>Uhakiki wa Score Sheets:</b> Kagua alama zilizotumwa na walimu. Ukibaini kosa, hariri au rudisha kwa mwalimu; zikiwa sahihi bofya <b>Thibitisha (Approve)</b>.</li>
+      <li><b>Matokeo ya Jumla & NECTA Division:</b> Mfumo unakokotoa kiotomatiki <b>Pointi (7 Bora O-Level / 3 Bora A-Level)</b>, <b>Division (I, II, III, IV, 0)</b>, <b>Wastani (%)</b>, <b>GPA</b>, na <b>Nafasi Darasani</b>.</li>
+      <li><b>Uchapishaji wa Ripoti za Muhula (A4 Page 1 of 1):</b> Chapisha ripoti ya mwanafunzi mmoja au <b>darasa zima kwa mkupuo</b>. Ripoti inajumuisha alama zote, maoni ya mwalimu wa darasa, maoni ya Mkuu wa Shule, <b>deni halisi la ada kutoka kwa Mhasibu</b>, na tarehe ya kufungua shule.</li>
+    </ol>
+  </div>
+  <div class="page-break"></div>
+
+  <div class="sec-head sh-teal">
+    <div class="ico">👩‍🏫</div>
+    <div><h2>SEHEMU YA 4: DASHIBODI YA MWALIMU (TEACHER PORTAL)</h2><small>Faili: teacher.html — Kazi zote za darasani, Excel, CA, Zamu na Salary Slips</small></div>
+  </div>
+
+  <table>
+    <tr><th>Kichupo</th><th>Kazi & Maelekezo ya Vitendo Kwa Mwalimu</th></tr>
+    <tr><td><b>📊 1. Muhtasari & Graphs</b></td><td>Huonyesha masomo uliyopangiwa, wastani wa ufaulu wa wanafunzi wako, na grafu ya mgawanyo wa madaraja (<code>A–F</code>).</td></tr>
+    <tr><td><b>✍️ 2. Jaza, Excel & Score Sheet</b></td><td>Jaza alama online <b>AU</b> pakua kiolezo cha <b>Excel (Mkondo au Form Zima)</b>, jaza alama offline, kisha pakia Excel na ubofye <b>📤 Wasilisha Kwa Mtaaluma</b>.</td></tr>
+    <tr><td><b>📈 3. Uchambuzi wa Somo</b></td><td>Hutoa takwimu za watahiniwa waliofanya mtihani, idadi ya A, B, C, D, E, S, F, na asilimia ya ufaulu wa somo lako.</td></tr>
+    <tr><td><b>🆘 4. Wanafunzi wa Remedial</b></td><td>Huchuja wanafunzi wote wenye alama chini ya <b>45%</b> ili uwaweke kwenye mpango wa masomo ya ziada (<i>Remedial Classes</i>).</td></tr>
+    <tr><td><b>📋 5. Mahudhurio (Roll Call)</b></td><td>Hurekodi mahudhurio ya kila siku (<code>Present</code>, <code>Absent</code>, <code>Sick</code>, <code>Permission</code>) na kutuma ujumbe wa utoro kwa mzazi via <b>WhatsApp/SMS</b>.</td></tr>
+    <tr><td><b>📝 6. Mazoezi (PDF) & Sahihisha</b></td><td>Pakia maswali ya zoezi au faili la <b>PDF</b> kwa darasa lako; wanafunzi hujibu online na unawasahihisha hapa.</td></tr>
+    <tr><td><b>⚖️ 7. Nidhamu & Maoni</b></td><td>Hurekodi matukio ya kinidhamu au pongezi za mwanafunzi na kuweka maoni ya mwalimu wa darasa kwa ajili ya ripoti ya muhula.</td></tr>
+    <tr><td><b>🛡️ 8. Ripoti ya Mwalimu wa Zamu</b></td><td>Ukiwa zamu, jaza ripoti ya usafi, chakula, bweni, na usalama na ubofye kutuma moja kwa moja kwa Mkuu wa Shule.</td></tr>
+    <tr><td><b>📑 9. Schemes & Silabasi</b></td><td>Wasilisha <i>Scheme of Work</i> na <i>Lesson Plan</i> kwa Mtaaluma, na sasisha asilimia (<code>%</code>) ya mada ulizokwishafundisha.</td></tr>
+    <tr><td><b>📅 10. Ratiba & Maktaba</b></td><td>Angalia ratiba yako ya vipindi vya wiki na orodha ya vitabu vilivyopo maktaba ya shule.</td></tr>
+    <tr><td><b>🏖️ 11. Omba Ruhusa / Kipindi</b></td><td>Tuma maombi rasmi ya ruhusa ya dharura/likizo kwa Mkuu wa Shule au ombi la kubadilisha kipindi kwa Mtaaluma.</td></tr>
+    <tr><td><b>💼 12. Salary Slip & Masurufu</b></td><td>Pakua na kuchapisha <b>Salary Pay Slip</b> yako iliyotolewa na Mhasibu, na uombe masurufu ya safari (<i>Imprest</i>).</td></tr>
+    <tr><td><b>🧪 13. Mazoezi Endelevu (CA)</b></td><td>Hifadhi alama za majaribio ya kila wiki/mwezi (<i>Quiz, Tests, Practicals</i>) kabla ya mtihani wa muhula.</td></tr>
+    <tr><td><b>💬 14. Ujumbe</b></td><td>Wasiliana moja kwa moja na Mkuu wa Shule, Mtaaluma, au Mhasibu.</td></tr>
+  </table>
+  <div class="sec-head sh-green">
+    <div class="ico">💰</div>
+    <div><h2>SEHEMU YA 5: OFISI YA MHASIBU (ACCOUNTANT & FFARS OFFICE)</h2><small>Faili: accountant.html — Mapato, Risiti za QR, FFARS PV, Mishahara, Ruzuku & Stoo</small></div>
+  </div>
+
+  <table>
+    <tr><th>Kundi & Kichupo</th><th>Maelezo ya Kina ya Utendaji</th></tr>
+    <tr><td><b>📊 1. Muhtasari (Fedha & Stoo)</b></td><td>Huonyesha uchambuzi wa mapato, matumizi na salio kwa vyanzo vitatu: <b>Kutwa</b>, <b>Hostel (Bweni)</b>, na <b>Kambi ya Masomo</b>, pamoja na salio la stoo.</td></tr>
+    <tr><td><b>🛒 2. Mapokezi (Kapu la Michango)</b></td><td>Weka jina la mwanafunzi, ongeza michango mingi kwenye kapu (<i>Multi-Item Receipt</i>), chagua <b>CRDB Bank</b> au <b>Cash</b>, na hifadhi. Huchapisha <b>Risiti ya QR (58/80mm)</b> na kutuma taarifa kwa mzazi via <b>WhatsApp/SMS</b>.</td></tr>
+    <tr><td><b>📄 3. Taarifa Kwa Mzazi & Waliolipa</b></td><td>Hutoa taarifa binafsi ya malipo na deni la mwanafunzi (<b>A4 Page 1 of 1</b>), orodha ya waliolipa, na orodha ya wadaiwa (<i>Defaulters</i>) yenye vikumbusho.</td></tr>
+    <tr><td><b>🏷️ 4. Viwango vya Ada, Kambi & Basi</b></td><td>Huweka viwango vya michango kwa kuchagua <b>Kategoria (Kutwa, Hostel, Kambi) NA Darasa/Kidato</b>, na kuvisambaza moja kwa moja kwenye Ripoti za Muhula za Mtaaluma.</td></tr>
+    <tr><td><b>💸 5. Matumizi & FFARS PV</b></td><td>Huandaa <i>Payment Voucher</i> na kuituma kwa Mkuu wa Shule aidhinishe. Ikishaidhinishwa, Mhasibu hulipa na kuchapisha <b>FFARS PV (A4 PDF)</b>.</td></tr>
+    <tr><td><b>🤝 6. Kamati ya Manunuzi</b></td><td>Huandika muhtasari wa kikao cha manunuzi, hutuma kwa Mkuu wa Shule, na ikishaidhinishwa huchapisha vocha yake ya malipo.</td></tr>
+    <tr><td><b>💼 7. Mishahara (Pre-Audit & Slip)</b></td><td>Huandaa mishahara/posho (<code>Gross, NSSF, PAYE, Net Pay</code>), hutuma kwa Mkuu kwa <i>Pre-Audit</i>, hulipa, na kuchapisha <b>Salary Pay Slip (Thermal & A4)</b>.</td></tr>
+    <tr><td><b>🧾 8. Masurufu & Petty Cash</b></td><td>Hufuatilia masurufu ya watumishi (<i>Imprest & Retirement</i>) na kurekodi matumizi madogomadogo ya ofisi (<i>Petty Cash Book</i>).</td></tr>
+    <tr><td><b>🏦 9. Bank Reconciliation (CRDB)</b></td><td>Hulinganisha salio la kitabu cha shule (<i>Cashbook</i>) na <i>CRDB Bank Statement</i> (<i>Uncredited Deposits & Unpresented Cheques</i>) na kuchapisha A4 PDF.</td></tr>
+    <tr><td><b>🏛️ 10. Ruzuku (Capitation Grant)</b></td><td>Hugawanya ruzuku ya serikali kiotomatiki kwa asilimia za TAMISEMI: <b>Utawala 10%, Taaluma 30%, Mitihani 20%, Vifaa/Dawa 30%, Ukarabati 10%</b>.</td></tr>
+    <tr><td><b>🎯 11. Bajeti vs Utekelezaji</b></td><td>Hulinganisha makadirio ya bajeti ya mwaka na matumizi halisi yaliyofanyika kwa asilimia (<code>%</code>).</td></tr>
+    <tr><td><b>📦 12. Stoo ya Vyakula & Vifaa</b></td><td>Hupokea vyakula/vifaa (na kujumlisha bidhaa zinazofanana kiotomatiki — <i>Auto-Sum</i>) na kukata salio jikoni/ofisini linapotumika.</td></tr>
+    <tr><td><b>🖥️ 13. Daftari la Mali (Fixed Assets)</b></td><td>Husajili mali zote za kudumu za shule, namba za utambulisho (<i>Asset Tag</i>), thamani, na hali yake.</td></tr>
+    <tr><td><b>🔒 14. Clearance, Funga Hesabu & Futa</b></td><td>Hutoa <b>Cheti cha Clearance (A4)</b> baada ya kuhakiki madeni ya ada na vitabu vya maktaba; hufunga hesabu za kipindi; na lina kitufe cha kufuta data za mhasibu kwa <b>Nywila Mara Mbili</b>.</td></tr>
+  </table>
+  <div class="page-break"></div>
+
+  <div class="sec-head sh-amber">
+    <div class="ico">📚</div>
+    <div><h2>SEHEMU YA 6: MAKTABA (LIBRARIAN) & PORTAL YA MWANAFUNZI/MZAZI</h2><small>Faili: librarian.html & student.html</small></div>
+  </div>
+
+  <table>
+    <tr><th>Moduli</th><th>Utendaji Muhimu Kwa Mtumiaji</th></tr>
+    <tr><td><b>📚 Maktaba (<code>librarian.html</code>)</b></td><td>Usajili wa vitabu na namba za <i>Barcode</i>, uazimaji na urejeshaji wa vitabu kwa wanafunzi/walimu, ukokotoaji wa faini ya kuchelewesha, na kuunganishwa moja kwa moja na <b>Cheti cha Clearance</b> cha Mhasibu.</td></tr>
+    <tr><td><b>👨‍👩‍👧 Mwanafunzi & Mzazi (<code>student.html</code>)</b></td><td>Kuona matokeo ya mitihani na kupakua ripoti mara tu Mtaaluma anapoyatangaza; kukagua hali ya malipo ya michango na risiti; kupakua mazoezi ya PDF ya walimu; na kusoma matangazo rasmi ya Mkuu wa Shule.</td></tr>
+  </table>
+
+  <div class="sec-head sh-red">
+    <div class="ico">🛡️</div>
+    <div><h2>SEHEMU YA 7: USALAMA WA TAARIFA (PDPA), BACKUP & ORODHA YA UZINDUZI</h2><small>Miongozo ya kiutawala, kisheria na kiufundi kwa uongozi wa shule</small></div>
+  </div>
+
+  <div class="tip-box">
+    <b>1. Uzingatiaji wa Sheria ya Ulinzi wa Taarifa Binafsi (PDPA — Tanzania):</b><br>
+    Taarifa za wanafunzi (Majina, Namba za PREM, Alama, na Simu za Wazazi) ni siri ya shule. Watumishi wote wanapaswa kuzitumia kwa shughuli halali za shule pekee na kutotoa nywila zao kwa mtu yeyote.
+  </div>
+
+  <div class="warn-box">
+    <b>2. Utaratibu wa Lazima wa Backup (Kila Ijumaa Saa 9:30 Alasiri):</b><br>
+    Ingawa mfumo unatunza data mtandaoni (<i>Cloud Live</i>), <b>Mtaaluma</b> na <b>Mhasibu</b> wanapaswa kubofya kitufe cha <b>💾 Backup</b> kila Ijumaa na kuhifadhi faili hilo kwenye <i>Flash Disk</i> ya ofisi au <i>Google Drive</i> maalum ya shule.
+  </div>
+
+  <div class="step-box" style="border-color:#064e3b;">
+    <strong style="color:#064e3b; font-size:13px;">✅ ORODHA YA UKAGUZI WA UZINDUZI (LAUNCH CHECKLIST):</strong>
+    <table>
+      <tr><th style="width:45px;">Hatua</th><th>Jambo la Kukamilisha Kabla ya Kuanza Rasmi</th><th style="width:90px;">Hali</th></tr>
+      <tr><td><b>1.</b></td><td>Futa data zote za majaribio kwenye moduli za <b>Mhasibu</b>, <b>Mtaaluma</b>, na <b>Mkuu wa Shule</b> kwa kutumia vitufe vyenye nywila mara mbili.</td><td>[ &nbsp;&nbsp;&nbsp; ]</td></tr>
+      <tr><td><b>2.</b></td><td>Badilisha nywila (<i>Passwords</i>) za akaunti za kiutawala (Mkuu wa Shule, Mtaaluma, Mhasibu, Mkutubi) ziwe imara na za siri.</td><td>[ &nbsp;&nbsp;&nbsp; ]</td></tr>
+      <tr><td><b>3.</b></td><td>Sajili wanafunzi wote halisi (<code>Form 1–6</code>) pamoja na namba za simu za wazazi na kategoria zao (<code>Kutwa/Hostel</code>).</td><td>[ &nbsp;&nbsp;&nbsp; ]</td></tr>
+      <tr><td><b>4.</b></td><td>Wapangie walimu masomo yao (<i>Subject Allocations</i>) kwenye moduli ya Mtaaluma.</td><td>[ &nbsp;&nbsp;&nbsp; ]</td></tr>
+      <tr><td><b>5.</b></td><td>Weka viwango rasmi vya michango ya muhula kwenye moduli ya Mhasibu ili viunganishwe na Ripoti za Muhula.</td><td>[ &nbsp;&nbsp;&nbsp; ]</td></tr>
+    </table>
+  </div>
+
+  <div style="text-align:center; font-size:11px; color:#64748b; margin-top:18px; border-top:1px solid #cbd5e1; padding-top:8px;">
+    <b>Sangabuye Secondary School — Integrated School Information System (SIS Portal)</b><br>
+    Imeandaliwa kwa ajili ya ufanisi wa Taaluma, Fedha na Utawala | Ilemela MC, Mwanza.
+  </div>
+</div>
+</body>
+</html>
