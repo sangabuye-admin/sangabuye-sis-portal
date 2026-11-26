@@ -1441,19 +1441,34 @@
     }
 
     const accTables = [
-      'accounting_receipts', 'fee_structures', 'student_bills', 'fee_payments',
-      'camp_students', 'school_bus_routes', 'expense_vouchers', 'procurement_committee',
-      'staff_payroll', 'staff_imprest', 'petty_cash_logs', 'capitation_grants',
-      'annual_budgets', 'store_inventory', 'store_usage_logs', 'fixed_assets', 'account_locks'
+      'accounting_receipts', 'receipts', 'fee_payments', 'hostel_payments',
+      'fee_structures', 'student_bills', 'camp_students', 'school_bus_routes',
+      'expense_vouchers', 'procurement_committee', 'staff_payroll', 'staff_imprest',
+      'petty_cash_logs', 'capitation_grants', 'annual_budgets', 'store_inventory',
+      'store_usage_logs', 'fixed_assets', 'account_locks'
     ];
+
     for (const tbl of accTables) {
-      await saveTablePermanent(tbl, new Array());
+      localStorage.setItem('sgb_' + tbl, '[]');
+      localStorage.removeItem(tbl);
+      if (SGB.forceReplaceCloud) {
+        await SGB.forceReplaceCloud(tbl, new Array());
+      } else if (SGB.pushToCloud) {
+        await SGB.pushToCloud(tbl);
+      }
+      if (SGB.sb && SGB.sb.from) {
+        try {
+          await SGB.sb.from(tbl).delete().neq('id', 0);
+        } catch (err) {}
+      }
     }
-    receiptCart = [];
-    procItemsDraft = [];
-    alert('✅ Data zote za Moduli ya Mhasibu zimefutwa kabisa (0) kote kwenye Kompyuta na Cloud! Hata ukibonyeza Refresh hazitarudi tena.');
+
+    receiptCart = new Array();
+    procItemsDraft = new Array();
+    alert('✅ Data zote za Moduli ya Mhasibu (ikiwemo risiti zote za majaribio za Hostel) zimefutwa kabisa kote kwenye Kompyuta na Cloud!');
     openTab('overview', document.querySelector('.menu-btn'));
   };
+
   window.filterAccountantTables = function(q) {
     const low = (q || '').toLowerCase();
     document.querySelectorAll('#viewArea table tbody tr').forEach(tr => {
@@ -1472,3 +1487,4 @@
 </script>
 </body>
 </html>
+
