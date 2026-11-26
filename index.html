@@ -455,6 +455,18 @@
     ensureDefaultAdmin();
     setInterval(checkServerConnection, 10000);
   });
+  <script>
+  window.addEventListener('DOMContentLoaded', function() {
+    const loginBtn = document.querySelector('button[type="submit"], button');
+    if (loginBtn && !document.getElementById('sgbManualLink')) {
+      const box = document.createElement('div');
+      box.id = 'sgbManualLink';
+      box.style.cssText = 'text-align:center; margin-top:14px; padding-top:10px; border-top:1px solid #e2e8f0;';
+      box.innerHTML = '<a href="manual.html" target="_blank" style="display:inline-block; background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; padding:8px 14px; border-radius:8px; font-weight:bold; text-decoration:none; font-size:13px;">📘 Soma / Pakua Mwongozo Kamili wa Mtumiaji (A4 PDF)</a>';
+      loginBtn.parentElement.appendChild(box);
+    }
+  });
+</script>
 </script>
 </body>
 </html>
