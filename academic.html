@@ -1221,6 +1221,51 @@
   }
 
   openTab('overview', document.querySelector('.menu-btn'));
+    (function enablePrivateUserMessages() {
+    const u = (typeof user !== 'undefined' && user) ? user : (SGB.getCurrentUser ? SGB.getCurrentUser() : {});
+    if (!u || !u.role) return;
+
+    const myName = (u.full_name || '').trim().toLowerCase();
+    const myUser = (u.username || '').trim().toLowerCase();
+    const myRole = (u.role || '').trim().toLowerCase();
+
+    const roleTags = {
+      headmaster: ['headmaster', 'mkuu', 'mkuu wa shule', 'director'],
+      academic: ['academic', 'mtaaluma', 'taaluma', 'academic master'],
+      accountant: ['accountant', 'mhasibu', 'bursar', 'fedha'],
+      teacher: ['teacher', 'mwalimu', 'walimu', 'walimu wote', 'staff'],
+      librarian: ['librarian', 'mkutubi', 'maktaba', 'library'],
+      student: ['student', 'mwanafunzi', 'wanafunzi', 'mzazi', 'wazazi']
+    };
+
+    const allowed = [myName, myUser, myRole, ...(roleTags[myRole] || [])].filter(Boolean);
+
+    const origSelect = SGB.select.bind(SGB);
+    SGB.select = function(table) {
+      const rows = origSelect(table);
+      if (table !== 'direct_messages') return rows;
+      return rows.filter(m => {
+        const s = (m.sender || '').trim().toLowerCase();
+        const r = (m.recipient || '').trim().toLowerCase();
+        if (r === 'all' || r === 'wote' || r === 'jumuiya ya shule') return true;
+        return allowed.some(tag =>
+          (s && (s === tag || s.includes(tag))) ||
+          (r && (r === tag || r.includes(tag)))
+        );
+      });
+    };
+
+    const origInsert = SGB.insert.bind(SGB);
+    SGB.insert = function(table, obj) {
+      if (table === 'direct_messages' && obj) {
+        const realSender = u.full_name || u.username || obj.sender;
+        if (!obj.sender || obj.sender === 'Staff' || obj.sender === 'User' || obj.sender === 'Mwalimu') {
+          obj.sender = realSender;
+        }
+      }
+      return origInsert(table, obj);
+    };
+  })();
 </script>
 </body>
 </html>
